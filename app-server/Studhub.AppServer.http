@@ -1,0 +1,6 @@
+@Studhub.AppServer_HostAddress = http://localhost:5299
+
+GET {{Studhub.AppServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
