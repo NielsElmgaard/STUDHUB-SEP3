@@ -1,4 +1,5 @@
 using Grpc.Net.Client;
+using Studhub.Grpc.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,12 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-//builder.Services.AddGrpcClient
+/**
+builder.Services.AddGrpcClient<>(o =>
+{
+    o.Address = new Uri("https://localhost:9090");
+});
+**/
 
 var app = builder.Build();
 
