@@ -1,0 +1,18 @@
+# JetBrains IDE files (Rider & IntelliJ IDEA)
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# C# / .NET / Rider specific ignores
+[Bb]in/
+[Oo]bj/
+*.csproj.user
+*.suo
+*.pdb
+
+# Java / Maven / Gradle specific ignores
+target/
+build/
+.gradle/
+.mvn/
