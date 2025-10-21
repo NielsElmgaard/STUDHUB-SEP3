@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+option java_package = "com.studhub.dataserver";
+option java_multiple_files = true;
+option java_outer_classname = "StudProto";
+package stud;
+
+option csharp_namespace = "Studhub.Grpc.Data";
+
+message CreateStudRequest {
+  string email = 1;
+  string username = 2;
+  string password = 3;
+}
+
+message CreateStudResponse {
+  bool is_success = 1;
+  string error_message = 2;
+}
+
+message GetStudByEmailRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message GetStudByEmailResponse {
+  string username = 1;
+  string error_message = 2;
+}
+
+service StudService {
+  rpc CreateStud(CreateStudRequest) returns (CreateStudResponse);
+  rpc GetStudByEmail(GetStudByEmailRequest) returns (GetStudByEmailResponse);
+}
+
