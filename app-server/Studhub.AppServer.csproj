@@ -21,8 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Controllers\"/>
-        <Folder Include="Services\"/>
+      <ProjectReference Include="..\StudHub.SharedDTO\StudHub.SharedDTO.csproj" />
     </ItemGroup>
 
 
