@@ -1,4 +1,6 @@
 ﻿@page "/Login"
+@using System.Collections
+@using StudHub.SharedDTO
 @inject HttpClient Http
 @rendermode InteractiveServer
 
@@ -9,25 +11,67 @@
 
 <button class="btn btn-primary" @onclick="LoginUser">Login</button>
 
+@if (@loggedIn)
+{
+    <p>Sets:</p>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ItemNo</th>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Completeness</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var set in sets)
+        {
+            <tr>
+                <td>@set.ItemNo</td>
+                <td>@set.Name</td>
+                <td>@set.Quantity</td>
+                <td>@set.Completeness</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
 <p role="status">@Message</p>
 
 @code {
+    private SetDTO[]? sets;
+    private bool loggedIn { get; set; } = false;
     private string Email { get; set; } = string.Empty;
     private string Password { get; set; } = string.Empty;
     private string Message = string.Empty;
+
     private async Task LoginUser()
     {
-        var loginRequest = new { Email, Password };
-        var response = await Http.PostAsJsonAsync("http://localhost:9080/auth/login", loginRequest);
+        try
+        {
+            var loginRequest = new LoginRequestDTO { Email = Email, Password = Password };
+            var response = await Http.PostAsJsonAsync("http://localhost:5299/auth/login", loginRequest);
 
-        if (response.IsSuccessStatusCode)
-        {
-            var username = await response.Content.ReadAsStringAsync();
-            Message = $"Logged in as {username}";
+            if (response.IsSuccessStatusCode)
+            {
+                var username = await response.Content.ReadAsStringAsync();
+                Message = $"Logged in as {username}";
+                Email = loginRequest.Email;
+                loggedIn = true;
+
+                sets = await Http.GetFromJsonAsync<SetDTO[]>($"http://localhost:5299/inventory/sets/{Email}");
+            }
+            else
+            {
+                Message = $"Login failed: {response.StatusCode}";
+                loggedIn = false;
+            }
         }
-        else
+        catch (Exception e)
         {
-            Message = "Login failed";
+            Message = $"Error: {e.Message}";
+            loggedIn = false;
         }
     }
+
 }

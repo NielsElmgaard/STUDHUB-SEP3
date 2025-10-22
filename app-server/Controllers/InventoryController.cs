@@ -6,16 +6,16 @@ namespace Studhub.AppServer.Controllers;
 [ApiController]
 [Route("[controller]")]
 
-public class SetsController : ControllerBase
+public class InventoryController : ControllerBase
 {
     private readonly IInventoryService _inventoryService;
 
-    public SetsController(IInventoryService inventoryService)
+    public InventoryController(IInventoryService inventoryService)
     {
         _inventoryService = inventoryService;
     }
 
-    [HttpGet]
+    [HttpGet("sets")]
     public async Task<ActionResult> GetSets([FromQuery] string email)
     {
         var sets = await _inventoryService.GetUserSetsAsync(email);

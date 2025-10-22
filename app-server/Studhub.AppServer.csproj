@@ -30,5 +30,9 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\StudHub.SharedDTO\StudHub.SharedDTO.csproj" />
+    </ItemGroup>
+
 
 </Project>

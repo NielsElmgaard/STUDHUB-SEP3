@@ -22,9 +22,14 @@ public class AuthService : IAuthService
 
 
         var response = await _grpcClient.GetStudByEmailAsync(request);
-        return string.IsNullOrEmpty(response.ErrorMessage)
-            ? response.Username
-            : null;
+        if (!string.IsNullOrEmpty(response.ErrorMessage))
+        {
+            Console.WriteLine("Error grpc: " + response.ErrorMessage);
+
+            return null;
+        }
+
+        return response.Username;
     }
 
     public async Task<BrickLinkCredentialsDTO?> GetBrickLinkCredentialsAsync(
