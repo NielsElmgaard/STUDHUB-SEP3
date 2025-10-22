@@ -17,12 +17,17 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="..\contracts\studhub_data.proto" GrpcServices="Client" ProtoRoot="..\contracts"/>
+        <Folder Include="Controllers\"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Controllers\"/>
-        <Folder Include="Services\"/>
+        <Protobuf Include="contracts\stud_service.proto" GrpcServices="Client" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="contracts\stud_service.proto">
+        <Link>contracts\stud_service.proto</Link>
+      </Content>
     </ItemGroup>
 
 
