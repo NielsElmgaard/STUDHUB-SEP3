@@ -31,7 +31,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Client\Client.csproj" />
       <ProjectReference Include="..\StudHub.SharedDTO\StudHub.SharedDTO.csproj" />
     </ItemGroup>
 

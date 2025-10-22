@@ -28,6 +28,7 @@ public class InventoryService : IInventoryService
             throw new Exception("Could not get BrickLink credentials");
         }
 
+        
         string consumerKey = credentials.ConsumerKey;
         string consumerSecret = credentials.ConsumerSecret;
         string tokenValue = credentials.TokenValue;

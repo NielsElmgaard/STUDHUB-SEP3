@@ -19,9 +19,11 @@ builder.Services.AddGrpcClient<StudService.StudServiceClient>(o =>
 
 builder.Services.AddScoped<IDataServer, GrpcDataServer>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
 
 //Vi fjerner denne test senere!!!!!
 builder.Services.AddHostedService<GrpcSmokeTest>();
+
 
 var app = builder.Build();
 
