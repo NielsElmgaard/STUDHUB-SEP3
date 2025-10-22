@@ -28,8 +28,34 @@ message GetStudByEmailResponse {
   string error_message = 2;
 }
 
+message GetAuthByEmailRequest {
+  string email = 1;
+}
+
+message GetAuthByEmailResponse {
+  string consumer_key = 1;
+  string consumer_secret = 2;
+  string token_value = 3;
+  string token_secret = 4;
+}
+
+message SetAuthByEmailRequest {
+  string email = 1;
+  string consumer_key = 2;
+  string consumer_secret = 3;
+  string token_value = 4;
+  string token_secret = 5;
+    }
+
+message SetAuthByEmailResponse {
+  bool is_success = 1;
+  string error_message = 2;
+}
+
 service StudService {
   rpc CreateStud(CreateStudRequest) returns (CreateStudResponse);
   rpc GetStudByEmail(GetStudByEmailRequest) returns (GetStudByEmailResponse);
+  rpc GetAuthByEmail(GetAuthByEmailRequest) returns (GetAuthByEmailResponse);
+  rpc SetAuthByEmail(SetAuthByEmailRequest) returns (SetAuthByEmailResponse);
 }
 
