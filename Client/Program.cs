@@ -1,10 +1,22 @@
 using Client.Components;
+using Microsoft.AspNetCore.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddScoped(sp =>
+{
+    var navManager = sp.GetRequiredService<NavigationManager>();
+    return new HttpClient
+    {
+        BaseAddress = new Uri(navManager.BaseUri)
+    };
+});
 
 var app = builder.Build();
 
@@ -17,9 +29,14 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
-
+app.UseRouting();
+app.UseAuthorization();
 app.UseAntiforgery();
+
+app.MapRazorPages();
+
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

@@ -1,0 +1,33 @@
+﻿@page "/Login"
+@inject HttpClient Http
+@rendermode InteractiveServer
+
+<h3>Login</h3>
+
+<input @bind="Email" placeholder="Enter your email"/>
+<input type="password" @bind="Password" placeholder="Enter your password"/>
+
+<button class="btn btn-primary" @onclick="LoginUser">Login</button>
+
+<p role="status">@Message</p>
+
+@code {
+    private string Email { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+    private string Message = string.Empty;
+    private async Task LoginUser()
+    {
+        var loginRequest = new { Email, Password };
+        var response = await Http.PostAsJsonAsync("http://localhost:9080/auth/login", loginRequest);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var username = await response.Content.ReadAsStringAsync();
+            Message = $"Logged in as {username}";
+        }
+        else
+        {
+            Message = "Login failed";
+        }
+    }
+}
