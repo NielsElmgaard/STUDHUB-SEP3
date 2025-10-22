@@ -1,20 +1,26 @@
 using Grpc.Net.Client;
 using Studhub.Grpc.Data;
+using Studhub.AppServer.Services;
+
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-/**
-builder.Services.AddGrpcClient<>(o =>
+// gRPC client for the Spring Boot Data Server
+builder.Services.AddGrpcClient<StudService.StudServiceClient>(o =>
 {
-    o.Address = new Uri("https://localhost:9090");
+    o.Address = new Uri(builder.Configuration["DataServer:GrpcAddress"]!);
 });
-**/
+
+builder.Services.AddScoped<IDataServer, GrpcDataServer>();
+
+//Vi fjerner denne test senere!!!!!
+builder.Services.AddHostedService<GrpcSmokeTest>();
 
 var app = builder.Build();
 
@@ -29,5 +35,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();
