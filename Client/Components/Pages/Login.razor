@@ -18,7 +18,7 @@
     private async Task LoginUser()
     {
         var loginRequest = new { Email, Password };
-        var response = await Http.PostAsJsonAsync("http://localhost:9080/auth/login", loginRequest);
+        var response = await Http.PostAsJsonAsync("http://localhost:5299/auth/login", loginRequest);
 
         if (response.IsSuccessStatusCode)
         {

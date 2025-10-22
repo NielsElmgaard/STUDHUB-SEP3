@@ -18,6 +18,7 @@ builder.Services.AddGrpcClient<StudService.StudServiceClient>(o =>
 });
 
 builder.Services.AddScoped<IDataServer, GrpcDataServer>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 //Vi fjerner denne test senere!!!!!
 builder.Services.AddHostedService<GrpcSmokeTest>();
