@@ -1,0 +1,17 @@
+﻿@using StudHub.SharedDTO
+
+@if (Set != null)
+{
+    <tr>
+        <td>@Set.ItemNumber</td>
+        <td>@Set.Name</td>
+        <td>@Set.Quantity</td>
+        <td>@Set.Condition</td>
+        <td>@Set.PriceFormatted</td>
+        <td>@Set.Completeness</td>
+    </tr>
+}
+
+@code {
+    [Parameter] public SetDTO? Set { get; set; }
+}

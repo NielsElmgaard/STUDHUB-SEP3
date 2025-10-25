@@ -1,5 +1,7 @@
 using Client.Components;
+using Client.Services;
 using Microsoft.AspNetCore.Components;
+using Studhub.AppServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,14 +11,16 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddScoped(sp =>
-{
-    var navManager = sp.GetRequiredService<NavigationManager>();
-    return new HttpClient
+    builder.Services.AddScoped(sp => new HttpClient
     {
-        BaseAddress = new Uri(navManager.BaseUri)
-    };
-});
+        BaseAddress = new Uri("http://localhost:5299/")
+    });
+
+builder.Services.AddScoped<ILoginAuthService, LoginAuthService>();
+builder.Services.AddScoped<AppState>();
+builder.Services.AddScoped<IInventoryService, InventoryServiceClientProxy>();
+
+
 
 var app = builder.Build();
 

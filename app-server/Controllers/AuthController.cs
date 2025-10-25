@@ -17,12 +17,14 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult> Login([FromBody] LoginRequestDTO request)
+    public async Task<ActionResult<LoginResponseDTO>> Login(
+        [FromBody] LoginRequestDTO request)
     {
         var username = await _authService.ValidateUserAsync(request.Email,
             request.Password);
-        if (username is null)
-            return Unauthorized("Invalid credentials");
-        return Ok(username);
+        if (username == null)
+            return BadRequest(new LoginResponseDTO
+                { ErrorMessage = "Invalid email or password" });
+        return Ok(new LoginResponseDTO { Username = username });
     }
 }
