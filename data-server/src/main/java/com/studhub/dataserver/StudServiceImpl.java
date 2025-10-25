@@ -40,20 +40,26 @@ public class StudServiceImpl extends StudServiceGrpc.StudServiceImplBase {
         String email = request.getEmail();
         String password = request.getPassword();
 
-        GetStudByEmailResponse.Builder responseBuilder = GetStudByEmailResponse.newBuilder();
+      System.out.println("Login attempt: email='" + email + "', password='" + password + "'");
+
+      GetStudByEmailResponse.Builder responseBuilder = GetStudByEmailResponse.newBuilder();
 
         // Lookup user by email
         studRepository.findByEmail(email).ifPresentOrElse(stud -> {
-            // Compare password
+          System.out.println("Stored hash for user: " + stud.getPasswordHash());
+          // Compare password
             if (passwordEncoder.matches(password, stud.getPasswordHash())) {
+              System.out.println("Password match success!");
                 responseBuilder.setUsername(stud.getUsername())
                         .setErrorMessage("");
             } else {
-                responseBuilder.setUsername("")
+              System.out.println("Password mismatch!");
+              responseBuilder.setUsername("")
                         .setErrorMessage("Invalid password");
             }
         }, () -> {
-            responseBuilder.setUsername("")
+          System.out.println("User not found");
+          responseBuilder.setUsername("")
                     .setErrorMessage("User not found");
         });
 

@@ -4,5 +4,5 @@ namespace Studhub.AppServer.Services;
 
 public interface IInventoryService
 {
-    Task<List<SetDTO>> GetUserSetsAsync(string userId);
+    Task<List<SetDTO>> GetUserSetsAsync(string email);
 }

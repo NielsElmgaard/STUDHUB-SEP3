@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <ItemGroup>
+        <ProjectReference Include="..\app-server\Studhub.AppServer.csproj" />
         <ProjectReference Include="..\StudHub.SharedDTO\StudHub.SharedDTO.csproj"/>
     </ItemGroup>
 

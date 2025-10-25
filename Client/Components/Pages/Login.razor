@@ -1,75 +1,56 @@
 ﻿@page "/Login"
 @using System.Collections
+@using System.Net
 @using StudHub.SharedDTO
+@using Client.Services
 @inject HttpClient Http
-@rendermode InteractiveServer
+@inject ILoginAuthService LoginAuthService
+@inject AppState AppState
+@inject NavigationManager NavManager
 
-<h3>Login</h3>
 
-<input @bind="Email" placeholder="Enter your email"/>
-<input type="password" @bind="Password" placeholder="Enter your password"/>
+<div class="d-flex flex-column align-items-center gap-3 w-50 mx-auto m-5">
+    <h7>Please enter your details</h7>
+    <h1>Welcome back</h1>
+    <input class="form-control" @bind="Email" placeholder="Email address"/>
+    <input class="form-control" type="password" @bind="Password" placeholder="Password"/>
+    <button class="btn btn-primary w-100 p-3" @onclick="LoginUser">Login</button>
+    <p role="status">@errorMessage</p>
+</div>
 
-<button class="btn btn-primary" @onclick="LoginUser">Login</button>
 
-@if (@loggedIn)
-{
-    <p>Sets:</p>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>ItemNo</th>
-            <th>Name</th>
-            <th>Quantity</th>
-            <th>Completeness</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var set in sets)
-        {
-            <tr>
-                <td>@set.ItemNo</td>
-                <td>@set.Name</td>
-                <td>@set.Quantity</td>
-                <td>@set.Completeness</td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}
-<p role="status">@Message</p>
+
 
 @code {
     private SetDTO[]? sets;
-    private bool loggedIn { get; set; } = false;
     private string Email { get; set; } = string.Empty;
     private string Password { get; set; } = string.Empty;
-    private string Message = string.Empty;
+    private string? errorMessage;
+
 
     private async Task LoginUser()
     {
         try
         {
-            var loginRequest = new { Email, Password };
-            var response = await Http.PostAsJsonAsync("http://localhost:5299/auth/login", loginRequest);
-            if (response.IsSuccessStatusCode)
+            LoginRequestDTO request = new LoginRequestDTO
             {
-                var username = await response.Content.ReadAsStringAsync();
-                Message = $"Logged in as {username}";
-                Email = loginRequest.Email;
-                loggedIn = true;
-
-                sets = await Http.GetFromJsonAsync<SetDTO[]>($"http://localhost:5299/inventory/sets/{Email}");
-            }
-            else
-            {
-                Message = $"Login failed: {response.StatusCode}";
-                loggedIn = false;
-            }
+                Email = Email.Trim(),
+                Password = Password.Trim()
+            };
+            var username = await LoginAuthService.LoginUserAsync(request);
+            AppState.SetLoggedInUser(request.Email);
+            NavManager.NavigateTo("/DisplaySets");
         }
         catch (Exception e)
         {
-            Message = $"Error: {e.Message}";
-            loggedIn = false;
+            if (e.Message.Contains("Invalid email or password"))
+            {
+                errorMessage = "Invalid email or password";
+            }
+            else
+            {
+                errorMessage = $"Error: {e.Message}";
+            }
         }
     }
 

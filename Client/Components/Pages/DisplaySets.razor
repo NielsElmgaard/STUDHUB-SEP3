@@ -1,0 +1,77 @@
+﻿@page "/DisplaySets"
+@using Client.Services
+@using Studhub.AppServer.Services
+@using StudHub.SharedDTO
+@inject IInventoryService InventoryService
+@inject AppState AppState
+<h3>Sets</h3>
+<p role="status">@errorMessage</p>
+@if (isLoading)
+{
+    <div class="d-flex justify-content-center my-3">
+        <img src="spinner.gif" alt="Loading..."
+             class="img-fluid w-25 mx-auto d-block"/>
+    </div>
+}
+else if (sets.Count == 0)
+{
+    <p>No sets found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Item Number</th>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Condition</th>
+            <th>Price</th>
+            <th>Completeness</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var set in sets ?? Enumerable.Empty<SetDTO>())
+        {
+            if (set != null)
+            {
+                <SetListItem Set="set"/>
+            }
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<SetDTO> sets { get; set; } = new();
+    private bool isLoading = true;
+
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AppState.IsLoggedIn)
+        {
+            return;
+        }
+
+        isLoading = true;
+        try
+        {
+            sets = await InventoryService.GetUserSetsAsync(AppState.LoggedInEmail);
+        }
+        catch (Exception e)
+        {
+            if (e.Message.Contains("No BrickLink credentials for"))
+            {
+                errorMessage = $"No BrickLink credentials for {AppState.LoggedInEmail}. Displaying empty table...";
+                sets = new List<SetDTO>();
+            }
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+}
