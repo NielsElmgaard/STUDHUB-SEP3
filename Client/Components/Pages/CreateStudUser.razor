@@ -1,0 +1,62 @@
+﻿@page "/CreateStudUser"
+@using Client.Services
+@using StudHub.SharedDTO.Users
+@inject IStudUserClientService StudUserClientService
+<h3>Create Stud User</h3>
+
+@if (!string.IsNullOrEmpty(LastSubmitResult))
+{
+    <h2 class="alert @(IsSucces ? "alert-success" : "alert-danger")">
+        @LastSubmitResult
+    </h2>
+}
+<UserForm StudUserUser="_studUserUser"
+          OnValidSubmit="ValidFormSubmitted"
+          OnInvalidSubmit="InvalidFormSubmitted"/>
+
+@code {
+
+    CreateStudUserRequestDTO _studUserUser = new CreateStudUserRequestDTO
+    {
+        Username = null,
+        Password = null,
+        Email = null
+    };
+
+    string LastSubmitResult;
+    bool IsSucces;
+    CreateStudUserResponseDTO? CreatedUser;
+
+    async Task ValidFormSubmitted()
+    {
+        LastSubmitResult = "Submitting stud user...";
+        IsSucces = false;
+        try
+        {
+            CreatedUser = await StudUserClientService.CreateStudUser(_studUserUser);
+
+            LastSubmitResult = $"Success! Stud user created with email: {_studUserUser.Email}.";
+            IsSucces = true;
+
+            _studUserUser = new CreateStudUserRequestDTO() // reset
+
+            {
+                Username = null,
+                Password = null,
+                Email = null
+            };
+        }
+        catch (Exception e)
+        {
+            LastSubmitResult = $"Server Error: {e.Message}";
+            IsSucces = false;
+        }
+    }
+
+    void InvalidFormSubmitted()
+    {
+        LastSubmitResult = "Failure! Please correct the highlighted errors.";
+        IsSucces = false;
+    }
+
+}

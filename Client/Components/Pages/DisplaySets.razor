@@ -1,8 +1,7 @@
 ﻿@page "/DisplaySets"
 @using Client.Services
-@using Studhub.AppServer.Services
 @using StudHub.SharedDTO
-@inject IInventoryService InventoryService
+@inject IInventoryClientService InventoryClientService
 @inject AppState AppState
 <h3>Sets</h3>
 <p role="status">@errorMessage</p>
@@ -58,13 +57,13 @@ else
         isLoading = true;
         try
         {
-            sets = await InventoryService.GetUserSetsAsync(AppState.LoggedInEmail);
+            sets = await InventoryClientService.GetUserSetsAsync(AppState.LoggedInEmail);
         }
         catch (Exception e)
         {
             if (e.Message.Contains("No BrickLink credentials for"))
             {
-                errorMessage = $"No BrickLink credentials for {AppState.LoggedInEmail}. Displaying empty table...";
+                errorMessage = $"No BrickLink credentials for {AppState.LoggedInEmail}";
                 sets = new List<SetDTO>();
             }
         }

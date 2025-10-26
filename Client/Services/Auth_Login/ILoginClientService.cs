@@ -2,7 +2,7 @@
 
 namespace Client.Services;
 
-public interface ILoginAuthService
+public interface ILoginClientService
 {
     Task<string> LoginUserAsync(LoginRequestDTO request);
 }
