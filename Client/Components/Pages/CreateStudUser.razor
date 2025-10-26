@@ -29,13 +29,13 @@
 
     async Task ValidFormSubmitted()
     {
-        LastSubmitResult = "Submitting post...";
+        LastSubmitResult = "Submitting stud user...";
         IsSucces = false;
         try
         {
             CreatedUser = await StudUserClientService.CreateStudUser(_studUserUser);
 
-            LastSubmitResult = $"Success! User created with email: {_studUserUser.Email}.";
+            LastSubmitResult = $"Success! Stud user created with email: {_studUserUser.Email}.";
             IsSucces = true;
 
             _studUserUser = new CreateStudUserRequestDTO() // reset
