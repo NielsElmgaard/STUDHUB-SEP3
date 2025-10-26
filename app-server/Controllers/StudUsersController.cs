@@ -40,6 +40,6 @@ public class StudUsersController : ControllerBase
         
         await _studUserService.CreateStudUser(request);
 
-        return Created($"/StudUsers/{request.Email}", request); // Måske implementere ID til StudUser i stedet for Email
+        return Created($"/StudUsers/{request.Email}", request); // TODO: Måske implementere ID til StudUser i stedet for Email
     }
 }
