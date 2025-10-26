@@ -16,15 +16,15 @@ builder.Services.AddRazorComponents()
         BaseAddress = new Uri("http://localhost:5299/")
     });
 
-builder.Services.AddScoped<ILoginAuthService, LoginAuthService>();
+builder.Services.AddScoped<ILoginClientService, LoginClientHttpClient>();
 builder.Services.AddScoped<AppState>();
-builder.Services.AddScoped<IInventoryService, InventoryServiceClientProxy>();
-
+builder.Services.AddScoped<IInventoryClientService, InventoryHttpClient>();
+builder.Services.AddScoped<IStudUserClientService, StudUserHttpClient>();
 
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP userRequest pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);

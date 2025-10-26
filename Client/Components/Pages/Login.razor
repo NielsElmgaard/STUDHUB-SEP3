@@ -4,7 +4,7 @@
 @using StudHub.SharedDTO
 @using Client.Services
 @inject HttpClient Http
-@inject ILoginAuthService LoginAuthService
+@inject ILoginClientService LoginClientService
 @inject AppState AppState
 @inject NavigationManager NavManager
 
@@ -13,8 +13,13 @@
     <h7>Please enter your details</h7>
     <h1>Welcome back</h1>
     <input class="form-control" @bind="Email" placeholder="Email address"/>
-    <input class="form-control" type="password" @bind="Password" placeholder="Password"/>
-    <button class="btn btn-primary w-100 p-3" @onclick="LoginUser">Login</button>
+    <input class="form-control" type="password" @bind="Password"
+           placeholder="Password"/>
+    <button class="btn btn-primary w-100 p-3" @onclick="LoginUser">Login
+    </button>
+    <button class="btn btn-primary w-100 p-3"
+            @onclick="@(() => NavManager.NavigateTo("/CreateStud"))">Sign Up
+    </button>
     <p role="status">@errorMessage</p>
 </div>
 
@@ -37,7 +42,7 @@
                 Email = Email.Trim(),
                 Password = Password.Trim()
             };
-            var username = await LoginAuthService.LoginUserAsync(request);
+            var username = await LoginClientService.LoginUserAsync(request);
             AppState.SetLoggedInUser(request.Email);
             NavManager.NavigateTo("/DisplaySets");
         }

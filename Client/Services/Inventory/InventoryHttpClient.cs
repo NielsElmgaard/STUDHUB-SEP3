@@ -1,13 +1,12 @@
-﻿using Studhub.AppServer.Services;
-using StudHub.SharedDTO;
+﻿using StudHub.SharedDTO;
 
 namespace Client.Services;
 
-public class InventoryServiceClientProxy : IInventoryService
+public class InventoryHttpClient : IInventoryClientService
 {
     private readonly HttpClient _httpClient;
 
-    public InventoryServiceClientProxy(HttpClient httpClient)
+    public InventoryHttpClient(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }

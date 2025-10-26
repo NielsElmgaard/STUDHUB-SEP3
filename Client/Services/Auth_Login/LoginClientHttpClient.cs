@@ -2,11 +2,11 @@
 
 namespace Client.Services;
 
-public class LoginAuthService : ILoginAuthService
+public class LoginClientHttpClient : ILoginClientService
 {
     private readonly HttpClient _httpClient;
 
-    public LoginAuthService(HttpClient httpClient)
+    public LoginClientHttpClient(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
