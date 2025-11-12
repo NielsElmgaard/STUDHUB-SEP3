@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Studhub.AppServer.Services.Auth_Login;
 using StudHub.SharedDTO;
 
 
@@ -88,13 +89,14 @@ public class InventoryService : IInventoryService
         var result = new StringBuilder();
         foreach (char c in value)
         {
-            if (unreservedChars.IndexOf(c)!=-1)
+            if (unreservedChars.IndexOf(c) != -1)
             {
                 result.Append(c);
             }
             else
             {
-                result.Append($"%{((int)c):X2}"); // formatted in Hexadecimal capitalized (2 digits guranteed)
+                result.Append(
+                    $"%{((int)c):X2}"); // formatted in Hexadecimal capitalized (2 digits guranteed)
             }
         }
 
@@ -150,24 +152,24 @@ public class InventoryService : IInventoryService
                 hmac.ComputeHash(Encoding.ASCII.GetBytes(signatureBaseString));
             oauthSignature = Convert.ToBase64String(hash);
         }
-        
+
         var authParamsForHeader = new SortedDictionary<string, string>
         {
             { "oauth_consumer_key", consumerKey },
             { "oauth_token", tokenValue },
-            {"oauth_signature",oauthSignature},
+            { "oauth_signature", oauthSignature },
             { "oauth_signature_method", oauthSignatureMethod },
             { "oauth_timestamp", oauthTimestamp },
             { "oauth_nonce", oauthNonce },
             { "oauth_version", oauthVersion }
         };
-        
+
         // Create authentication header value
         var authHeaderValue = "realm=\"\", " + string.Join(", ",
             authParamsForHeader.Select(kvp =>
                 $"{UrlEncode(kvp.Key)}=\"{UrlEncode(kvp.Value)}\""));
-        
-        
+
+
         return authHeaderValue;
     }
 
@@ -193,14 +195,15 @@ public class InventoryService : IInventoryService
         {
             // Full request url with query parameters
             var queryString = string.Join("&",
-                queryParams.Select(kvp => $"{UrlEncode(kvp.Key)}={UrlEncode(kvp.Value)}"));
+                queryParams.Select(kvp =>
+                    $"{UrlEncode(kvp.Key)}={UrlEncode(kvp.Value)}"));
             var fullUrl = $"{url}?{queryString}";
 
             // Auth header value
             var authHeaderValue = CreateOAuth1Header(
                 url, "GET", queryParams, consumerKey, consumerSecret,
                 tokenValue, tokenSecret);
-            
+
             // applying header to request
             var request = new HttpRequestMessage(HttpMethod.Get, fullUrl);
             request.Headers.Authorization =
@@ -209,7 +212,7 @@ public class InventoryService : IInventoryService
                 new MediaTypeWithQualityHeaderValue("application/json"));
             var response = await _httpClient.SendAsync(request);
 
-            
+
             response
                 .EnsureSuccessStatusCode(); // if IsSuccessStatusCode=false -> throws exception
 
@@ -217,9 +220,8 @@ public class InventoryService : IInventoryService
 
             Console.WriteLine("===== BrickLink Response Body =====");
             Console.WriteLine(jsonResponse);
-            
-            
-            
+
+
             // To deserialize only get meta and code response for api succes check before full deserialization
             using (JsonDocument document = JsonDocument.Parse(jsonResponse))
             {
