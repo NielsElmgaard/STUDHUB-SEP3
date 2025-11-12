@@ -1,6 +1,7 @@
 using Grpc.Net.Client;
 using Studhub.Grpc.Data;
 using Studhub.AppServer.Services;
+using Studhub.AppServer.Services.Auth_Login;
 using Studhub.AppServer.Services.StudUser;
 
 AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
