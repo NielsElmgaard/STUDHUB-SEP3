@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Studhub.AppServer.Services;
 using Studhub.AppServer.Services.Auth_Login;
 using StudHub.SharedDTO;
+using StudHub.SharedDTO.StoreCredentials;
 using StudHub.SharedDTO.Users;
 
 namespace Studhub.AppServer.Controllers;
@@ -22,23 +23,51 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<LoginResponseDTO>> Login(
         [FromBody] LoginRequestDTO request)
     {
-        var grpcUser = await _authService.ValidateUserAsync(request.Email, request.Password);
+        var studUser =
+            await _authService.ValidateUserAsync(request.Email,
+                request.Password);
 
-        if (grpcUser == null)
+        if (studUser == null)
         {
             return BadRequest(new LoginResponseDTO
                 { ErrorMessage = "Invalid email or password" });
         }
-        
+
         return Ok(new LoginResponseDTO
         {
-            Username = grpcUser.Username,
-            StudUser = new StudUserDTO
-            {
-                Id = grpcUser.Id,
-                Email = grpcUser.Email,
-                Username = grpcUser.Username
-            }
+            Username = studUser.Username,
+            StudUser = studUser
+        });
+    }
+
+    [HttpPut("bricklinksync")]
+    public async Task<ActionResult<BrickLinkCredentialsResponseDTO>>
+        SetBrickLinkCredentials(
+            [FromBody] BrickLinkCredentialsRequestDTO request)
+    {
+        var credentials = await _authService.SetBrickLinkCredentialsAsync(
+            request.StudUserId,
+            request.ConsumerKey, request.ConsumerSecret, request.TokenValue,
+            request.TokenSecret);
+
+        return Ok(new BrickLinkCredentialsResponseDTO
+        {
+            IsSucces = true
+        });
+    }
+
+    [HttpPut("brickowlsync")]
+    public async Task<ActionResult<BrickOwlCredentialsResponseDTO>>
+        SetBrickOwlCredentials(
+            [FromBody] BrickOwlCredentialsRequestDTO request)
+    {
+        var credentials = await _authService.SetBrickOwlCredentialsAsync(
+            request.StudUserId,
+            request.BrickOwlApiKey);
+
+        return Ok(new BrickLinkCredentialsResponseDTO
+        {
+            IsSucces = true
         });
     }
 }

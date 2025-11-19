@@ -1,62 +1,32 @@
 ﻿@page "/Login"
-@using System.Collections
-@using System.Net
-@using StudHub.SharedDTO
-@using Client.Services
-@inject HttpClient Http
-@inject ILoginClientService LoginClientService
-@inject AppState AppState
+@using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager NavManager
-
+@inject AuthenticationStateProvider AuthProvider
 
 <div class="d-flex flex-column align-items-center gap-3 w-50 mx-auto m-5">
-    <h7>Please enter your details</h7>
     <h1>Welcome back</h1>
-    <input class="form-control" @bind="Email" placeholder="Email address"/>
-    <input class="form-control" type="password" @bind="Password"
-           placeholder="Password"/>
-    <button class="btn btn-primary w-100 p-3" @onclick="LoginUser">Login
-    </button>
-    <button class="btn btn-primary w-100 p-3"
-            @onclick="@(() => NavManager.NavigateTo("/CreateStudUser"))">Sign Up
-    </button>
+    <input class="form-control" @bind="Email" placeholder="Email address" />
+    <input class="form-control" type="password" @bind="Password" placeholder="Password" />
+    <button class="btn btn-primary w-100 p-3" @onclick="LoginUser">Login</button>
+    <button class="btn btn-secondary w-100 p-3" @onclick="@(() => NavManager.NavigateTo("/CreateStudUser"))">Sign Up</button>
     <p role="status">@errorMessage</p>
 </div>
 
-
-
-
 @code {
-    private SetDTO[]? sets;
     private string Email { get; set; } = string.Empty;
     private string Password { get; set; } = string.Empty;
     private string? errorMessage;
-
 
     private async Task LoginUser()
     {
         try
         {
-            LoginRequestDTO request = new LoginRequestDTO
-            {
-                Email = Email.Trim(),
-                Password = Password.Trim()
-            };
-            var username = await LoginClientService.LoginUserAsync(request);
-            AppState.SetLoggedInUser(request.Email);
-            NavManager.NavigateTo("/DisplaySets");
+            await ((SimpleAuthProvider)AuthProvider).LoginASync(Email.Trim(), Password.Trim());
+            NavManager.NavigateTo("/Dashboard");
         }
         catch (Exception e)
         {
-            if (e.Message.Contains("Invalid email or password"))
-            {
-                errorMessage = "Invalid email or password";
-            }
-            else
-            {
-                errorMessage = $"Error: {e.Message}";
-            }
+            errorMessage = e.Message.Contains("Invalid") ? "Invalid email or password" : $"Error: {e.Message}";
         }
     }
-
 }

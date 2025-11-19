@@ -30,6 +30,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
     stud.setUsername(request.getUsername());
     stud.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
+
+    // Empty connection objects for new users
+    BrickLinkConnection blConnection = new BrickLinkConnection();
+    BrickOwlConnection boConnection = new BrickOwlConnection();
+
+    stud.setBrickLinkConnection(blConnection);
+    blConnection.setStud(stud);
+
+    stud.setBrickOwlConnection(boConnection);
+    boConnection.setStud(stud);
+
     Stud savedStud = studRepository.save(stud);
 
     // TODO: handle exception when create stud fail
@@ -103,6 +114,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
     studRepository.findById(id).ifPresentOrElse(stud -> {
       BrickLinkConnection connection = stud.getBrickLinkConnection();
+
+      if (connection == null) {
+        b.setConsumerKey("").setConsumerSecret("").setTokenValue("")
+            .setTokenSecret("");
+        return;
+      }
+
       b.setConsumerKey(connection.getConsumerKey() == null ?
               "" :
               connection.getConsumerKey()).setConsumerSecret(
@@ -131,6 +149,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
     studRepository.findById(id).ifPresentOrElse(stud -> {
       BrickOwlConnection connection = stud.getBrickOwlConnection();
+
+      if (connection == null) {
+        b.setApiKey("");
+        return;
+      }
+
       b.setApiKey(connection.getApiKey() == null ? "" : connection.getApiKey());
     }, () -> {
       b.setApiKey("");
@@ -159,6 +183,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
       {
         var stud = optionalStud.get();
         BrickLinkConnection connection = stud.getBrickLinkConnection();
+
+        if (connection == null) {
+          connection = new BrickLinkConnection();
+          stud.setBrickLinkConnection(connection);
+          connection.setStud(stud);
+        }
 
         connection.setConsumerKey(request.getConsumerKey());
         connection.setConsumerSecret(request.getConsumerSecret());
@@ -196,6 +226,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
       {
         var stud = optionalStud.get();
         BrickOwlConnection connection = stud.getBrickOwlConnection();
+
+        if (connection == null) {
+          connection = new BrickOwlConnection();
+          stud.setBrickOwlConnection(connection);
+          connection.setStud(stud);
+        }
 
         connection.setApiKey(request.getApiKey());
         studRepository.save(stud);
