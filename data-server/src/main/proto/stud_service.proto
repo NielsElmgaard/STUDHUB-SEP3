@@ -3,59 +3,84 @@ syntax = "proto3";
 option java_package = "com.studhub.dataserver";
 option java_multiple_files = true;
 option java_outer_classname = "StudProto";
+
 package stud;
 
 option csharp_namespace = "Studhub.Grpc.Data";
 
 message CreateStudRequest {
-  string email = 1;
-  string username = 2;
-  string password = 3;
+    string email = 1;
+    string username = 2;
+    string password = 3;
 }
 
 message CreateStudResponse {
-  bool is_success = 1;
-  string error_message = 2;
+    bool is_success = 1;
+    string error_message = 2;
 }
 
 message GetStudByEmailRequest {
-  string email = 1;
-  string password = 2;
+    string email = 1;
+    string password = 2;
 }
 
 message GetStudByEmailResponse {
-  string username = 1;
-  string error_message = 2;
+    string username = 1;
+    string error_message = 2;
 }
 
-message GetAuthByEmailRequest {
-  string email = 1;
+// changed from email to id
+message GetBrickLinkAuthByIdRequest {
+    int64 id = 1;
 }
 
-message GetAuthByEmailResponse {
-  string consumer_key = 1;
-  string consumer_secret = 2;
-  string token_value = 3;
-  string token_secret = 4;
+message GetBrickOwlAuthByIdRequest {
+    int64 id = 1;
 }
 
-message SetAuthByEmailRequest {
-  string email = 1;
-  string consumer_key = 2;
-  string consumer_secret = 3;
-  string token_value = 4;
-  string token_secret = 5;
-    }
+// changed from email to id
+message GetBrickLinkAuthByIdResponse {
+    string consumer_key = 1;
+    string consumer_secret = 2;
+    string token_value = 3;
+    string token_secret = 4;
+}
 
-message SetAuthByEmailResponse {
-  bool is_success = 1;
-  string error_message = 2;
+message GetBrickOwlAuthByIdResponse {
+    string api_key = 1;
+}
+
+// changed from email to id
+message SetBrickLinkAuthByIdRequest {
+    int64 id = 1;
+    string consumer_key = 2;
+    string consumer_secret = 3;
+    string token_value = 4;
+    string token_secret = 5;
+}
+
+message SetBrickOwlAuthByIdRequest {
+    int64 id = 1;
+    string api_key = 2;
+}
+
+// changed from email to id
+message SetBrickLinkAuthByIdResponse {
+    bool is_success = 1;
+    string error_message = 2;
+}
+
+message SetBrickOwlAuthByIdResponse {
+    bool is_success = 1;
+    string error_message = 2;
 }
 
 service StudService {
-  rpc CreateStud(CreateStudRequest) returns (CreateStudResponse);
-  rpc GetStudByEmail(GetStudByEmailRequest) returns (GetStudByEmailResponse);
-  rpc GetAuthByEmail(GetAuthByEmailRequest) returns (GetAuthByEmailResponse);
-  rpc SetAuthByEmail(SetAuthByEmailRequest) returns (SetAuthByEmailResponse);
+    rpc CreateStud (CreateStudRequest) returns (CreateStudResponse);
+    rpc GetStudByEmail (GetStudByEmailRequest) returns (GetStudByEmailResponse); // TO-DO: change from email to id
+    rpc GetBrickLinkAuthById (GetBrickLinkAuthByIdRequest) returns (GetBrickLinkAuthByIdResponse);
+    rpc GetBrickOwlAuthById (GetBrickOwlAuthByIdRequest) returns (GetBrickOwlAuthByIdResponse);
+    rpc SetBrickLinkAuthById (SetBrickLinkAuthByIdRequest) returns (SetBrickLinkAuthByIdResponse);
+    rpc SetBrickOwlAuthById (SetBrickOwlAuthByIdRequest) returns (SetBrickOwlAuthByIdResponse);
 }
 
