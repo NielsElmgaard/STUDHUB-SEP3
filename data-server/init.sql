@@ -1,8 +1,3 @@
-
-
-DROP TABLE if exists stud cascade;
-
-
 CREATE TABLE IF NOT EXISTS stud
 (
     email           VARCHAR(255) PRIMARY KEY,
@@ -13,4 +8,6 @@ CREATE TABLE IF NOT EXISTS stud
     token_value     TEXT,
     token_secret    TEXT
 );
+
+
 

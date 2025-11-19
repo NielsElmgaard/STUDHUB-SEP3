@@ -1,59 +1,85 @@
 package com.studhub.dataserver;
 
+import com.studhub.dataserver.storeconnection.BrickLinkConnection;
+import com.studhub.dataserver.storeconnection.BrickOwlConnection;
 import jakarta.persistence.*;
 
-@Entity
-public class Stud {
-    @Id
-    @Column(nullable = false, unique = true)
-    private String email; // Primary key
+@Entity public class Stud
+{
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
 
-    private String username;
-    private String passwordHash;
-    private String consumerKey;
-    private String consumerSecret;
-    private String tokenValue;
-    private String tokenSecret;
+  @Column(nullable = false, unique = true) private String email;
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+  @Column(nullable = false) private String username;
+  @Column(nullable = false) private String passwordHash;
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+  @OneToOne(mappedBy = "stud", cascade = CascadeType.ALL, orphanRemoval = true)
+  private BrickLinkConnection brickLinkConnection;
 
-    public String getPasswordHash() { return passwordHash; }
-    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+  @OneToOne(mappedBy = "stud", cascade = CascadeType.ALL, orphanRemoval = true)
+  private BrickOwlConnection brickOwlConnection;
 
-    public String getConsumerKey() {
-        return consumerKey;
-    }
+  public BrickLinkConnection getBrickLinkConnection()
+  {
+    return brickLinkConnection;
+  }
 
-    public void setConsumerKey(String consumerKey) {
-        this.consumerKey = consumerKey;
-    }
+  public void setBrickLinkConnection(BrickLinkConnection brickLinkConnection)
+  {
+    this.brickLinkConnection = brickLinkConnection;
+  }
 
-    public String getConsumerSecret() {
-        return consumerSecret;
-    }
+  public BrickOwlConnection getBrickOwlConnection()
+  {
+    return brickOwlConnection;
+  }
 
-    public void setConsumerSecret(String consumerSecret) {
-        this.consumerSecret = consumerSecret;
-    }
+  public void setBrickOwlConnection(BrickOwlConnection brickOwlConnection)
+  {
+    this.brickOwlConnection = brickOwlConnection;
+  }
 
-    public String getTokenSecret() {
-        return tokenSecret;
-    }
+  public Long getId()
+  {
+    return id;
+  }
 
-    public void setTokenSecret(String tokenSecret) {
-        this.tokenSecret = tokenSecret;
-    }
+  // Should only be used for testing
+  public void setId(Long id)
+  {
+    this.id = id;
+  }
 
-    public String getTokenValue() {
-        return tokenValue;
-    }
+  public String getEmail()
+  {
+    return email;
+  }
 
-    public void setTokenValue(String tokenValue) {
-        this.tokenValue = tokenValue;
-    }
+  public void setEmail(String email)
+  {
+    this.email = email;
+  }
+
+  public String getUsername()
+  {
+    return username;
+  }
+
+  public void setUsername(String username)
+  {
+    this.username = username;
+  }
+
+  public String getPasswordHash()
+  {
+    return passwordHash;
+  }
+
+  public void setPasswordHash(String passwordHash)
+  {
+    this.passwordHash = passwordHash;
+  }
+
+
 }
 
