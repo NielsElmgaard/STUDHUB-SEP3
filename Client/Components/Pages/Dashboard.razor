@@ -29,7 +29,7 @@
     private async Task LogoutUser()
     {
         await ((SimpleAuthProvider)AuthProvider).Logout();
-        NavManager.NavigateTo("/Login");
+        NavManager.NavigateTo("/");
     }
 }
 

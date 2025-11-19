@@ -1,13 +1,28 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    <AuthorizeView>
+        <Authorized>
+            <div class="sidebar">
+                <NavMenu />
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            @* no sidebar when not logged in *@
+        </NotAuthorized>
+    </AuthorizeView>
 
     <main>
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            <AuthorizeView>
+                <Authorized>
+                    <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+                </Authorized>
+                <NotAuthorized>
+                    @* nothing in top row when not logged in *@
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
 
         <article class="content px-4">

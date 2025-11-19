@@ -5,6 +5,7 @@ using Client.Services.StoreConnection;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Studhub.AppServer.Services;
+using Client.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,9 +26,12 @@ builder.Services.AddScoped<IStudUserClientService, StudUserHttpClient>();
 builder.Services.AddScoped<AuthenticationStateProvider, SimpleAuthProvider>();
 builder.Services.AddScoped<IStoreAuthClientService, StoreAuthHttpClient>();
 builder.Services.AddAuthentication();
-//builder.Services.AddAuthenticationCore();
+builder.Services.AddAuthenticationCore();
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<SimpleAuthProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
+    sp.GetRequiredService<SimpleAuthProvider>());
 var app = builder.Build();
 
 // Configure the HTTP userRequest pipeline.
