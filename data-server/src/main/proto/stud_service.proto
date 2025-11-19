@@ -31,8 +31,10 @@ message GetStudByEmailRequest {
 }
 
 message GetStudByEmailResponse {
-    string username = 1;
-    string error_message = 2;
+    int64 id = 1;
+    string email = 2;
+    string username = 3;
+    string error_message = 4;
 }
 
 message GetStudByIdResponse {

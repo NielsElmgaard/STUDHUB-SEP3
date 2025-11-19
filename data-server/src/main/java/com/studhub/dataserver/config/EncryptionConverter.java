@@ -9,6 +9,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+// https://thorben-janssen.com/how-to-use-jpa-type-converter-to/
 // chat-gpt - Ikke brugt endnu
 // Hvis brugt, tilføj @Convert(converter = EncryptionConverter.class) til api-nøglerne
 @Converter

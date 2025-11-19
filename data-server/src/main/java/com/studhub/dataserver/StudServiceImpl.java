@@ -52,14 +52,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
       // Compare password
       if (passwordEncoder.matches(password, stud.getPasswordHash()))
       {
-        responseBuilder.setUsername(stud.getUsername()).setErrorMessage("");
+        responseBuilder.setId(stud.getId()).setEmail(stud.getEmail()).setUsername(stud.getUsername()).setErrorMessage("");
       }
       else
       {
-        responseBuilder.setUsername("").setErrorMessage("Invalid password");
+        responseBuilder.setId(-1).setEmail("").setUsername("").setErrorMessage("Invalid password");
       }
     }, () -> {
-      responseBuilder.setUsername("").setErrorMessage("User not found");
+      responseBuilder.setId(-1).setEmail("").setUsername("").setErrorMessage("User not found");
     });
 
     responseObserver.onNext(responseBuilder.build());

@@ -2,6 +2,7 @@
 using Studhub.Grpc.Data;
 using StudHub.SharedDTO;
 using StudHub.SharedDTO.StoreCredentials;
+using StudHub.SharedDTO.Users;
 
 namespace Studhub.AppServer.Services.Auth_Login;
 
@@ -20,7 +21,8 @@ public class AuthService : IAuthService
         _httpClient = httpClient;
     }
 
-    public async Task<string?> ValidateUserAsync(string email, string password)
+    public async Task<StudUserDTO?> ValidateUserAsync(string email,
+        string password)
     {
         var grpcResponse = await _grpcClient.GetStudByEmailAsync(
             new GetStudByEmailRequest()
@@ -36,7 +38,12 @@ public class AuthService : IAuthService
             return null;
         }
 
-        return grpcResponse.Username;
+        return new StudUserDTO
+        {
+            Id = grpcResponse.Id,
+            Email = grpcResponse.Email,
+            Username = grpcResponse.Username
+        };
     }
 
     public async Task<BrickLinkCredentialsDTO?> SetBrickLinkCredentialsAsync(
@@ -124,7 +131,8 @@ public class AuthService : IAuthService
         try
         {
             var jsonResponse = await OAuthHelper.ExecuteSignedApiCallAsync(
-                _httpClient, brickLinkConnectionTestUrl, HttpMethod.Get, consumerKey,
+                _httpClient, brickLinkConnectionTestUrl, HttpMethod.Get,
+                consumerKey,
                 consumerSecret, tokenValue, tokenSecret);
 
             return new BrickLinkConnectionTestDTO
