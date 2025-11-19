@@ -1,6 +1,7 @@
 using Client.Components;
 using Client.Components.Authentication;
 using Client.Services;
+using Client.Services.StoreConnection;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Studhub.AppServer.Services;
@@ -22,6 +23,7 @@ builder.Services.AddScoped<ILoginClientService, LoginClientHttpClient>();
 builder.Services.AddScoped<IInventoryClientService, InventoryHttpClient>();
 builder.Services.AddScoped<IStudUserClientService, StudUserHttpClient>();
 builder.Services.AddScoped<AuthenticationStateProvider, SimpleAuthProvider>();
+builder.Services.AddScoped<IStoreAuthClientService, StoreAuthHttpClient>();
 builder.Services.AddAuthentication();
 //builder.Services.AddAuthenticationCore();
 builder.Services.AddAuthorization();

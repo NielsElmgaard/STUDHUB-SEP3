@@ -4,5 +4,5 @@ namespace Client.Services;
 
 public interface IInventoryClientService
 {
-    Task<List<SetDTO>> GetUserSetsAsync(string email);
+    Task<List<SetDTO>> GetUserSetsAsync(long studUserId);
 }

@@ -8,6 +8,7 @@
 <h3>Dashboard</h3>
 <p>Logged in as @userEmail</p>
 <button class="btn btn-danger" @onclick="LogoutUser">Logout</button>
+<button class="btn btn-secondary w-100 p-3" @onclick="@(() => NavManager.NavigateTo("/StoreConnectionPage"))">Connect with store</button>
 </Authorized>
 <NotAuthorized>
     <NotAuthorizedContent/>

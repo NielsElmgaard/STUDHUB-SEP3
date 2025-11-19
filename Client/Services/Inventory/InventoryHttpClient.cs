@@ -11,10 +11,10 @@ public class InventoryHttpClient : IInventoryClientService
         _httpClient = httpClient;
     }
 
-    public async Task<List<SetDTO>> GetUserSetsAsync(string email)
+    public async Task<List<SetDTO>> GetUserSetsAsync(long studUserId)
     {
         var response =
-            await _httpClient.GetAsync($"Inventory/sets?email={email}");
+            await _httpClient.GetAsync($"Inventory/sets?studUserId={studUserId}");
         if (!response.IsSuccessStatusCode)
         {
             var error = await response.Content.ReadAsStringAsync();

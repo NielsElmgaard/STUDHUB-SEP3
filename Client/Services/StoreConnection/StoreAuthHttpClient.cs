@@ -1,0 +1,46 @@
+using StudHub.SharedDTO.StoreCredentials;
+
+namespace Client.Services.StoreConnection;
+
+public class StoreAuthHttpClient : IStoreAuthClientService
+{
+    private readonly HttpClient _httpClient;
+
+    public StoreAuthHttpClient(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+
+    public async Task<BrickLinkCredentialsResponseDTO> SetBrickLinkCredentials(
+        BrickLinkCredentialsRequestDTO credentialsRequest)
+    {
+        HttpResponseMessage httpResponse =
+            await _httpClient.PutAsJsonAsync("auth/bricklinksync",
+                credentialsRequest);
+
+        if (!httpResponse.IsSuccessStatusCode)
+        {
+            var errorResponse = await httpResponse.Content
+                .ReadFromJsonAsync<BrickLinkCredentialsResponseDTO>();
+            if (errorResponse != null &&
+                !string.IsNullOrEmpty(errorResponse.ErrorMessage))
+            {
+                throw new Exception(
+                    $"Failed to set BrickLink credentials: {errorResponse.ErrorMessage}");
+            }
+
+            throw new Exception(
+                $"Error setting BrickLink credentials (Status: {(int)httpResponse.StatusCode})");
+        }
+
+        var brickLinkResponse = await httpResponse.Content
+            .ReadFromJsonAsync<BrickLinkCredentialsResponseDTO>();
+        return brickLinkResponse;
+    }
+
+    public async Task<BrickOwlCredentialsResponseDTO> SetBrickOwlCredentials(
+        BrickOwlCredentialsRequestDTO credentialsRequest)
+    {
+        throw new NotImplementedException();
+    }
+}
