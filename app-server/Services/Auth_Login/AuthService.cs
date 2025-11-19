@@ -23,9 +23,9 @@ public class AuthService : IAuthService
     public async Task<string?> ValidateUserAsync(string email, string password)
     {
         var grpcResponse = await _grpcClient.GetStudByEmailAsync(
-            new GetStudByEmailRequest
+            new GetStudByEmailRequest()
             {
-                Email = email.Trim(),
+                Email = email,
                 Password = password.Trim()
             });
 
@@ -40,10 +40,10 @@ public class AuthService : IAuthService
     }
 
     public async Task<BrickLinkCredentialsDTO?> SetBrickLinkCredentialsAsync(
-        string email, string consumerKey,
+        long studUserId, string consumerKey,
         string consumerSecret, string tokenValue, string tokenSecret)
     {
-        var connectionTest = await TestBrickLinkConnectionAsync(email,
+        var connectionTest = await TestBrickLinkConnectionAsync(studUserId,
             consumerKey, consumerSecret, tokenValue, tokenSecret);
 
         if (connectionTest == null || !connectionTest.IsValid)
@@ -54,10 +54,10 @@ public class AuthService : IAuthService
 
         try
         {
-            var grpcResponse = await _grpcClient.SetAuthByEmailAsync(
-                new SetAuthByEmailRequest
+            var grpcResponse = await _grpcClient.SetBrickLinkAuthByIdAsync(
+                new SetBrickLinkAuthByIdRequest()
                 {
-                    Email = email,
+                    Id = studUserId,
                     ConsumerKey = consumerKey,
                     ConsumerSecret = consumerSecret,
                     TokenValue = tokenValue,
@@ -67,7 +67,7 @@ public class AuthService : IAuthService
             if (!grpcResponse.IsSuccess)
             {
                 throw new Exception(
-                    $"gRPC SetAuthByEmailAsync save failed: {grpcResponse.ErrorMessage}");
+                    $"gRPC SetBrickLinkAuthByIdAsync save failed: {grpcResponse.ErrorMessage}");
             }
 
             return new BrickLinkCredentialsDTO
@@ -86,14 +86,14 @@ public class AuthService : IAuthService
     }
 
     public async Task<BrickLinkCredentialsDTO?> GetBrickLinkCredentialsAsync(
-        string email)
+        long studUserId)
     {
         try
         {
-            var res = await _grpcClient.GetAuthByEmailAsync(
-                new GetAuthByEmailRequest
+            var res = await _grpcClient.GetBrickLinkAuthByIdAsync(
+                new GetBrickLinkAuthByIdRequest
                 {
-                    Email = email
+                    Id = studUserId
                 });
             var noCreds =
                 string.IsNullOrEmpty(res.ConsumerKey) &&
@@ -118,7 +118,7 @@ public class AuthService : IAuthService
     }
 
     public async Task<BrickLinkConnectionTestDTO?> TestBrickLinkConnectionAsync(
-        string email, string consumerKey,
+        long studUserId, string consumerKey,
         string consumerSecret, string tokenValue, string tokenSecret)
     {
         try
@@ -153,19 +153,19 @@ public class AuthService : IAuthService
 
 
     public async Task<BrickOwlCredentialsResponseDTO?>
-        SetBrickOwlCredentialsAsync(string email, string brickOwlApiKey)
+        SetBrickOwlCredentialsAsync(long studUserId, string brickOwlApiKey)
     {
         throw new NotImplementedException();
     }
 
     public async Task<BrickOwlCredentialsDTO?> GetBrickOwlCredentialsAsync(
-        string email)
+        long studUserId)
     {
         throw new NotImplementedException();
     }
 
     public async Task<BrickOwlConnectionTestDTO?> TestBrickOwlConnectionAsync(
-        string email, string brickOwlApiKey)
+        long studUserId, string brickOwlApiKey)
     {
         throw new NotImplementedException();
     }

@@ -7,23 +7,23 @@ public interface IAuthService
 {
     Task<string?> ValidateUserAsync(string email, string password);
 
-    Task<BrickLinkCredentialsDTO?> SetBrickLinkCredentialsAsync(string email,
+    Task<BrickLinkCredentialsDTO?> SetBrickLinkCredentialsAsync(long studUserId,
         string consumerKey, string consumerSecret, string tokenValue,
         string tokenSecret);
 
-    Task<BrickLinkCredentialsDTO?> GetBrickLinkCredentialsAsync(string email);
+    Task<BrickLinkCredentialsDTO?> GetBrickLinkCredentialsAsync(long studUserId);
 
     Task<BrickLinkConnectionTestDTO?>
-        TestBrickLinkConnectionAsync(string email,
+        TestBrickLinkConnectionAsync(long studUserId,
             string consumerKey, string consumerSecret, string tokenValue,
             string tokenSecret);
 
     Task<BrickOwlCredentialsResponseDTO?> SetBrickOwlCredentialsAsync(
-        string email,
+        long studUserId,
         string brickOwlApiKey);
 
-    Task<BrickOwlCredentialsDTO?> GetBrickOwlCredentialsAsync(string email);
+    Task<BrickOwlCredentialsDTO?> GetBrickOwlCredentialsAsync(long studUserId);
 
-    Task<BrickOwlConnectionTestDTO?> TestBrickOwlConnectionAsync(string email,
+    Task<BrickOwlConnectionTestDTO?> TestBrickOwlConnectionAsync(long studUserId,
         string brickOwlApiKey);
 }

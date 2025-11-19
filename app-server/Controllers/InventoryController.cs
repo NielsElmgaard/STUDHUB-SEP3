@@ -16,9 +16,9 @@ public class InventoryController : ControllerBase
     }
 
     [HttpGet("sets")]
-    public async Task<ActionResult> GetSets([FromQuery] string email)
+    public async Task<ActionResult> GetSets([FromQuery] long studUserId)
     {
-        var sets = await _inventoryService.GetUserSetsAsync(email);
+        var sets = await _inventoryService.GetUserSetsAsync(studUserId);
         return Ok(sets);
     }
 }

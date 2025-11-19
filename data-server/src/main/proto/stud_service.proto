@@ -17,6 +17,12 @@ message CreateStudRequest {
 message CreateStudResponse {
     bool is_success = 1;
     string error_message = 2;
+    int64 id = 3; // generated studId
+}
+
+message GetStudByIdRequest {
+    int64 id = 1;
+    string password = 2;
 }
 
 message GetStudByEmailRequest {
@@ -29,7 +35,11 @@ message GetStudByEmailResponse {
     string error_message = 2;
 }
 
-// changed from email to id
+message GetStudByIdResponse {
+    string username = 1;
+    string error_message = 2;
+}
+
 message GetBrickLinkAuthByIdRequest {
     int64 id = 1;
 }
@@ -77,7 +87,8 @@ message SetBrickOwlAuthByIdResponse {
 
 service StudService {
     rpc CreateStud (CreateStudRequest) returns (CreateStudResponse);
-    rpc GetStudByEmail (GetStudByEmailRequest) returns (GetStudByEmailResponse); // TO-DO: change from email to id
+    rpc GetStudById (GetStudByIdRequest) returns (GetStudByIdResponse); // for internal service logic
+    rpc GetStudByEmail (GetStudByEmailRequest) returns (GetStudByEmailResponse); // user-facing validation e.g. login
     rpc GetBrickLinkAuthById (GetBrickLinkAuthByIdRequest) returns (GetBrickLinkAuthByIdResponse);
     rpc GetBrickOwlAuthById (GetBrickOwlAuthByIdRequest) returns (GetBrickOwlAuthByIdResponse);
     rpc SetBrickLinkAuthById (SetBrickLinkAuthByIdRequest) returns (SetBrickLinkAuthByIdResponse);

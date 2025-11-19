@@ -25,7 +25,7 @@ public class InventoryService : IInventoryService
         _httpClient = httpClient;
     }
 
-    public async Task<List<SetDTO>> GetUserSetsAsync(string email)
+    public async Task<List<SetDTO>> GetUserSetsAsync(long studUserId)
     {
         try
         {
@@ -35,7 +35,7 @@ public class InventoryService : IInventoryService
             };
 
             var jsonResponse =
-                await ExecuteSignedApiCallAsync(email, queryParams);
+                await ExecuteSignedApiCallAsync(studUserId, queryParams);
 
             // Deserialize response
             var options = new JsonSerializerOptions()
@@ -69,13 +69,13 @@ public class InventoryService : IInventoryService
         catch (JsonException e)
         {
             throw new JsonException(
-                $"Error deserializing BrickLink response content for {email}",
+                $"Error deserializing BrickLink response content for {studUserId}",
                 e);
         }
         catch (Exception e)
         {
             throw new Exception(
-                $"An error occurred during Set mapping or processing for {email}",
+                $"An error occurred during Set mapping or processing for {studUserId}",
                 e);
         }
     }
@@ -175,14 +175,14 @@ public class InventoryService : IInventoryService
 
 
     // OAuth 1.0a Helper Method
-    private async Task<string> ExecuteSignedApiCallAsync(string email,
+    private async Task<string> ExecuteSignedApiCallAsync(long studUserId,
         Dictionary<string, string> queryParams)
     {
         var credentials =
-            await _authService.GetBrickLinkCredentialsAsync(email);
+            await _authService.GetBrickLinkCredentialsAsync(studUserId);
         if (credentials == null)
         {
-            throw new Exception($"No BrickLink credentials for {email}");
+            throw new Exception($"No BrickLink credentials for {studUserId}");
         }
 
 
@@ -245,12 +245,12 @@ public class InventoryService : IInventoryService
         catch (HttpRequestException e)
         {
             throw new HttpRequestException(
-                $"HTTP or API Code Error during API call for {email}", e);
+                $"HTTP or API Code Error during API call for {studUserId}", e);
         }
         catch (Exception e)
         {
             throw new Exception(
-                $"An unexpected error occurred during API execution for {email}",
+                $"An unexpected error occurred during API execution for {studUserId}",
                 e);
         }
     }

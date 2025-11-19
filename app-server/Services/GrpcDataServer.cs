@@ -13,6 +13,6 @@ public sealed class GrpcDataServer : IDataServer
     public Task<CreateStudResponse> CreateStudAsync(CreateStudRequest req, CancellationToken ct = default)
         => _client.CreateStudAsync(req, cancellationToken: ct).ResponseAsync;
 
-    public Task<GetStudByEmailResponse> GetStudByEmailAsync(GetStudByEmailRequest req, CancellationToken ct = default)
-        => _client.GetStudByEmailAsync(req, cancellationToken: ct).ResponseAsync;
+    public Task<GetStudByIdResponse> GetStudByIdAsync(GetStudByIdRequest req, CancellationToken ct = default)
+        => _client.GetStudByIdAsync(req, cancellationToken: ct).ResponseAsync;
 }

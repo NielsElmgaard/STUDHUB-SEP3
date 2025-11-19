@@ -7,5 +7,5 @@ namespace Studhub.AppServer.Services;
 public interface IDataServer
 {
     Task<CreateStudResponse> CreateStudAsync(CreateStudRequest req, CancellationToken ct = default);
-    Task<GetStudByEmailResponse> GetStudByEmailAsync(GetStudByEmailRequest req, CancellationToken ct = default);
+    Task<GetStudByIdResponse> GetStudByIdAsync(GetStudByIdRequest req, CancellationToken ct = default);
 }
