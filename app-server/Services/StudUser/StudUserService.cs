@@ -25,7 +25,8 @@ public class StudUserService : IStudUserService
         return new CreateStudUserResponseDTO
         {
             IsSuccess = grpcResponse.IsSuccess,
-            ErrorMessage = grpcResponse.ErrorMessage
+            ErrorMessage = grpcResponse.ErrorMessage,
+            Id = grpcResponse.Id
         };
     }
 }

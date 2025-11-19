@@ -30,11 +30,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
     stud.setUsername(request.getUsername());
     stud.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
-    studRepository.save(stud);
+    Stud savedStud = studRepository.save(stud);
 
     // TODO: handle exception when create stud fail
     CreateStudResponse response = CreateStudResponse.newBuilder()
-        .setIsSuccess(true).build();
+        .setIsSuccess(true).setId(savedStud.getId()).build();
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }
@@ -49,6 +49,33 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
     // Lookup user by email
     studRepository.findByEmail(email).ifPresentOrElse(stud -> {
+      // Compare password
+      if (passwordEncoder.matches(password, stud.getPasswordHash()))
+      {
+        responseBuilder.setUsername(stud.getUsername()).setErrorMessage("");
+      }
+      else
+      {
+        responseBuilder.setUsername("").setErrorMessage("Invalid password");
+      }
+    }, () -> {
+      responseBuilder.setUsername("").setErrorMessage("User not found");
+    });
+
+    responseObserver.onNext(responseBuilder.build());
+    responseObserver.onCompleted();
+  }
+
+  @Override public void getStudById(GetStudByIdRequest request,
+      StreamObserver<GetStudByIdResponse> responseObserver)
+  {
+    Long id = request.getId();
+    String password = request.getPassword();
+
+    GetStudByIdResponse.Builder responseBuilder = GetStudByIdResponse.newBuilder();
+
+    // Lookup user by id
+    studRepository.findById(id).ifPresentOrElse(stud -> {
       // Compare password
       if (passwordEncoder.matches(password, stud.getPasswordHash()))
       {
@@ -151,8 +178,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
     responseObserver.onCompleted();
   }
 
-  @Override public void setBrickOwlAuthById(
-      SetBrickOwlAuthByIdRequest request,
+  @Override public void setBrickOwlAuthById(SetBrickOwlAuthByIdRequest request,
       StreamObserver<SetBrickOwlAuthByIdResponse> responseObserver)
   {
     Long id = request.getId();

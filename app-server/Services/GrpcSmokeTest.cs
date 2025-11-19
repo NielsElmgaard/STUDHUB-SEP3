@@ -30,12 +30,12 @@ public sealed class GrpcSmokeTest : IHostedService
             _log.LogInformation("CreateStud → success={Success}, error='{Error}'",
                 create.IsSuccess, create.ErrorMessage);
 
-            var get = await _client.GetStudByEmailAsync(new GetStudByEmailRequest
+            var get = await _client.GetStudByIdAsync(new GetStudByIdRequest
             {
-                Email = "alice@example.com",
+                Id = 1,
                 Password = "supersecret"
             }, cancellationToken: ct);
-            _log.LogInformation("GetStudByEmail → username='{User}', error='{Error}'",
+            _log.LogInformation("GetStudById → username='{User}', error='{Error}'",
                 get.Username, get.ErrorMessage);
         }
         catch (Exception ex)

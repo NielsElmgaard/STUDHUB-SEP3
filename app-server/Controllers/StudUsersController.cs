@@ -38,8 +38,15 @@ public class StudUsersController : ControllerBase
         }
         
         
-        await _studUserService.CreateStudUser(request);
+        var grpcResponse = await _studUserService.CreateStudUser(request);
 
-        return Created($"/StudUsers/{request.Email}", request); // TODO: Måske implementere ID til StudUser i stedet for Email
+        var response = new CreateStudUserResponseDTO
+        {
+            IsSuccess = grpcResponse.IsSuccess,
+            ErrorMessage = grpcResponse.ErrorMessage,
+            Id = grpcResponse.Id
+        };
+        
+        return Created($"/StudUsers/{response.Id}", request);
     }
 }
