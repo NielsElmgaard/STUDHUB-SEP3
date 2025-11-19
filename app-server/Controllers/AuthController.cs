@@ -45,7 +45,7 @@ public class AuthController : ControllerBase
         SetBrickLinkCredentials(
             [FromBody] BrickLinkCredentialsRequestDTO request)
     {
-        var credentials = await _authService.SetBrickLinkCredentialsAsync(
+       await _authService.SetBrickLinkCredentialsAsync(
             request.StudUserId,
             request.ConsumerKey, request.ConsumerSecret, request.TokenValue,
             request.TokenSecret);
