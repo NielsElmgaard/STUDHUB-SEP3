@@ -29,8 +29,9 @@ public class StoreAuthHttpClient : IStoreAuthClientService
                     $"Failed to set BrickLink credentials: {errorResponse.ErrorMessage}");
             }
 
+            string content = await httpResponse.Content.ReadAsStringAsync();
             throw new Exception(
-                $"Error setting BrickLink credentials (Status: {(int)httpResponse.StatusCode})");
+                $"Error setting BrickLink credentials (Status: {(int)httpResponse.StatusCode}). Response: {content.Substring(0, Math.Min(content.Length, 100))}");
         }
 
         var brickLinkResponse = await httpResponse.Content

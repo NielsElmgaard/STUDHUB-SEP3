@@ -7,6 +7,7 @@ using Studhub.AppServer.Services.StudUser;
 AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<GlobalExceptionHandlerMiddleware>();
 
 // Add services to the container.
 
@@ -24,6 +25,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IStudUserService, StudUserService>();
 
+
 //Vi fjerner denne test senere!!!!!
 builder.Services.AddHostedService<GrpcSmokeTest>();
 
@@ -37,6 +39,8 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
 
 app.UseAuthorization();
 

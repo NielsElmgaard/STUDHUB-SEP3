@@ -55,8 +55,11 @@ public class AuthService : IAuthService
 
         if (connectionTest == null || !connectionTest.IsValid)
         {
-            throw new Exception(
-                $"BrickLink credentials invalid: {connectionTest?.ErrorMessage ?? "Unknown error"}");
+            string errorMessage =
+                connectionTest?.ErrorMessage ??
+                "Invalid or expired BrickLink credentials (Code: 401).";
+            throw new ArgumentException(
+                $"BrickLink credentials invalid: {errorMessage}");
         }
 
         try

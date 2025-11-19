@@ -61,7 +61,7 @@
         if (claimsPrincipal.Identity is null || !claimsPrincipal.Identity.IsAuthenticated)
         {
             // the user is not logged in
-            LastSubmitResultBL = "You must be logged in to create a post.";
+            LastSubmitResultBL = "You must be logged in to sync.";
             isSuccesBL = false;
             return;
         }
