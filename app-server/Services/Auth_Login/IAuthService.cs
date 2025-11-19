@@ -1,11 +1,12 @@
 ﻿using StudHub.SharedDTO;
 using StudHub.SharedDTO.StoreCredentials;
+using StudHub.SharedDTO.Users;
 
 namespace Studhub.AppServer.Services.Auth_Login;
 
 public interface IAuthService
 {
-    Task<string?> ValidateUserAsync(string email, string password);
+    Task<StudUserDTO?> ValidateUserAsync(string email, string password);
 
     Task<BrickLinkCredentialsDTO?> SetBrickLinkCredentialsAsync(long studUserId,
         string consumerKey, string consumerSecret, string tokenValue,

@@ -1,0 +1,34 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager NavManager
+@page "/Dashboard"
+<PageTitle>Dashboard</PageTitle>
+<AuthorizeView>
+    <Authorized>
+<h3>Dashboard</h3>
+<p>Logged in as @userEmail</p>
+<button class="btn btn-danger" @onclick="LogoutUser">Logout</button>
+</Authorized>
+<NotAuthorized>
+    <NotAuthorizedContent/>
+</NotAuthorized>
+</AuthorizeView>
+@code {
+    private string? userEmail;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity?.IsAuthenticated ?? false)
+        {
+            userEmail = user.Identity.Name;
+        }
+    }
+    private async Task LogoutUser()
+    {
+        await ((SimpleAuthProvider)AuthProvider).Logout();
+        NavManager.NavigateTo("/Login");
+    }
+}
+

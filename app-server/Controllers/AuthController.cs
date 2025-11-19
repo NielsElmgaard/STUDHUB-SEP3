@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Studhub.AppServer.Services;
 using Studhub.AppServer.Services.Auth_Login;
 using StudHub.SharedDTO;
+using StudHub.SharedDTO.Users;
 
 namespace Studhub.AppServer.Controllers;
 
@@ -21,11 +22,23 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<LoginResponseDTO>> Login(
         [FromBody] LoginRequestDTO request)
     {
-        var username = await _authService.ValidateUserAsync(request.Email,
-            request.Password);
-        if (username == null)
+        var grpcUser = await _authService.ValidateUserAsync(request.Email, request.Password);
+
+        if (grpcUser == null)
+        {
             return BadRequest(new LoginResponseDTO
                 { ErrorMessage = "Invalid email or password" });
-        return Ok(new LoginResponseDTO { Username = username });
+        }
+        
+        return Ok(new LoginResponseDTO
+        {
+            Username = grpcUser.Username,
+            StudUser = new StudUserDTO
+            {
+                Id = grpcUser.Id,
+                Email = grpcUser.Email,
+                Username = grpcUser.Username
+            }
+        });
     }
 }
