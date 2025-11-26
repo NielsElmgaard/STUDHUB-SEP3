@@ -14,20 +14,6 @@
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Content Include="obj\Debug\net9.0\Client.csproj.Up2Date" />
-      <Content Include="obj\Debug\net9.0\Client.dll" />
-      <Content Include="obj\Debug\net9.0\Client.genruntimeconfig.cache" />
-      <Content Include="obj\Debug\net9.0\Client.pdb" />
-      <Content Include="obj\Debug\net9.0\rjimswa.dswa.cache.json" />
-      <Content Include="obj\Debug\net9.0\rjsmcshtml.dswa.cache.json" />
-      <Content Include="obj\Debug\net9.0\rjsmrazor.dswa.cache.json" />
-      <Content Include="obj\Debug\net9.0\staticwebassets.build.endpoints.json" />
-      <Content Include="obj\Debug\net9.0\staticwebassets.build.json" />
-      <Content Include="obj\Debug\net9.0\staticwebassets.build.json.cache" />
-      <Content Include="obj\Debug\net9.0\staticwebassets.development.json" />
-    </ItemGroup>
-
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>

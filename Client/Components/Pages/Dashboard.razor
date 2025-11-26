@@ -8,102 +8,160 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager NavManager
 @inject DashboardRegistry Registry
-@inject DashboardSettingsService SettingsService
 
 <PageTitle>Dashboard</PageTitle>
 
 <AuthorizeView>
     <Authorized>
-        <div class="dashboard-header">
-            <div class="dashboard-header-left">
+        <!-- Header: title + user + buttons -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
                 <h3 class="mb-1 page-title-glow">dashboard</h3>
                 <small class="logged-in-info">logged in as @userEmail</small>
             </div>
-
-            @if (isLoaded)
-            {
-                <div class="dashboard-header-right">
-                    <div class="widget-filter">
-                        <span class="widget-filter-label">// widgets</span>
-                        <div class="widget-filter-list">
-                            @foreach (var w in Registry.Widgets)
-                            {
-                                var isChecked = settings.EnabledWidgetIds.Contains(w.Id);
-                                <label class="form-check widget-filter-item">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           checked="@isChecked"
-                                           @onchange="e => ToggleWidget(w.Id, e)" />
-                                    <span class="form-check-label">@w.Title</span>
-                                </label>
-                            }
-                        </div>
-                    </div>
-                </div>
-            }
         </div>
 
-        <!-- Widget grid stays the same -->
+        <!-- Filters -->
+        <div class="mb-3 d-flex gap-2 align-items-center">
+            <input class="form-control w-auto"
+                   style="min-width: 220px"
+                   placeholder="Filter widgets…"
+                   @bind="filterText" />
+
+            <select class="form-select w-auto" @bind="selectedTag">
+                <option value="">All tags</option>
+                @foreach (var tag in AllTags)
+                {
+                    <option value="@tag">@tag</option>
+                }
+            </select>
+        </div>
+
+        <!-- Dashboard grid -->
         <div class="dashboard-grid">
-            @foreach (var widget in VisibleWidgets)
+            @foreach (var widget in OrderedFilteredWidgets)
             {
-                var hasRoute = !string.IsNullOrEmpty(widget.DetailsRoute);
+                var id = widget.Id;
+                var state = GetState(id);
 
                 <DashboardCard Title="@widget.Title"
-                               IsClickable="@hasRoute"
-                               OnClick="@(hasRoute ? () => NavManager.NavigateTo(widget.DetailsRoute!) : null)">
-                    <DynamicComponent Type="@widget.ComponentType" />
+                               IconCss="@widget.IconCss"
+                               IsCollapsed="@state.IsCollapsed"
+                               IsCollapsedChanged="(b => SetCollapsed(id, b))"
+                               OnMoveUp="(() => MoveUp(id))"
+                               OnMoveDown="(() => MoveDown(id))">
+                    <ChildContent>
+                        <DynamicComponent Type="@widget.ComponentType" />
+                    </ChildContent>
+                    <CollapsedContent>
+                        <em>@widget.Title (compact view)</em>
+                    </CollapsedContent>
                 </DashboardCard>
             }
         </div>
-
     </Authorized>
 
     <NotAuthorized>
-        <NotAuthorizedContent />
+        <NotAuthorizedContent/>
     </NotAuthorized>
 </AuthorizeView>
 
-
 @code {
     private string? userEmail;
-    private DashboardSettings settings = new();
-    private bool isLoaded = false;
+
+    // filter state
+    private string filterText = "";
+    private string selectedTag = "";
+
+    // UI state per widget (collapsed + order)
+    private class WidgetUiState
+    {
+        public bool IsCollapsed { get; set; }
+        public int Order { get; set; }
+    }
+
+    private readonly Dictionary<string, WidgetUiState> _state = new();
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-
         if (user.Identity?.IsAuthenticated ?? false)
         {
             userEmail = user.Identity.Name;
-            settings = await SettingsService.LoadAsync(userEmail!, Registry.Widgets);
         }
-        else
-        {
-            // Not logged in: default to all enabled, no persistence
-            settings = new DashboardSettings
-            {
-                EnabledWidgetIds = Registry.Widgets.Select(w => w.Id).ToHashSet()
-            };
-        }
-
-        isLoaded = true;
     }
 
-    private async Task ToggleWidget(string id, ChangeEventArgs e)
+    // --- Filtering + ordering helpers ---
+
+    private IEnumerable<string> AllTags =>
+        Registry.Widgets
+            .SelectMany(w => w.Tags)
+            .Distinct()
+            .OrderBy(t => t);
+
+    private IEnumerable<DashboardWidgetDescriptor> OrderedFilteredWidgets =>
+        Registry.Widgets
+            .Select(w => new { w, state = GetState(w.Id) })
+            .Where(x =>
+                (string.IsNullOrWhiteSpace(filterText)
+                 || x.w.Title.Contains(filterText, StringComparison.OrdinalIgnoreCase)
+                 || x.w.Tags.Any(t => t.Contains(filterText, StringComparison.OrdinalIgnoreCase)))
+                &&
+                (string.IsNullOrWhiteSpace(selectedTag)
+                 || x.w.Tags.Contains(selectedTag)))
+            .OrderBy(x => x.state.Order)
+            .Select(x => x.w);
+
+    private WidgetUiState GetState(string id)
     {
-        bool isChecked = (bool)e.Value!;
-        if (isChecked)
-            settings.EnabledWidgetIds.Add(id);
-        else
-            settings.EnabledWidgetIds.Remove(id);
+        if (!_state.TryGetValue(id, out var s))
+        {
+            s = new WidgetUiState
+            {
+                IsCollapsed = true,
+                Order = _state.Count  // append at the end
+            };
+            _state[id] = s;
+        }
 
-        if (userEmail is not null)
-            await SettingsService.SaveAsync(userEmail, settings);
+        return s;
     }
 
-    private IEnumerable<DashboardWidgetDescriptor> VisibleWidgets =>
-        Registry.Widgets.Where(w => settings.EnabledWidgetIds.Contains(w.Id));
+    private void SetCollapsed(string id, bool value)
+    {
+        GetState(id).IsCollapsed = value;
+    }
+
+    private void MoveUp(string id)
+    {
+        var current = GetState(id);
+        var above = _state.Values
+            .Where(s => s.Order < current.Order)
+            .OrderByDescending(s => s.Order)
+            .FirstOrDefault();
+
+        if (above is null) return;
+
+        (current.Order, above.Order) = (above.Order, current.Order);
+    }
+
+    private void MoveDown(string id)
+    {
+        var current = GetState(id);
+        var below = _state.Values
+            .Where(s => s.Order > current.Order)
+            .OrderBy(s => s.Order)
+            .FirstOrDefault();
+
+        if (below is null) return;
+
+        (current.Order, below.Order) = (below.Order, current.Order);
+    }
+
+    private async Task LogoutUser()
+    {
+        await ((SimpleAuthProvider)AuthProvider).Logout();
+        NavManager.NavigateTo("/");
+    }
 }

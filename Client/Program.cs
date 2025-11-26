@@ -33,8 +33,6 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<SimpleAuthProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
     sp.GetRequiredService<SimpleAuthProvider>());
-builder.Services.AddScoped<Client.Services.Dashboard.DashboardSettingsService>();
-
 
 var app = builder.Build();
 
