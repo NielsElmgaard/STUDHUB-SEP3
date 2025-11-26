@@ -23,7 +23,7 @@ public class GlobalExceptionHandlerMiddleware : IMiddleware
         }
         catch (ArgumentException ex)
         {
-            await HandleBrickLinkExceptionAsync(context, ex, 400);
+            await HandleStoreExceptionAsync(context, ex, 400);
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -36,13 +36,13 @@ public class GlobalExceptionHandlerMiddleware : IMiddleware
     }
 
     
-    private async Task HandleBrickLinkExceptionAsync(HttpContext context,
+    private async Task HandleStoreExceptionAsync(HttpContext context,
         ArgumentException exception, int statusCode)
     {
         var traceId = context.TraceIdentifier;
 
         _logger.LogError(exception,
-            "BrickLink credential validation failed. TraceId: {TraceId}",
+            "BrickLink or Brick Owl credential validation failed. TraceId: {TraceId}",
             traceId);
 
         var errorResponse = new BrickLinkCredentialsResponseDTO

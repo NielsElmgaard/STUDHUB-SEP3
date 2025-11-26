@@ -13,8 +13,8 @@
 <PageTitle>Store Connection</PageTitle>
 <AuthorizeView>
     <Authorized>
-        <h3 class="extra-bold my-3">Store Connection</h3>
-        <h4 class="my-2">BrickLink</h4>
+        <h1 class="extra-bold my-3">Store Connection</h1>
+        <h4 class="my-2 store-connection-glow">BrickLink</h4>
         @if (!string.IsNullOrEmpty(LastSubmitResultBL))
         {
             <h2 class="alert @(isSuccesBL ? "alert-success" : "alert-danger")">
@@ -24,8 +24,8 @@
         <BrickLinkCredentialsForm BrickLinkCredentials="_brickLinkCredentials"
                                   OnValidSubmit="ValidBrickLinkFormSubmitted"
                                   OnInvalidSubmit="InvalidBrickLinkFormSubmitted"/>
-        <h4 class="mt-5 mb-2">BrickOwl</h4>
-        @if (!string.IsNullOrEmpty(LastSubmitResultBL))
+        <h4 class="mt-5 mb-2 store-connection-glow">BrickOwl</h4>
+        @if (!string.IsNullOrEmpty(LastSubmitResultBO))
         {
             <h2 class="alert @(isSuccesBO ? "alert-success" : "alert-danger")">
                 @LastSubmitResultBO
@@ -48,8 +48,8 @@
     string LastSubmitResultBO;
     bool isSuccesBL;
     bool isSuccesBO;
-    BrickLinkCredentialsResponseDTO CreatedBrickLinkConnection;
-    BrickOwlCredentialsResponseDTO CreatedBrickOwlConnection;
+    BrickLinkCredentialsResponseDTO? CreatedBrickLinkConnection;
+    BrickOwlCredentialsResponseDTO? CreatedBrickOwlConnection;
     [CascadingParameter] public Task<AuthenticationState> State { get; set; }
 
 
@@ -73,13 +73,13 @@
             return;
         }
         _brickLinkCredentials.StudUserId = studUserId; // set StudUserId before sending
-        LastSubmitResultBL = "Syncing BrickLink...";
+        LastSubmitResultBL = "Connecting BrickLink...";
         isSuccesBL = false;
         try
         {
             CreatedBrickLinkConnection = await StoreAuthClientService.SetBrickLinkCredentials(_brickLinkCredentials);
 
-            LastSubmitResultBL = $"Success! BrickLink synced.";
+            LastSubmitResultBL = $"Success! BrickLink connected.";
             isSuccesBL = true;
         }
         catch (Exception e)
@@ -89,16 +89,50 @@
         }
     }
 
-    async Task InvalidBrickLinkFormSubmitted()
+    void InvalidBrickLinkFormSubmitted()
     {
+        isSuccesBL = false;
     }
 
     async Task ValidBrickOwlFormSubmitted()
     {
+        AuthenticationState authenticationState = await State;
+        ClaimsPrincipal claimsPrincipal = authenticationState.User;
+
+        if (claimsPrincipal.Identity is null || !claimsPrincipal.Identity.IsAuthenticated)
+        {
+            // the user is not logged in
+            LastSubmitResultBO = "You must be logged in to sync.";
+            isSuccesBO = false;
+            return;
+        }
+        var userIdClaim = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !long.TryParse(userIdClaim.Value, out long studUserId))
+        {
+            LastSubmitResultBO = "Error: Could not retrieve or parse user ID.";
+            isSuccesBO = false;
+            return;
+        }
+        _brickOwlCredentials.StudUserId = studUserId; // set StudUserId before sending
+        LastSubmitResultBO = "Connecting Brick Owl...";
+        isSuccesBL = false;
+        try
+        {
+            CreatedBrickOwlConnection = await StoreAuthClientService.SetBrickOwlCredentials(_brickOwlCredentials);
+
+            LastSubmitResultBO = $"Success! Brick Owl connected.";
+            isSuccesBO = true;
+        }
+        catch (Exception e)
+        {
+            LastSubmitResultBO = $"Server Error: {e.Message}";
+            isSuccesBO = false;
+        }
     }
 
-    async Task InvalidBrickOwlFormSubmitted()
+    void InvalidBrickOwlFormSubmitted()
     {
+        isSuccesBO = false;
     }
 
 }

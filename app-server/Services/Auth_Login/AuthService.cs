@@ -14,6 +14,9 @@ public class AuthService : IAuthService
     private static string brickLinkConnectionTestUrl =
         "https://api.bricklink.com/api/store/v1/items/PART/3001";
 
+    private static string brickOwlConnectionTestUrl =
+        "https://api.brickowl.com/v1/user/details";
+
     public AuthService(StudService.StudServiceClient grpcClient,
         HttpClient httpClient)
     {
@@ -50,8 +53,8 @@ public class AuthService : IAuthService
         long studUserId, string consumerKey,
         string consumerSecret, string tokenValue, string tokenSecret)
     {
-        var connectionTest = await TestBrickLinkConnectionAsync(studUserId,
-            consumerKey, consumerSecret, tokenValue, tokenSecret);
+        var connectionTest = await TestBrickLinkConnectionAsync(consumerKey,
+            consumerSecret, tokenValue, tokenSecret);
 
         if (connectionTest == null || !connectionTest.IsValid)
         {
@@ -128,7 +131,7 @@ public class AuthService : IAuthService
     }
 
     public async Task<BrickLinkConnectionTestDTO?> TestBrickLinkConnectionAsync(
-        long studUserId, string consumerKey,
+        string consumerKey,
         string consumerSecret, string tokenValue, string tokenSecret)
     {
         try
@@ -163,21 +166,105 @@ public class AuthService : IAuthService
     }
 
 
-    public async Task<BrickOwlCredentialsResponseDTO?>
+    public async Task<BrickOwlCredentialsDTO?>
         SetBrickOwlCredentialsAsync(long studUserId, string brickOwlApiKey)
     {
-        throw new NotImplementedException();
+        var connectionTest = await TestBrickOwlConnectionAsync(brickOwlApiKey);
+
+        if (connectionTest == null || !connectionTest.IsValid)
+        {
+            string errorMessage =
+                connectionTest?.ErrorMessage ??
+                "Invalid or expired Brick Owl credentials (Code: 401).";
+            throw new ArgumentException(
+                $"Brick Owl credentials invalid: {errorMessage}");
+        }
+
+        try
+        {
+            var grpcResponse = await _grpcClient.SetBrickOwlAuthByIdAsync(
+                new SetBrickOwlAuthByIdRequest()
+                {
+                    Id = studUserId,
+                    ApiKey = brickOwlApiKey
+                });
+
+            if (!grpcResponse.IsSuccess)
+            {
+                throw new Exception(
+                    $"gRPC SetBrickOwlAuthByIdAsync save failed: {grpcResponse.ErrorMessage}");
+            }
+
+            return new BrickOwlCredentialsDTO
+            {
+                BrickOwlApiKey = brickOwlApiKey
+            };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"gRPC error: {e}");
+            throw;
+        }
     }
 
     public async Task<BrickOwlCredentialsDTO?> GetBrickOwlCredentialsAsync(
         long studUserId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var res = await _grpcClient.GetBrickOwlAuthByIdAsync(
+                new GetBrickOwlAuthByIdRequest()
+                {
+                    Id = studUserId
+                });
+            var noCreds = string.IsNullOrEmpty(res.ApiKey);
+
+            if (noCreds) return null;
+
+            return new BrickOwlCredentialsDTO()
+            {
+                BrickOwlApiKey = res.ApiKey
+            };
+        }
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+        {
+            return null;
+        }
     }
 
     public async Task<BrickOwlConnectionTestDTO?> TestBrickOwlConnectionAsync(
-        long studUserId, string brickOwlApiKey)
+        string brickOwlApiKey)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var request =
+                new HttpRequestMessage(HttpMethod.Get,
+                    $"{brickOwlConnectionTestUrl}?key={brickOwlApiKey}");
+            var response = await _httpClient.SendAsync(request);
+
+            response.EnsureSuccessStatusCode();
+
+            return new BrickOwlConnectionTestDTO()
+            {
+                IsValid = true,
+                ErrorMessage = null
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            return new BrickOwlConnectionTestDTO()
+            {
+                IsValid = false,
+                ErrorMessage = $"HTTP/BrickOwl error: {e.Message}"
+            };
+        }
+        catch (Exception e)
+        {
+            return new BrickOwlConnectionTestDTO()
+            {
+                IsValid = false,
+                ErrorMessage = $"Unexpected error: {e.Message}"
+            };
+        }
     }
 }
