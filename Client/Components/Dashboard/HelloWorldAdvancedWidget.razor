@@ -1,0 +1,32 @@
+@namespace Client.Components.Dashboard
+
+<div>
+    <h6>Hello World (Dynamic)</h6>
+    <p>The time right now is:</p>
+    <strong>@now.ToString("HH:mm:ss")</strong>
+</div>
+
+@code {
+    private DateTime now;
+    private CancellationTokenSource cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        now = DateTime.Now;
+
+        // updates every second
+        var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+
+        // this loop runs until component is disposed
+        while (await timer.WaitForNextTickAsync(cts.Token))
+        {
+            now = DateTime.Now;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose()
+    {
+        cts.Cancel();
+    }
+}

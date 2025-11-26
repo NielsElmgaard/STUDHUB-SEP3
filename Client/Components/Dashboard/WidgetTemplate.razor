@@ -1,0 +1,42 @@
+@namespace Client.Components.Dashboard
+
+<div>
+    <h6>Template Widget</h6>
+
+    @if (IsLoading)
+    {
+        <p>Loading...</p>
+    }
+    else if (Error is not null)
+    {
+        <p class="text-danger">@Error</p>
+    }
+    else
+    {
+        <p>@Content</p>
+    }
+</div>
+
+@code {
+    // Example “backend data”
+    private bool IsLoading = true;
+    private string? Error;
+    private string Content = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await Task.Delay(200); // simulate API call
+            Content = "Example content loaded!";
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+}

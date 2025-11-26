@@ -1,21 +1,86 @@
+@page "/Dashboard"
+
+@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Authorization
+@using Client.Components.Dashboard
+@using Client.Services.Dashboard 
+
 @inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager NavManager
-@page "/Dashboard"
+@inject DashboardRegistry Registry
+
 <PageTitle>Dashboard</PageTitle>
+
 <AuthorizeView>
     <Authorized>
-<h3>Dashboard</h3>
-<p>Logged in as @userEmail</p>
-<button class="btn btn-danger" @onclick="LogoutUser">Logout</button>
-<button class="btn btn-secondary w-100 p-3" @onclick="@(() => NavManager.NavigateTo("/StoreConnectionPage"))">Connect with store</button>
-</Authorized>
-<NotAuthorized>
-    <NotAuthorizedContent/>
-</NotAuthorized>
+        <!-- Header: title + user + buttons -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h3 class="mb-1 page-title-glow">dashboard</h3>
+                <small class="logged-in-info">logged in as @userEmail</small>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="mb-3 d-flex gap-2 align-items-center">
+            <input class="form-control w-auto"
+                   style="min-width: 220px"
+                   placeholder="Filter widgets…"
+                   @bind="filterText" />
+
+            <select class="form-select w-auto" @bind="selectedTag">
+                <option value="">All tags</option>
+                @foreach (var tag in AllTags)
+                {
+                    <option value="@tag">@tag</option>
+                }
+            </select>
+        </div>
+
+        <!-- Dashboard grid -->
+        <div class="dashboard-grid">
+            @foreach (var widget in OrderedFilteredWidgets)
+            {
+                var id = widget.Id;
+                var state = GetState(id);
+
+                <DashboardCard Title="@widget.Title"
+                               IconCss="@widget.IconCss"
+                               IsCollapsed="@state.IsCollapsed"
+                               IsCollapsedChanged="(b => SetCollapsed(id, b))"
+                               OnMoveUp="(() => MoveUp(id))"
+                               OnMoveDown="(() => MoveDown(id))">
+                    <ChildContent>
+                        <DynamicComponent Type="@widget.ComponentType" />
+                    </ChildContent>
+                    <CollapsedContent>
+                        <em>@widget.Title (compact view)</em>
+                    </CollapsedContent>
+                </DashboardCard>
+            }
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+        <NotAuthorizedContent/>
+    </NotAuthorized>
 </AuthorizeView>
+
 @code {
     private string? userEmail;
+
+    // filter state
+    private string filterText = "";
+    private string selectedTag = "";
+
+    // UI state per widget (collapsed + order)
+    private class WidgetUiState
+    {
+        public bool IsCollapsed { get; set; }
+        public int Order { get; set; }
+    }
+
+    private readonly Dictionary<string, WidgetUiState> _state = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,10 +91,77 @@
             userEmail = user.Identity.Name;
         }
     }
+
+    // --- Filtering + ordering helpers ---
+
+    private IEnumerable<string> AllTags =>
+        Registry.Widgets
+            .SelectMany(w => w.Tags)
+            .Distinct()
+            .OrderBy(t => t);
+
+    private IEnumerable<DashboardWidgetDescriptor> OrderedFilteredWidgets =>
+        Registry.Widgets
+            .Select(w => new { w, state = GetState(w.Id) })
+            .Where(x =>
+                (string.IsNullOrWhiteSpace(filterText)
+                 || x.w.Title.Contains(filterText, StringComparison.OrdinalIgnoreCase)
+                 || x.w.Tags.Any(t => t.Contains(filterText, StringComparison.OrdinalIgnoreCase)))
+                &&
+                (string.IsNullOrWhiteSpace(selectedTag)
+                 || x.w.Tags.Contains(selectedTag)))
+            .OrderBy(x => x.state.Order)
+            .Select(x => x.w);
+
+    private WidgetUiState GetState(string id)
+    {
+        if (!_state.TryGetValue(id, out var s))
+        {
+            s = new WidgetUiState
+            {
+                IsCollapsed = true,
+                Order = _state.Count  // append at the end
+            };
+            _state[id] = s;
+        }
+
+        return s;
+    }
+
+    private void SetCollapsed(string id, bool value)
+    {
+        GetState(id).IsCollapsed = value;
+    }
+
+    private void MoveUp(string id)
+    {
+        var current = GetState(id);
+        var above = _state.Values
+            .Where(s => s.Order < current.Order)
+            .OrderByDescending(s => s.Order)
+            .FirstOrDefault();
+
+        if (above is null) return;
+
+        (current.Order, above.Order) = (above.Order, current.Order);
+    }
+
+    private void MoveDown(string id)
+    {
+        var current = GetState(id);
+        var below = _state.Values
+            .Where(s => s.Order > current.Order)
+            .OrderBy(s => s.Order)
+            .FirstOrDefault();
+
+        if (below is null) return;
+
+        (current.Order, below.Order) = (below.Order, current.Order);
+    }
+
     private async Task LogoutUser()
     {
         await ((SimpleAuthProvider)AuthProvider).Logout();
         NavManager.NavigateTo("/");
     }
 }
-

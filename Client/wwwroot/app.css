@@ -163,3 +163,88 @@ h1, .store-connection-glow {
   max-width: 90%;     
 }
 
+.dashboard-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.dashboard-card {
+  flex: 1 1 320px;        /* grow, shrink, basis */
+  max-width: 100%;
+  border-radius: .5rem;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,.05);
+  display: flex;
+  flex-direction: column;
+}
+
+
+.dashboard-card-header {
+  padding: .5rem .75rem;
+  border-bottom: 1px solid #eee;
+  background-color: #f8f9fa;
+}
+
+.dashboard-card-body {
+  padding: .75rem;
+}
+
+/* Compact state – keep it small */
+.dashboard-card.collapsed .dashboard-card-body {
+  max-height: 70px;
+  overflow: hidden;
+}
+
+.page-title-glow {
+  color: #fff;
+  text-shadow:
+          0 0 8px #8a2be2,
+          0 0 16px #8a2be2,
+          0 0 24px #1e90ff,
+          0 0 48px #1e90ff;
+  letter-spacing: 1px;
+  font-weight: 800;
+}
+
+.logged-in-info {
+  color: #a0a0ff;                 /* soft neon-ish light blue */
+  font-weight: 600;
+  text-shadow:
+          0 0 6px rgba(138, 43, 226, 0.6),
+          0 0 12px rgba(30, 144, 255, 0.6);
+}
+
+/* Makes the logout button stick to the bottom of the sidebar */
+.logout-container {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  right: 0;
+  padding: 0 1rem;
+}
+
+.btn-logout-neon {
+  background: transparent;
+  border: 2px solid #ff4c4c;
+  color: #ffaaaa;
+  font-weight: 600;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+  box-shadow:
+          0 0 6px #ff4c4c,
+          0 0 12px #ff2a2a;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-logout-neon:hover {
+  color: white;
+  border-color: #ff6666;
+  box-shadow:
+          0 0 10px #ff4c4c,
+          0 0 20px #ff2a2a;
+  transform: scale(1.03);
+}
+

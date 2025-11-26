@@ -1,6 +1,11 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid d-flex justify-content-center"><a
-            class="navbar-brand" href="">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager NavManager
+
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid d-flex justify-content-center">
+        <a class="navbar-brand" href="/Dashboard">
             <img class="img-fluid w-auto"
                  src="studhub_logo.png" alt="StudHub Logo"/>
         </a>
@@ -13,18 +18,31 @@
      onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu"
-                      aria-hidden="true"></span> Home
+            <NavLink class="nav-link" href="/Dashboard">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> home
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="login">
+            <NavLink class="nav-link" href="StoreConnectionPage">
                 <span class="bi bi-box-arrow-in-right-nav-menu"
-                      aria-hidden="true"></span> Login
+                      aria-hidden="true"></span> connect store
             </NavLink>
         </div>
     </nav>
 </div>
+
+<div class="logout-container">
+    <button class="btn btn-logout-neon w-100" @onclick="Logout">logout
+    </button>
+</div>
+
+@code {
+    private async Task Logout()
+    {
+        await ((SimpleAuthProvider)AuthProvider).Logout();
+        NavManager.NavigateTo("/");
+    }
+}
+
 

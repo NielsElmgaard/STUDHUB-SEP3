@@ -20,6 +20,7 @@ builder.Services.AddRazorComponents()
         BaseAddress = new Uri("http://localhost:5299/")
     });
 
+builder.Services.AddSingleton<Client.Services.Dashboard.DashboardRegistry>();
 builder.Services.AddScoped<ILoginClientService, LoginClientHttpClient>();
 builder.Services.AddScoped<IInventoryClientService, InventoryHttpClient>();
 builder.Services.AddScoped<IStudUserClientService, StudUserHttpClient>();
@@ -32,6 +33,7 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<SimpleAuthProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
     sp.GetRequiredService<SimpleAuthProvider>());
+
 var app = builder.Build();
 
 // Configure the HTTP userRequest pipeline.

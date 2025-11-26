@@ -2,23 +2,42 @@
 @layout LoginLayout
 @using StudHub.SharedDTO
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Web
 @inject HttpClient Http
 @inject ILoginClientService LoginClientService
 @inject NavigationManager NavManager
 @inject SimpleAuthProvider AuthProvider
 
 
+
 <div class="login-form-container d-flex flex-column align-items-center gap-3 mx-auto m-5">
     <h1>// welcome back</h1>
 
-    <input class="form-control" @bind="Email" placeholder="enter email..."/>
-    <input class="form-control" type="password" @bind="Password"
-           placeholder="enter password..."/>
+    <input class="form-control"
+           @bind="Email"
+           @bind:event="oninput"
+           placeholder="enter email..."
+           @onkeyup="HandleKeyUp"
+           tabindex="1" />
 
-    <button class="btn btn-primary w-100 p-3" @onclick="LoginUser">sign in >>
-    </button>
+    <input class="form-control"
+           type="password"
+           @bind="Password"
+           @bind:event="oninput"
+           placeholder="enter password..."
+           @onkeyup="HandleKeyUp"
+           tabindex="2" />
+
     <button class="btn btn-primary w-100 p-3"
-            @onclick="@(() => NavManager.NavigateTo("/CreateStudUser"))">new user >>
+            @onclick="LoginUser"
+            tabindex="3">
+        sign in >>
+    </button>
+
+    <button class="btn btn-primary w-100 p-3"
+            @onclick="@(() => NavManager.NavigateTo("/CreateStudUser"))"
+            tabindex="4">
+        new user >>
     </button>
     
     <div class="error-placeholder">
@@ -29,17 +48,25 @@
     </div>
 </div>
 
+
+
 @code {
     private string Email { get; set; } = string.Empty;
     private string Password { get; set; } = string.Empty;
     private string? _errorMessage;
 
+    private async Task HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await LoginUser();
+        }
+    }
 
     private async Task LoginUser()
     {
         _errorMessage = null;
 
-        // Empty fields
         if (string.IsNullOrWhiteSpace(Email))
         {
             _errorMessage = "error: email field is empty";
@@ -55,13 +82,13 @@
         try
         {
             await AuthProvider.LoginASync(Email.Trim(), Password.Trim());
-            
             NavManager.NavigateTo("/Dashboard");
         }
-        catch (Exception e)
+        catch (Exception)
         {
             _errorMessage = "error: invalid email or password";
         }
     }
+}
 
 }
