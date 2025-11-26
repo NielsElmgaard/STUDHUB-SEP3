@@ -1,3 +1,4 @@
+using System.Text.Json;
 using StudHub.SharedDTO.StoreCredentials;
 
 namespace Client.Services.StoreConnection;
@@ -30,6 +31,20 @@ public class StoreAuthHttpClient : IStoreAuthClientService
             }
 
             string content = await httpResponse.Content.ReadAsStringAsync();
+            
+            try
+            {
+                using JsonDocument document = JsonDocument.Parse(content);
+                if (document.RootElement.TryGetProperty("Detail", out JsonElement detailElement) &&
+                    detailElement.ValueKind == JsonValueKind.String)
+                {
+                    throw new Exception(detailElement.GetString());
+                }
+            }
+            catch (JsonException)
+            {
+            }
+            
             throw new Exception(
                 $"Error setting BrickLink credentials (Status: {(int)httpResponse.StatusCode}). Response: {content.Substring(0, Math.Min(content.Length, 100))}");
         }
@@ -58,11 +73,27 @@ public class StoreAuthHttpClient : IStoreAuthClientService
             }
 
             string content = await httpResponse.Content.ReadAsStringAsync();
+
+            try
+            {
+                using JsonDocument document = JsonDocument.Parse(content);
+                if (document.RootElement.TryGetProperty("Detail",
+                        out JsonElement detailElement) &&
+                    detailElement.ValueKind == JsonValueKind.String)
+                {
+                    throw new Exception(detailElement.GetString());
+                }
+            }
+            catch (JsonException)
+            {
+            }
+
             throw new Exception(
-                $"Error setting Brick Owl credentials (Status: {(int)httpResponse.StatusCode}). Response: {content.Substring(0, Math.Min(content.Length, 100))}");
+                $"Server Error: Error setting Brick Owl credentials (Status: {(int)httpResponse.StatusCode}). Response: {content.Substring(0, Math.Min(content.Length, 100))}");
         }
 
         var brickOwlResponse = await httpResponse.Content
             .ReadFromJsonAsync<BrickOwlCredentialsResponseDTO>();
-        return brickOwlResponse!;    }
+        return brickOwlResponse!;
+    }
 }
