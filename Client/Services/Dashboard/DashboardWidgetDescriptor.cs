@@ -5,5 +5,6 @@ public record DashboardWidgetDescriptor(
     string Title,
     string[] Tags,
     Type ComponentType,
-    string? IconCss = null
+    string? DetailsRoute,
+    bool DefaultEnabled = true
 );
