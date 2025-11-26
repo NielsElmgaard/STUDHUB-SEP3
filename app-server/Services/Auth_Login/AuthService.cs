@@ -98,7 +98,7 @@ public class AuthService : IAuthService
         }
         catch (Exception e)
         {
-            Console.WriteLine($"gRPC error: {e}");
+            Console.WriteLine($"gRPC Error: {e}");
             throw;
         }
     }
