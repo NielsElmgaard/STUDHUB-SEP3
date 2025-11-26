@@ -31,11 +31,12 @@ public class StoreAuthHttpClient : IStoreAuthClientService
             }
 
             string content = await httpResponse.Content.ReadAsStringAsync();
-            
+
             try
             {
                 using JsonDocument document = JsonDocument.Parse(content);
-                if (document.RootElement.TryGetProperty("Detail", out JsonElement detailElement) &&
+                if (document.RootElement.TryGetProperty("Detail",
+                        out JsonElement detailElement) &&
                     detailElement.ValueKind == JsonValueKind.String)
                 {
                     throw new Exception(detailElement.GetString());
@@ -44,7 +45,7 @@ public class StoreAuthHttpClient : IStoreAuthClientService
             catch (JsonException)
             {
             }
-            
+
             throw new Exception(
                 $"Error setting BrickLink credentials (Status: {(int)httpResponse.StatusCode}). Response: {content.Substring(0, Math.Min(content.Length, 100))}");
         }
@@ -95,5 +96,103 @@ public class StoreAuthHttpClient : IStoreAuthClientService
         var brickOwlResponse = await httpResponse.Content
             .ReadFromJsonAsync<BrickOwlCredentialsResponseDTO>();
         return brickOwlResponse!;
+    }
+
+    public async Task<BrickLinkCredentialsResponseDTO>
+        ClearBrickLinkCredentials(long studUserId)
+    {
+        HttpResponseMessage httpResponse =
+            await _httpClient.DeleteAsync(
+                $"auth/bricklink-connect/{studUserId}");
+
+        if (!httpResponse.IsSuccessStatusCode)
+        {
+            var errorResponse = await httpResponse.Content
+                .ReadFromJsonAsync<BrickLinkCredentialsResponseDTO>();
+            if (errorResponse != null &&
+                !string.IsNullOrEmpty(errorResponse.ErrorMessage))
+            {
+                throw new Exception(
+                    $"Failed to clear BrickLink credentials: {errorResponse.ErrorMessage}");
+            }
+
+            string content = await httpResponse.Content.ReadAsStringAsync();
+
+            try
+            {
+                using JsonDocument document = JsonDocument.Parse(content);
+                if (document.RootElement.TryGetProperty("Detail",
+                        out JsonElement detailElement) &&
+                    detailElement.ValueKind == JsonValueKind.String)
+                {
+                    throw new Exception(detailElement.GetString());
+                }
+            }
+            catch (JsonException)
+            {
+            }
+
+            throw new Exception(
+                $"Error clearing BrickLink credentials (Status: {(int)httpResponse.StatusCode}). Response: {content.Substring(0, Math.Min(content.Length, 100))}");
+        }
+
+        return new BrickLinkCredentialsResponseDTO { IsSucces = true };
+    }
+
+    public async Task<BrickOwlCredentialsResponseDTO> ClearBrickOwlCredentials(
+        long studUserId)
+    {
+        HttpResponseMessage httpResponse =
+            await _httpClient.DeleteAsync(
+                $"auth/brickowl-connect/{studUserId}");
+
+        if (!httpResponse.IsSuccessStatusCode)
+        {
+            var errorResponse = await httpResponse.Content
+                .ReadFromJsonAsync<BrickOwlCredentialsResponseDTO>();
+            if (errorResponse != null &&
+                !string.IsNullOrEmpty(errorResponse.ErrorMessage))
+            {
+                throw new Exception(
+                    $"Failed to clear Brick Owl credentials: {errorResponse.ErrorMessage}");
+            }
+
+            string content = await httpResponse.Content.ReadAsStringAsync();
+
+            try
+            {
+                using JsonDocument document = JsonDocument.Parse(content);
+                if (document.RootElement.TryGetProperty("Detail",
+                        out JsonElement detailElement) &&
+                    detailElement.ValueKind == JsonValueKind.String)
+                {
+                    throw new Exception(detailElement.GetString());
+                }
+            }
+            catch (JsonException)
+            {
+            }
+
+            throw new Exception(
+                $"Server Error: Error clearing Brick Owl credentials (Status: {(int)httpResponse.StatusCode}). Response: {content.Substring(0, Math.Min(content.Length, 100))}");
+        }
+
+        return new BrickOwlCredentialsResponseDTO { IsSucces = true };
+    }
+
+    public async Task<bool> IsBrickLinkConnected(long studUserId)
+    {
+        HttpResponseMessage httpResponse =
+            await _httpClient.GetAsync($"auth/bricklink-status/{studUserId}");
+
+        return httpResponse.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> IsBrickOwlConnected(long studUserId)
+    {
+        HttpResponseMessage httpResponse =
+            await _httpClient.GetAsync($"auth/brickowl-status/{studUserId}");
+
+        return httpResponse.IsSuccessStatusCode;
     }
 }

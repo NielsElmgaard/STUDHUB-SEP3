@@ -255,7 +255,7 @@ public class AuthService : IAuthService
             response.EnsureSuccessStatusCode();
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
-            
+
             return new BrickOwlConnectionTestDTO()
             {
                 IsValid = true,
@@ -277,6 +277,120 @@ public class AuthService : IAuthService
                 IsValid = false,
                 ErrorMessage = $"Unexpected error: {e.Message}"
             };
+        }
+    }
+
+    public async Task<BrickLinkCredentialsDTO?> ClearBrickLinkCredentialsAsync(
+        long studUserId, string consumerKey,
+        string consumerSecret, string tokenValue, string tokenSecret)
+    {
+        try
+        {
+            var grpcResponse = await _grpcClient.SetBrickLinkAuthByIdAsync(
+                new SetBrickLinkAuthByIdRequest()
+                {
+                    Id = studUserId,
+                    ConsumerKey = consumerKey,
+                    ConsumerSecret = consumerSecret,
+                    TokenValue = tokenValue,
+                    TokenSecret = tokenSecret
+                });
+
+            if (!grpcResponse.IsSuccess)
+            {
+                throw new Exception(
+                    $"gRPC ClearBrickLinkAuthByIdAsync save failed: {grpcResponse.ErrorMessage}");
+            }
+
+            return null;
+        }
+        catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable)
+        {
+            throw new InvalidOperationException(
+                "Connection could not be established.", e);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"gRPC Error: {e}");
+            throw;
+        }
+    }
+
+    public async Task<BrickOwlCredentialsDTO?>
+        ClearBrickOwlCredentialsAsync(long studUserId, string brickOwlApiKey)
+    {
+        try
+        {
+            var grpcResponse = await _grpcClient.SetBrickOwlAuthByIdAsync(
+                new SetBrickOwlAuthByIdRequest()
+                {
+                    Id = studUserId,
+                    ApiKey = brickOwlApiKey
+                });
+
+            if (!grpcResponse.IsSuccess)
+            {
+                throw new Exception(
+                    $"gRPC ClearBrickOwlAuthByIdAsync save failed: {grpcResponse.ErrorMessage}");
+            }
+
+            return null;
+        }
+        catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable)
+        {
+            throw new InvalidOperationException(
+                "Connection could not be established.", e);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"gRPC error: {e}");
+            throw;
+        }
+    }
+
+    public async Task<bool> IsBrickLinkConnectedAsync(long studUserId)
+    {
+        var request = new GetBrickLinkAuthByIdRequest
+        {
+            Id = studUserId
+        };
+
+        try
+        {
+            GetBrickLinkAuthByIdResponse response =
+                await _grpcClient.GetBrickLinkAuthByIdAsync(request);
+            return
+                !string.IsNullOrEmpty(response
+                    .ConsumerKey); // If Consumer Key is not empty (assumes the other api keys is empty as well), the user is connected.
+        }
+        catch (RpcException e)
+        {
+            Console.WriteLine(
+                $"gRPC Error calling GetBrickLinkAuthById: {e.Status.Detail}");
+            return false;
+        }
+    }
+
+    public async Task<bool> IsBrickOwlConnectedAsync(long studUserId)
+    {
+        var request = new GetBrickOwlAuthByIdRequest
+        {
+            Id = studUserId
+        };
+
+        try
+        {
+            GetBrickOwlAuthByIdResponse response =
+                await _grpcClient.GetBrickOwlAuthByIdAsync(request);
+            return
+                !string.IsNullOrEmpty(response
+                    .ApiKey); // If Api Key is not empty, the user is connected.
+        }
+        catch (RpcException e)
+        {
+            Console.WriteLine(
+                $"gRPC Error calling GetBrickOwlAuthById: {e.Status.Detail}");
+            return false;
         }
     }
 }

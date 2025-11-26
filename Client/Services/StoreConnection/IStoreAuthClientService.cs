@@ -9,4 +9,12 @@ public interface IStoreAuthClientService
     
     Task<BrickOwlCredentialsResponseDTO> SetBrickOwlCredentials(
         BrickOwlCredentialsRequestDTO credentialsRequest);
+    
+    Task<BrickLinkCredentialsResponseDTO> ClearBrickLinkCredentials(long studUserId);
+    
+    Task<BrickOwlCredentialsResponseDTO> ClearBrickOwlCredentials(long studUserId);
+
+    Task<bool> IsBrickLinkConnected(long studUserId);
+    Task<bool> IsBrickOwlConnected(long studUserId);
+
 }

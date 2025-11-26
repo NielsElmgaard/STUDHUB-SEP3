@@ -4,6 +4,7 @@ namespace StudHub.SharedDTO.Users;
 
 public class CreateStudUserRequestDTO
 {
+    
     [Required(ErrorMessage = "Username is required and cannot be empty.")]
 
     public required string Username { get; set; }

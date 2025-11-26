@@ -45,7 +45,7 @@ public class AuthController : ControllerBase
         SetBrickLinkCredentials(
             [FromBody] BrickLinkCredentialsRequestDTO request)
     {
-       await _authService.SetBrickLinkCredentialsAsync(
+        await _authService.SetBrickLinkCredentialsAsync(
             request.StudUserId,
             request.ConsumerKey, request.ConsumerSecret, request.TokenValue,
             request.TokenSecret);
@@ -61,13 +61,58 @@ public class AuthController : ControllerBase
         SetBrickOwlCredentials(
             [FromBody] BrickOwlCredentialsRequestDTO request)
     {
-       await _authService.SetBrickOwlCredentialsAsync(
+        await _authService.SetBrickOwlCredentialsAsync(
             request.StudUserId,
             request.BrickOwlApiKey);
 
-        return Ok(new BrickLinkCredentialsResponseDTO
+        return Ok(new BrickOwlCredentialsResponseDTO
         {
             IsSucces = true
         });
+    }
+
+    [HttpDelete("bricklink-connect/{studUserId:long}")]
+    public async Task<ActionResult<BrickLinkCredentialsResponseDTO>>
+        ClearBrickLinkCredentials(long studUserId)
+    {
+        await _authService.ClearBrickLinkCredentialsAsync(studUserId, "",
+            "", "", "");
+
+        return NoContent();
+    }
+
+    [HttpDelete("brickowl-connect/{studUserId:long}")]
+    public async Task<ActionResult<BrickOwlCredentialsResponseDTO>>
+        ClearBrickOwlCredentials(long studUserId)
+    {
+        await _authService.ClearBrickOwlCredentialsAsync(studUserId, "");
+
+        return NoContent();
+    }
+    
+    [HttpGet("bricklink-status/{studUserId:long}")]
+    public async Task<ActionResult> GetBrickLinkConnectionStatus(long studUserId)
+    {
+        bool isConnected = await _authService.IsBrickLinkConnectedAsync(studUserId);
+
+        if (isConnected)
+        {
+            return Ok();
+        }
+
+        return NotFound();
+    }
+    
+    [HttpGet("brickowl-status/{studUserId:long}")]
+    public async Task<ActionResult> GetBrickOwlConnectionStatus(long studUserId)
+    {
+        bool isConnected = await _authService.IsBrickOwlConnectedAsync(studUserId);
+
+        if (isConnected)
+        {
+            return Ok();
+        }
+
+        return NotFound();
     }
 }

@@ -27,4 +27,16 @@ public interface IAuthService
 
     Task<BrickOwlConnectionTestDTO?> TestBrickOwlConnectionAsync(
         string brickOwlApiKey);
+    
+    Task<BrickLinkCredentialsDTO?> ClearBrickLinkCredentialsAsync(long studUserId,
+        string consumerKey, string consumerSecret, string tokenValue,
+        string tokenSecret);
+    
+    Task<BrickOwlCredentialsDTO?> ClearBrickOwlCredentialsAsync(
+        long studUserId,
+        string brickOwlApiKey);
+
+    Task<bool> IsBrickLinkConnectedAsync(long studUserId);
+
+    Task<bool> IsBrickOwlConnectedAsync(long studUserId);
 }
