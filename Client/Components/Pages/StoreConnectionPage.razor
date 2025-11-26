@@ -15,6 +15,16 @@
     <Authorized>
         <h1 class="extra-bold my-3">Store Connection</h1>
         <h4 class="my-2 store-connection-glow">BrickLink</h4>
+        <p>
+            Steps to obtain BrickLink credentials.
+        <ul>
+            <li>Visit <a
+                    href="https://www.bricklink.com/v2/api/register_consumer.page">BrickLink</a>
+            </li>
+            <li>Add Access token</li>
+            <li>We advise adding 0.0.0.0 for the IP Address and the IP Mask</li>
+        </ul>
+        </p>
         @if (!string.IsNullOrEmpty(LastSubmitResultBL))
         {
             <h2 class="alert @(isSuccesBL ? "alert-success" : "alert-danger")">
@@ -25,16 +35,26 @@
                                   OnValidSubmit="ValidBrickLinkFormSubmitted"
                                   OnInvalidSubmit="InvalidBrickLinkFormSubmitted"/>
         <h4 class="mt-5 mb-2 store-connection-glow">BrickOwl</h4>
+        <p>
+            Steps to obtain BrickLink credentials.
+            <ul>
+                <li>Visit <a href="https://www.brickowl.com/api_docs">Brick Owl</a>
+                </li>
+                <li>Click the generate an API key Link</li>
+                <li>Click the Add API Key Button</li>
+                <li>Make sure the key is enabled</li>
+            </ul>
+        </p>
         @if (!string.IsNullOrEmpty(LastSubmitResultBO))
         {
             <h2 class="alert @(isSuccesBO ? "alert-success" : "alert-danger")">
                 @LastSubmitResultBO
             </h2>
         }
-        
+
         <BrickOwlCredentialsForm BrickOwlCredentials="_brickOwlCredentials"
-                              OnValidSubmit="ValidBrickOwlFormSubmitted"
-                              OnInvalidSubmit="InvalidBrickOwlFormSubmitted"/>
+                                 OnValidSubmit="ValidBrickOwlFormSubmitted"
+                                 OnInvalidSubmit="InvalidBrickOwlFormSubmitted"/>
     </Authorized>
     <NotAuthorized>
         <NotAuthorizedContent/>
@@ -65,6 +85,7 @@
             isSuccesBL = false;
             return;
         }
+
         var userIdClaim = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim == null || !long.TryParse(userIdClaim.Value, out long studUserId))
         {
@@ -72,6 +93,7 @@
             isSuccesBL = false;
             return;
         }
+
         _brickLinkCredentials.StudUserId = studUserId; // set StudUserId before sending
         LastSubmitResultBL = "Connecting BrickLink...";
         isSuccesBL = false;
@@ -106,6 +128,7 @@
             isSuccesBO = false;
             return;
         }
+
         var userIdClaim = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim == null || !long.TryParse(userIdClaim.Value, out long studUserId))
         {
@@ -113,6 +136,7 @@
             isSuccesBO = false;
             return;
         }
+
         _brickOwlCredentials.StudUserId = studUserId; // set StudUserId before sending
         LastSubmitResultBO = "Connecting Brick Owl...";
         isSuccesBL = false;

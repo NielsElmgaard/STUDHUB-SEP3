@@ -20,14 +20,9 @@ builder.Services.AddGrpcClient<StudService.StudServiceClient>(o =>
     o.Address = new Uri(builder.Configuration["DataServer:GrpcAddress"]!);
 });
 
-builder.Services.AddScoped<IDataServer, GrpcDataServer>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IStudUserService, StudUserService>();
-
-
-//Vi fjerner denne test senere!!!!!
-builder.Services.AddHostedService<GrpcSmokeTest>();
 
 
 var app = builder.Build();
