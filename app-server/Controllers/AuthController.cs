@@ -40,7 +40,7 @@ public class AuthController : ControllerBase
         });
     }
 
-    [HttpPut("bricklinksync")]
+    [HttpPut("bricklink-connect")]
     public async Task<ActionResult<BrickLinkCredentialsResponseDTO>>
         SetBrickLinkCredentials(
             [FromBody] BrickLinkCredentialsRequestDTO request)
@@ -56,12 +56,12 @@ public class AuthController : ControllerBase
         });
     }
 
-    [HttpPut("brickowlsync")]
+    [HttpPut("brickowl-connect")]
     public async Task<ActionResult<BrickOwlCredentialsResponseDTO>>
         SetBrickOwlCredentials(
             [FromBody] BrickOwlCredentialsRequestDTO request)
     {
-        var credentials = await _authService.SetBrickOwlCredentialsAsync(
+       await _authService.SetBrickOwlCredentialsAsync(
             request.StudUserId,
             request.BrickOwlApiKey);
 

@@ -15,16 +15,16 @@ public interface IAuthService
     Task<BrickLinkCredentialsDTO?> GetBrickLinkCredentialsAsync(long studUserId);
 
     Task<BrickLinkConnectionTestDTO?>
-        TestBrickLinkConnectionAsync(long studUserId,
+        TestBrickLinkConnectionAsync(
             string consumerKey, string consumerSecret, string tokenValue,
             string tokenSecret);
 
-    Task<BrickOwlCredentialsResponseDTO?> SetBrickOwlCredentialsAsync(
+    Task<BrickOwlCredentialsDTO?> SetBrickOwlCredentialsAsync(
         long studUserId,
         string brickOwlApiKey);
 
     Task<BrickOwlCredentialsDTO?> GetBrickOwlCredentialsAsync(long studUserId);
 
-    Task<BrickOwlConnectionTestDTO?> TestBrickOwlConnectionAsync(long studUserId,
+    Task<BrickOwlConnectionTestDTO?> TestBrickOwlConnectionAsync(
         string brickOwlApiKey);
 }

@@ -10,6 +10,12 @@ public class OAuthHelper
     // Encode string according to RFC 3986
     public static string UrlEncode(string value)
     {
+        // REMINDER After unit test failed, I added this null check
+        if (value == null)
+        {
+            throw new ArgumentNullException(nameof(value), "Value cannot be null for URL encoding.");
+        }
+        
         const string unreservedChars =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~"; //  RFC396: unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
         var result = new StringBuilder();

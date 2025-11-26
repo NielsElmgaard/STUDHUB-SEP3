@@ -1,5 +1,6 @@
 html, body {
   font-family: "Fira Code", "JetBrains Mono", "Source Code Pro", Consolas, monospace;
+  background-color: black;
 }
 
 
@@ -93,7 +94,7 @@ h1:focus
 }
 
 /* Header glow */
-h1 {
+h1, .store-connection-glow {
   color: #fff;
   text-shadow:
           0 0 8px #8a2be2,   /* purple */
