@@ -6,120 +6,130 @@
 @using Studhub.AppServer.Services.Auth_Login
 @using StudHub.SharedDTO
 @using StudHub.SharedDTO.StoreCredentials
+
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IStoreAuthClientService StoreAuthClientService
 
-
 <PageTitle>Store Connection</PageTitle>
+
 <AuthorizeView>
     <Authorized>
-        <h1 class="extra-bold my-3">Store Connection</h1>
-        <h4 class="my-2 store-connection-glow">BrickLink</h4>
-        @if (!IsBrickLinkConnected)
-        {
-            <p>
-                Steps to obtain BrickLink credentials.
-                <ul>
-                    <li>Visit
-                        <a
-                            href="https://www.bricklink.com/v2/api/register_consumer.page">BrickLink</a>
+        <!-- SAME HEADER STYLE AS DASHBOARD -->
+        <div class="dashboard-header">
+            <div class="dashboard-header-left">
+                <h3 class="mb-1 page-title-glow">store connection</h3>
+                <small class="logged-in-info">logged in as @userEmail</small>
+            </div>
+            <div class="dashboard-header-right">
+                <!-- reserved for future notifications / status -->
+            </div>
+        </div>
+
+        <div class="store-page">
+            <!-- BrickLink section -->
+            <section class="store-section">
+                <h4 class="store-connection-glow mb-2">BrickLink</h4>
+
+                <p class="store-body-text">
+                    Steps to obtain BrickLink credentials:
+                </p>
+                <ul class="store-body-list">
+                    <li>
+                        Visit
+                        <a href="https://www.bricklink.com/v2/api/register_consumer.page"
+                           target="_blank" rel="noopener noreferrer">
+                            BrickLink
+                        </a>
                     </li>
-                    <li>Add Access token</li>
+                    <li>Add access token</li>
                     <li>We advise adding 0.0.0.0 for the IP Address and the IP Mask</li>
                 </ul>
-            </p>
-            @if (!string.IsNullOrEmpty(LastSubmitResultBL))
-            {
-                <h2 class="alert @(isSuccesBL ? "alert-success" : "alert-danger")">
-                    @LastSubmitResultBL
-                </h2>
-            }
 
-            <BrickLinkCredentialsForm BrickLinkCredentials="_brickLinkCredentials"
-                                      OnValidSubmit="ValidBrickLinkFormSubmitted"
-                                      OnInvalidSubmit="InvalidBrickLinkFormSubmitted"/>
-        }
-        else
-        {
-            <div>
-                <button class="btn btn-logout-neon w-25" @onclick="DisconnectBrickLink">Disconnect
-                </button>
-            </div>
-        }
-        <h4 class="mt-5 mb-2 store-connection-glow">BrickOwl</h4>
-        @if (!IsBrickOwlConnected)
-        {
-            <p>
-                Steps to obtain BrickLink credentials.
-                <ul>
-                    <li>Visit <a href="https://www.brickowl.com/api_docs">Brick Owl</a>
+                @if (!string.IsNullOrEmpty(LastSubmitResultBL))
+                {
+                    <div class="alert @(isSuccesBL ? "alert-success" : "alert-danger") store-alert">
+                        @LastSubmitResultBL
+                    </div>
+                }
+
+                <BrickLinkCredentialsForm BrickLinkCredentials="_brickLinkCredentials"
+                                          OnValidSubmit="ValidBrickLinkFormSubmitted"
+                                          OnInvalidSubmit="InvalidBrickLinkFormSubmitted" />
+            </section>
+
+            <!-- BrickOwl section -->
+            <section class="store-section mt-5">
+                <h4 class="store-connection-glow mb-2">BrickOwl</h4>
+
+                <p class="store-body-text">
+                    Steps to obtain BrickOwl credentials:
+                </p>
+                <ul class="store-body-list">
+                    <li>
+                        Visit
+                        <a href="https://www.brickowl.com/api_docs"
+                           target="_blank" rel="noopener noreferrer">
+                            Brick Owl
+                        </a>
                     </li>
-                    <li>Click the generate an API key Link</li>
-                    <li>Click the Add API Key Button</li>
+                    <li>Click the “generate an API key” link</li>
+                    <li>Click the “Add API Key” button</li>
                     <li>Make sure the key is enabled</li>
                 </ul>
-            </p>
-            @if (!string.IsNullOrEmpty(LastSubmitResultBO))
-            {
-                <h2 class="alert @(isSuccesBO ? "alert-success" : "alert-danger")">
-                    @LastSubmitResultBO
-                </h2>
-            }
 
-            <BrickOwlCredentialsForm BrickOwlCredentials="_brickOwlCredentials"
-                                     OnValidSubmit="ValidBrickOwlFormSubmitted"
-                                     OnInvalidSubmit="InvalidBrickOwlFormSubmitted"/>
-        }
-        else
-        {
-            <div>
-                <button class="btn btn-logout-neon w-25" @onclick="DisconnectBrickOwl">Disconnect
-                </button>
-            </div>
-        }
+                @if (!string.IsNullOrEmpty(LastSubmitResultBO))
+                {
+                    <div class="alert @(isSuccesBO ? "alert-success" : "alert-danger") store-alert">
+                        @LastSubmitResultBO
+                    </div>
+                }
+
+                <BrickOwlCredentialsForm BrickOwlCredentials="_brickOwlCredentials"
+                                         OnValidSubmit="ValidBrickOwlFormSubmitted"
+                                         OnInvalidSubmit="InvalidBrickOwlFormSubmitted" />
+            </section>
+        </div>
     </Authorized>
+
     <NotAuthorized>
-        <NotAuthorizedContent/>
+        <NotAuthorizedContent />
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
-    BrickLinkCredentialsRequestDTO _brickLinkCredentials = new BrickLinkCredentialsRequestDTO();
-    BrickOwlCredentialsRequestDTO _brickOwlCredentials = new BrickOwlCredentialsRequestDTO();
-    string LastSubmitResultBL;
-    string LastSubmitResultBO;
-    bool isSuccesBL;
-    bool isSuccesBO;
-    BrickLinkCredentialsResponseDTO? CreatedBrickLinkConnection;
-    BrickOwlCredentialsResponseDTO? CreatedBrickOwlConnection;
-    [CascadingParameter] public Task<AuthenticationState> State { get; set; }
+    private BrickLinkCredentialsRequestDTO _brickLinkCredentials = new();
+    private BrickOwlCredentialsRequestDTO _brickOwlCredentials = new();
 
-    private bool IsBrickLinkConnected { get; set; }
-    private bool IsBrickOwlConnected { get; set; }
+    private string? LastSubmitResultBL;
+    private string? LastSubmitResultBO;
+    private bool isSuccesBL;
+    private bool isSuccesBO;
 
+    private BrickLinkCredentialsResponseDTO? CreatedBrickLinkConnection;
+    private BrickOwlCredentialsResponseDTO? CreatedBrickOwlConnection;
 
-    protected async override Task OnInitializedAsync()
+    [CascadingParameter] public Task<AuthenticationState> State { get; set; } = default!;
+
+    private string? userEmail;
+
+    protected override async Task OnInitializedAsync()
     {
-        AuthenticationState authenticationState = await State;
-        ClaimsPrincipal claimsPrincipal = authenticationState.User;
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
-        var userIdClaim = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
-        if (userIdClaim != null && long.TryParse(userIdClaim.Value, out long studUserId))
+        if (user.Identity?.IsAuthenticated ?? false)
         {
-            IsBrickLinkConnected = await StoreAuthClientService.IsBrickLinkConnected(studUserId);
-
-            IsBrickOwlConnected = await StoreAuthClientService.IsBrickOwlConnected(studUserId);
+            userEmail = user.Identity.Name;
         }
     }
 
-    async Task ValidBrickLinkFormSubmitted()
+    private async Task ValidBrickLinkFormSubmitted()
     {
-        AuthenticationState authenticationState = await State;
-        ClaimsPrincipal claimsPrincipal = authenticationState.User;
+        var authenticationState = await State;
+        var claimsPrincipal = authenticationState.User;
 
         if (claimsPrincipal.Identity is null || !claimsPrincipal.Identity.IsAuthenticated)
         {
-            // the user is not logged in
             LastSubmitResultBL = "You must be logged in to sync.";
             isSuccesBL = false;
             return;
@@ -133,16 +143,17 @@
             return;
         }
 
-        _brickLinkCredentials.StudUserId = studUserId; // set StudUserId before sending
+        _brickLinkCredentials.StudUserId = studUserId;
         LastSubmitResultBL = "Connecting BrickLink...";
         isSuccesBL = false;
+
         try
         {
-            CreatedBrickLinkConnection = await StoreAuthClientService.SetBrickLinkCredentials(_brickLinkCredentials);
+            CreatedBrickLinkConnection =
+                await StoreAuthClientService.SetBrickLinkCredentials(_brickLinkCredentials);
 
-            LastSubmitResultBL = $"Success! BrickLink connected.";
+            LastSubmitResultBL = "Success! BrickLink connected.";
             isSuccesBL = true;
-            IsBrickLinkConnected = true;
         }
         catch (Exception e)
         {
@@ -151,19 +162,18 @@
         }
     }
 
-    void InvalidBrickLinkFormSubmitted()
+    private void InvalidBrickLinkFormSubmitted()
     {
         isSuccesBL = false;
     }
 
-    async Task ValidBrickOwlFormSubmitted()
+    private async Task ValidBrickOwlFormSubmitted()
     {
-        AuthenticationState authenticationState = await State;
-        ClaimsPrincipal claimsPrincipal = authenticationState.User;
+        var authenticationState = await State;
+        var claimsPrincipal = authenticationState.User;
 
         if (claimsPrincipal.Identity is null || !claimsPrincipal.Identity.IsAuthenticated)
         {
-            // the user is not logged in
             LastSubmitResultBO = "You must be logged in to sync.";
             isSuccesBO = false;
             return;
@@ -177,16 +187,17 @@
             return;
         }
 
-        _brickOwlCredentials.StudUserId = studUserId; // set StudUserId before sending
+        _brickOwlCredentials.StudUserId = studUserId;
         LastSubmitResultBO = "Connecting Brick Owl...";
         isSuccesBO = false;
+
         try
         {
-            CreatedBrickOwlConnection = await StoreAuthClientService.SetBrickOwlCredentials(_brickOwlCredentials);
+            CreatedBrickOwlConnection =
+                await StoreAuthClientService.SetBrickOwlCredentials(_brickOwlCredentials);
 
-            LastSubmitResultBO = $"Success! Brick Owl connected.";
+            LastSubmitResultBO = "Success! Brick Owl connected.";
             isSuccesBO = true;
-            IsBrickOwlConnected = true;
         }
         catch (Exception e)
         {
@@ -195,69 +206,8 @@
         }
     }
 
-    void InvalidBrickOwlFormSubmitted()
+    private void InvalidBrickOwlFormSubmitted()
     {
         isSuccesBO = false;
     }
-
-    async Task DisconnectBrickLink()
-    {
-        AuthenticationState authenticationState = await State;
-        ClaimsPrincipal claimsPrincipal = authenticationState.User;
-        var userIdClaim = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null || !long.TryParse(userIdClaim.Value, out long studUserId))
-        {
-            LastSubmitResultBL = "Error: Could not retrieve or parse user ID.";
-            isSuccesBL = false;
-            return;
-        }
-
-        LastSubmitResultBL = "Disconnecting BrickLink...";
-        isSuccesBL = false;
-        try
-        {
-            await StoreAuthClientService.ClearBrickLinkCredentials(studUserId);
-
-            LastSubmitResultBL = "Success! BrickLink disconnected.";
-            isSuccesBL = true;
-            IsBrickLinkConnected = false;
-        }
-        catch (Exception e)
-        {
-            LastSubmitResultBL = $"Server Error: Could not disconnect: {e.Message}";
-            isSuccesBL = false;
-        }
-    }
-    
-    async Task DisconnectBrickOwl()
-    {
-        AuthenticationState authenticationState = await State;
-        ClaimsPrincipal claimsPrincipal = authenticationState.User;
-        var userIdClaim = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null || !long.TryParse(userIdClaim.Value, out long studUserId))
-        {
-            LastSubmitResultBO = "Error: Could not retrieve or parse user ID.";
-            isSuccesBO = false;
-            return;
-        }
-
-        LastSubmitResultBO = "Disconnecting Brick Owl...";
-        isSuccesBO = false;
-        try
-        {
-            await StoreAuthClientService.ClearBrickOwlCredentials(studUserId);
-
-            LastSubmitResultBO = "Success! Brick Owl disconnected.";
-            isSuccesBO = true;
-            IsBrickOwlConnected = false;
-        }
-        catch (Exception e)
-        {
-            LastSubmitResultBO = $"Server Error: Could not disconnect: {e.Message}";
-            isSuccesBO = false;
-        }
-    }
-
 }

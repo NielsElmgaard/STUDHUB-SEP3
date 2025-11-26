@@ -1,9 +1,9 @@
 @namespace Client.Components.Dashboard
-
 @inherits ComponentBase
 
-<div class="dashboard-card @(IsCollapsed ? "collapsed" : "")">
-    <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+<div class="dashboard-card @(IsClickable ? "dashboard-card-clickable" : "")"
+     @onclick="HandleClick">
+    <div class="dashboard-card-header">
         <div class="d-flex align-items-center gap-2">
             @if (!string.IsNullOrWhiteSpace(IconCss))
             {
@@ -11,44 +11,31 @@
             }
             <strong>@Title</strong>
         </div>
-
-        <div class="btn-group btn-group-sm">
-            <button class="btn btn-outline-secondary" @onclick="OnMoveUpClicked" title="Move up">▲</button>
-            <button class="btn btn-outline-secondary" @onclick="OnMoveDownClicked" title="Move down">▼</button>
-
-            <button class="btn btn-outline-secondary" @onclick="ToggleCollapse" title="Toggle compact/expanded">
-                @(IsCollapsed ? "Expand" : "Compact")
-            </button>
-        </div>
     </div>
 
     <div class="dashboard-card-body">
-        <CascadingValue Value="IsCollapsed">
-            @ChildContent
-        </CascadingValue>
+        <div class="widget-content-root">
+            <div class="widget-main">
+                @ChildContent
+            </div>
+        </div>
     </div>
-
 </div>
 
 @code {
     [Parameter] public string Title { get; set; } = "";
     [Parameter] public string? IconCss { get; set; }
-
-    // state + callbacks
-    [Parameter] public bool IsCollapsed { get; set; }
-    [Parameter] public EventCallback<bool> IsCollapsedChanged { get; set; }
-    [Parameter] public EventCallback OnMoveUp { get; set; }
-    [Parameter] public EventCallback OnMoveDown { get; set; }
-
-    // IMPORTANT: these must be RenderFragment, not bool
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public RenderFragment? CollapsedContent { get; set; }
 
-    private async Task ToggleCollapse()
+    // NEW
+    [Parameter] public bool IsClickable { get; set; } = false;
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    private async Task HandleClick()
     {
-        await IsCollapsedChanged.InvokeAsync(!IsCollapsed);
+        if (IsClickable && OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync();
+        }
     }
-
-    private async Task OnMoveUpClicked() => await OnMoveUp.InvokeAsync();
-    private async Task OnMoveDownClicked() => await OnMoveDown.InvokeAsync();
 }
