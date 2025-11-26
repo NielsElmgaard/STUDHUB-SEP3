@@ -91,9 +91,14 @@ public class AuthService : IAuthService
                 TokenSecret = tokenSecret
             };
         }
+        catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable)
+        {
+            throw new InvalidOperationException(
+                "Connection could not be established.", e);
+        }
         catch (Exception e)
         {
-            Console.WriteLine($"gRPC error: {e}");
+            Console.WriteLine($"gRPC Error: {e}");
             throw;
         }
     }
@@ -200,6 +205,11 @@ public class AuthService : IAuthService
                 BrickOwlApiKey = brickOwlApiKey
             };
         }
+        catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable)
+        {
+            throw new InvalidOperationException(
+                "Connection could not be established.", e);
+        }
         catch (Exception e)
         {
             Console.WriteLine($"gRPC error: {e}");
@@ -244,6 +254,8 @@ public class AuthService : IAuthService
 
             response.EnsureSuccessStatusCode();
 
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            
             return new BrickOwlConnectionTestDTO()
             {
                 IsValid = true,

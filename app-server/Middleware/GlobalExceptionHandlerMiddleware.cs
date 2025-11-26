@@ -19,7 +19,7 @@ public class GlobalExceptionHandlerMiddleware : IMiddleware
         }
         catch (InvalidOperationException ex)
         {
-            await HandleGenericExceptionAsync(context, ex, 404);
+            await HandleGenericExceptionAsync(context, ex, 503);
         }
         catch (ArgumentException ex)
         {
@@ -64,10 +64,12 @@ public class GlobalExceptionHandlerMiddleware : IMiddleware
         var traceId = context.TraceIdentifier;
         _logger.LogError(exception, "Error occurred. TraceId: {TraceId}",
             traceId);
-
+        
+        string title = (statusCode == 503) ? "Connection Error" : "Server Error";
+        
         var genericError = new
         {
-            Title = "Server Error",
+            Title = title,
             Status = statusCode,
             Detail = exception.Message,
             TraceId = traceId
