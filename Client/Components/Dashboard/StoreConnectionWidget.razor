@@ -1,11 +1,57 @@
+@using System.Security.Claims
+@using Client.Services.StoreConnection
+@using Microsoft.AspNetCore.Components.Authorization
 @namespace Client.Components.Dashboard
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IStoreAuthClientService StoreAuthClientService
+
 <div class="store-widget">
     <div class="store-status-row">
         <span class="store-label">BrickLink</span>
-        <span class="badge bg-success">connected</span>
+        @if (IsBrickLinkConnected)
+        {
+            <span class="badge bg-success">connected</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">not connected</span>
+        }
     </div>
     <div class="store-status-row">
         <span class="store-label">BrickOwl</span>
-        <span class="badge bg-secondary">not connected</span>
+        @if (IsBrickOwlConnected)
+        {
+            <span class="badge bg-success">connected</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">not connected</span>
+        }
     </div>
 </div>
+
+@code {
+
+    private bool IsBrickLinkConnected { get; set; }
+    private bool IsBrickOwlConnected { get; set; }
+    [CascadingParameter] public Task<AuthenticationState> State { get; set; } = default!;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get logged-in email for header
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+
+        // Load connection statuses
+        AuthenticationState authenticationState = await State;
+        ClaimsPrincipal cp = authenticationState.User;
+
+        var uid = cp.FindFirst(ClaimTypes.NameIdentifier);
+        if (uid != null && long.TryParse(uid.Value, out long studUserId))
+        {
+            IsBrickLinkConnected = await StoreAuthClientService.IsBrickLinkConnected(studUserId);
+            IsBrickOwlConnected = await StoreAuthClientService.IsBrickOwlConnected(studUserId);
+        }
+    }
+
+}
