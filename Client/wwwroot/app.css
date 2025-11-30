@@ -1,7 +1,8 @@
-html, body {
+html, body
+{
   font-family: "Fira Code", "JetBrains Mono", "Source Code Pro", Consolas, monospace;
   background-color: #000;
-  color: #e5e6ff;              /* default text color everywhere */
+  color: #e5e6ff; /* default text color everywhere */
 }
 
 a, .btn-link
@@ -74,11 +75,13 @@ h1:focus
   text-align: start;
 }
 
-.extra-bold {
+.extra-bold
+{
   font-weight: 900;
 }
 
-.login-root {
+.login-root
+{
   min-height: 100vh;
   margin: 0;
   background: #000;
@@ -89,22 +92,22 @@ h1:focus
 }
 
 /* Placeholder so that everything stays centered */
-.error-placeholder {
+.error-placeholder
+{
   height: 24px;
 }
 
 /* Header glow */
-h1, .store-connection-glow {
+h1, .store-connection-glow
+{
   color: #fff;
-  text-shadow:
-          0 0 8px #8a2be2,   /* purple */
-          0 0 16px #8a2be2,
-          0 0 24px #1e90ff,  /* blue */
-          0 0 48px #1e90ff;
+  text-shadow: 0 0 8px #8a2be2, /* purple */ 0 0 16px #8a2be2,
+  0 0 24px #1e90ff, /* blue */ 0 0 48px #1e90ff;
 }
 
 /* Neon wireframe buttons */
-.btn-primary {
+.btn-primary
+{
   background: transparent !important;
   border: 2px solid #8a2be2;
   color: #fff;
@@ -112,79 +115,82 @@ h1, .store-connection-glow {
   transition: all 0.25s ease;
   text-transform: lowercase;
   letter-spacing: 1px;
-  box-shadow:
-          0 0 6px #8a2be2,
-          0 0 12px #1e90ff;
-  padding: 0.6rem 1rem !important; 
-  height: 44px;                      
+  box-shadow: 0 0 6px #8a2be2,
+  0 0 12px #1e90ff;
+  padding: 0.6rem 1rem !important;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 /* Hover: stronger glow, slight scale-up */
-.btn-primary:hover {
+.btn-primary:hover
+{
   border-color: #1e90ff;
   transform: scale(1.01);
-  box-shadow:
-          0 0 4px #8a2be2,
-          0 0 8px #8a2be2,
-          0 0 12px #1e90ff,
-          0 0 16px #1e90ff;
+  box-shadow: 0 0 4px #8a2be2,
+  0 0 8px #8a2be2,
+  0 0 12px #1e90ff,
+  0 0 16px #1e90ff;
 }
 
 /* Active (pressed) state — subtle shrink to feel clicky */
-.btn-primary:active {
+.btn-primary:active
+{
   transform: scale(0.98);
-  box-shadow:
-          0 0 6px #8a2be2,
-          0 0 12px #1e90ff inset;
+  box-shadow: 0 0 6px #8a2be2,
+  0 0 12px #1e90ff inset;
 }
 
 /* Input field wireframe aesthetic for consistency */
-.form-control {
+.form-control
+{
   background: transparent;
   border: 2px solid #555;
   color: #fff;
   transition: all 0.25s ease;
 }
 
-.form-control:focus {
+.form-control:focus
+{
   border-color: #8a2be2;
-  box-shadow:
-          0 0 6px #8a2be2,
-          0 0 12px #1e90ff;
+  box-shadow: 0 0 6px #8a2be2,
+  0 0 12px #1e90ff;
   background: transparent;
   color: #fff;
 }
 
-.login-form-container {
-  width: 520px;      
-  max-width: 90%;     
+.login-form-container
+{
+  width: 520px;
+  max-width: 90%;
 }
 
-.dashboard-grid {
+.dashboard-grid
+{
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
 }
 
-@media (max-width: 768px) {
-  .dashboard-grid {
+@media (max-width: 768px)
+{
+  .dashboard-grid
+  {
     grid-template-columns: 1fr;
   }
 }
 
 /* Card container */
-.dashboard-card {
+.dashboard-card
+{
   aspect-ratio: 4 / 3;
   border-radius: 12px;
   border: 1px solid rgba(138, 43, 226, 0.7);
-  background:
-          radial-gradient(circle at top left, #111326, #050510);
-  box-shadow:
-          0 0 10px rgba(138, 43, 226, 0.45),
-          0 0 18px rgba(30, 144, 255, 0.35);
+  background: radial-gradient(circle at top left, #111326, #050510);
+  box-shadow: 0 0 10px rgba(138, 43, 226, 0.45),
+  0 0 18px rgba(30, 144, 255, 0.35);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -192,15 +198,16 @@ h1, .store-connection-glow {
 }
 
 /* Hover: subtle lift + stronger glow */
-.dashboard-card:hover {
+.dashboard-card:hover
+{
   transform: translateY(-3px);
-  box-shadow:
-          0 0 14px rgba(138, 43, 226, 0.8),
-          0 0 26px rgba(30, 144, 255, 0.8);
+  box-shadow: 0 0 14px rgba(138, 43, 226, 0.8),
+  0 0 26px rgba(30, 144, 255, 0.8);
 }
 
 /* Header */
-.dashboard-card-header {
+.dashboard-card-header
+{
   padding: 0.55rem 0.9rem;
   border-bottom: 1px solid #262840;
   background: linear-gradient(to right, #050510, #0b0f24);
@@ -211,7 +218,8 @@ h1, .store-connection-glow {
 }
 
 /* Body */
-.dashboard-card-body {
+.dashboard-card-body
+{
   flex: 1;
   padding: 0.8rem 0.9rem;
   display: flex;
@@ -219,24 +227,27 @@ h1, .store-connection-glow {
 }
 
 /* Layout for content + footer inside body */
-.widget-content-root {
+.widget-content-root
+{
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
 /* Main widget content: vertically centred */
-.widget-main {
+.widget-main
+{
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;   /* vertical centering */
-  align-items: center;       /* horizontal centering */
+  justify-content: center; /* vertical centering */
+  align-items: center; /* horizontal centering */
   text-align: center;
 }
 
 /* Footer (more >> button) pinned to bottom, centered */
-.widget-footer {
+.widget-footer
+{
   margin-top: 0.75rem;
   display: flex;
   justify-content: center;
@@ -245,31 +256,33 @@ h1, .store-connection-glow {
 /* If you want widget text a bit softer than header but readable */
 .dashboard-card-body p,
 .dashboard-card-body span,
-.dashboard-card-body small {
+.dashboard-card-body small
+{
   color: #c7c9ff;
 }
 
-.page-title-glow {
+.page-title-glow
+{
   color: #fff;
-  text-shadow:
-          0 0 8px #8a2be2,
-          0 0 16px #8a2be2,
-          0 0 24px #1e90ff,
-          0 0 48px #1e90ff;
+  text-shadow: 0 0 8px #8a2be2,
+  0 0 16px #8a2be2,
+  0 0 24px #1e90ff,
+  0 0 48px #1e90ff;
   letter-spacing: 1px;
   font-weight: 800;
 }
 
-.logged-in-info {
-  color: #a0a0ff;                 /* soft neon-ish light blue */
+.logged-in-info
+{
+  color: #a0a0ff; /* soft neon-ish light blue */
   font-weight: 600;
-  text-shadow:
-          0 0 6px rgba(138, 43, 226, 0.6),
-          0 0 12px rgba(30, 144, 255, 0.6);
+  text-shadow: 0 0 6px rgba(138, 43, 226, 0.6),
+  0 0 12px rgba(30, 144, 255, 0.6);
 }
 
 /* Makes the logout button stick to the bottom of the sidebar */
-.logout-container {
+.logout-container
+{
   position: absolute;
   bottom: 1rem;
   left: 0;
@@ -277,30 +290,31 @@ h1, .store-connection-glow {
   padding: 0 1rem;
 }
 
-.btn-logout-neon {
+.btn-logout-neon
+{
   background: transparent;
   border: 2px solid #ff4c4c;
   color: #ffaaaa;
   font-weight: 600;
   text-transform: lowercase;
   letter-spacing: 1px;
-  box-shadow:
-          0 0 6px #ff4c4c,
-          0 0 12px #ff2a2a;
+  box-shadow: 0 0 6px #ff4c4c,
+  0 0 12px #ff2a2a;
   transition: all 0.2s ease-in-out;
 }
 
-.btn-logout-neon:hover {
+.btn-logout-neon:hover
+{
   color: white;
   border-color: #ff6666;
-  box-shadow:
-          0 0 10px #ff4c4c,
-          0 0 20px #ff2a2a;
+  box-shadow: 0 0 10px #ff4c4c,
+  0 0 20px #ff2a2a;
   transform: scale(1.03);
 }
 
-.dashboard-header {
-  min-height: 120px;     
+.dashboard-header
+{
+  min-height: 120px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -308,19 +322,22 @@ h1, .store-connection-glow {
   margin-bottom: 1rem;
 }
 
-.dashboard-header-left {
+.dashboard-header-left
+{
   display: flex;
   flex-direction: column;
 }
 
-.dashboard-header-right {
+.dashboard-header-right
+{
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
 /* placeholder for future notifications icon */
-.notifications-pill {
+.notifications-pill
+{
   padding: 0.25rem 0.75rem;
   border-radius: 999px;
   border: 1px solid #444;
@@ -328,44 +345,49 @@ h1, .store-connection-glow {
   font-size: 0.75rem;
 }
 
-.store-widget {
+.store-widget
+{
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
 }
 
-.store-status-row {
+.store-status-row
+{
   display: flex;
   justify-content: center;
   gap: 0.5rem;
 }
 
-.widget-filter {
+.widget-filter
+{
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 0.35rem;
 }
 
-.widget-filter-label {
+.widget-filter-label
+{
   font-size: 0.75rem;
   text-transform: lowercase;
   color: #a0a0ff;
   letter-spacing: 0.08em;
-  text-shadow:
-          0 0 6px rgba(138, 43, 226, 0.6),
-          0 0 10px rgba(30, 144, 255, 0.6);
+  text-shadow: 0 0 6px rgba(138, 43, 226, 0.6),
+  0 0 10px rgba(30, 144, 255, 0.6);
 }
 
-.widget-filter-list {
+.widget-filter-list
+{
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.35rem 0.75rem;
-  max-width: 360px;   /* so it doesn’t explode the header */
+  max-width: 360px; /* so it doesn’t explode the header */
 }
 
-.widget-filter-item {
+.widget-filter-item
+{
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -374,97 +396,220 @@ h1, .store-connection-glow {
   cursor: pointer;
 }
 
-.widget-filter-item .form-check-input {
+.widget-filter-item .form-check-input
+{
   background-color: transparent;
   border-color: #666;
 }
 
-.widget-filter-item .form-check-input:checked {
+.widget-filter-item .form-check-input:checked
+{
   background-color: #8a2be2;
   border-color: #8a2be2;
-  box-shadow:
-          0 0 6px rgba(138, 43, 226, 0.8),
-          0 0 10px rgba(30, 144, 255, 0.7);
+  box-shadow: 0 0 6px rgba(138, 43, 226, 0.8),
+  0 0 10px rgba(30, 144, 255, 0.7);
 }
 
-.dashboard-card-clickable {
+.dashboard-card-clickable
+{
   cursor: pointer;
 }
 
-.dashboard-card-clickable:hover {
+.dashboard-card-clickable:hover
+{
   /* a tiny extra glow on top of the existing hover */
-  box-shadow:
-          0 0 16px rgba(138, 43, 226, 0.9),
-          0 0 28px rgba(30, 144, 255, 0.9);
+  box-shadow: 0 0 16px rgba(138, 43, 226, 0.9),
+  0 0 28px rgba(30, 144, 255, 0.9);
 }
 
-.dashboard-card-clickable:active {
+.dashboard-card-clickable:active
+{
   transform: translateY(1px);
-  box-shadow:
-          0 0 8px rgba(138, 43, 226, 0.7),
-          0 0 14px rgba(30, 144, 255, 0.6);
+  box-shadow: 0 0 8px rgba(138, 43, 226, 0.7),
+  0 0 14px rgba(30, 144, 255, 0.6);
 }
 
 /* Container for the body of the store page */
-.store-page {
+.store-page
+{
   margin-top: 0.75rem;
   max-width: 960px;
 }
 
 /* Sections (BrickLink / BrickOwl) */
-.store-section {
+.store-section
+{
   color: #e5e6ff; /* brighter than default */
 }
 
 /* Body text + list text */
-.store-body-text {
+.store-body-text
+{
   color: #cfd2ff;
   font-size: 0.9rem;
   margin-bottom: 0.35rem;
 }
 
-.store-body-list {
+.store-body-list
+{
   margin-top: 0;
   margin-bottom: 0.75rem;
   padding-left: 1.25rem;
 }
 
-.store-body-list li {
+.store-body-list li
+{
   color: #d8dbff;
   font-size: 0.9rem;
 }
 
 /* Links inside instructions */
-.store-body-list a {
+.store-body-list a
+{
   color: #7fb7ff;
   text-decoration: underline;
 }
 
-.store-body-list a:hover {
+.store-body-list a:hover
+{
   color: #a4cdff;
 }
 
 /* Alerts on dark background */
-.store-alert {
+.store-alert
+{
   margin-top: 0.75rem;
   padding-top: 0.4rem;
   padding-bottom: 0.4rem;
 }
 
 /* Input field text color */
-.form-control {
+.form-control
+{
   color: #e9e9ff !important; /* brighter white-violet */
 }
 
 /* Placeholder color (critical) */
-.form-control::placeholder {
-  color: #bfbfff !important;  /* neon-friendly light purple */
-  opacity: 1 !important;      /* prevent Bootstrap from dimming it */
+.form-control::placeholder
+{
+  color: #bfbfff !important; /* neon-friendly light purple */
+  opacity: 1 !important; /* prevent Bootstrap from dimming it */
 }
 
 /* When focused, still bright */
-.form-control:focus::placeholder {
+.form-control:focus::placeholder
+{
   color: #d7d7ff !important;
 }
 
+
+/*
+  Source - https://stackoverflow.com/a
+  Posted by CobyC
+  Retrieved 2025-11-30, License - CC BY-SA 4.0
+ */
+
+.pop-container
+{
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  background-color: rgba(18, 12, 41, 0.9);
+}
+
+.popconfirm
+{
+  color: #e5e6ff;
+  padding: 15px;
+  border-radius: 12px;
+  min-width: 300px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  background: radial-gradient(circle at top left, #111326, #050510);
+  border: 1px solid rgba(138, 43, 226, 0.7);
+  box-shadow: 0 0 10px rgba(138, 43, 226, 0.7),
+  0 0 20px rgba(30, 144, 255, 0.4);
+}
+
+.pop-message-card
+{
+  border-radius: 10px;
+  border: 1px solid #262840;
+  background-color: rgba(10, 10, 30, 0.5);
+}
+
+.pop-message-card .card-header
+{
+  padding: 0.5rem 0.9rem;
+  border-bottom: 1px solid #262840;
+  background: linear-gradient(to right, #050510, #0b0f24);
+  color: #f8f6ff;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.pop-message-card .card-body
+{
+  background-color: transparent;
+}
+
+.pop-message-card, .pop-message-card div, .pop-message-card p
+{
+  background-color: transparent;
+  color: #e5e6ff;
+  line-height: 1.4;
+}
+
+.btn-yes
+{
+  background: transparent;
+  border: 2px solid #39ff14;
+  color: #aaffaa;
+  width: 100%;
+  font-weight: 600;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 6px #00ff00,
+  0 0 12px #39ff14;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-yes:hover
+{
+  color: white;
+  border-color: #00ff00;
+  box-shadow: 0 0 10px #00ff00,
+  0 0 20px #39ff14;
+  transform: scale(1.01);
+}
+
+.btn-no
+{
+  background: transparent !important;
+  border: 2px solid #ff4c4c;
+  color: #ffaaaa;
+  width: 100%;
+  font-weight: 600;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 6px #ff4c4c,
+  0 0 12px #ff2a2a;
+  transition: all 0.2s ease;
+}
+
+.btn-no:hover
+{
+  color: white;
+  border-color: #ff6666;
+  transform: scale(1.01);
+  box-shadow: 0 0 8px #ff4c4c,
+  0 0 16px #ff2a2a,
+  0 0 24px #ff0000;
+}
 
