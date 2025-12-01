@@ -315,6 +315,7 @@
             LastSubmitResultBL = "BrickLink disconnected.";
             isSuccesBL = true;
             IsBrickLinkConnected = false;
+            _brickLinkCredentials = new();
         }
         catch (Exception e)
         {
@@ -356,6 +357,7 @@
             LastSubmitResultBO = "Brick Owl disconnected.";
             isSuccesBO = true;
             IsBrickOwlConnected = false;
+            _brickOwlCredentials = new();
         }
         catch (Exception e)
         {

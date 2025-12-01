@@ -1,8 +1,7 @@
 ﻿using System.Text.Json;
-using Client.Services.StudUser;
 using StudHub.SharedDTO.Users;
 
-namespace Client.Services;
+namespace Client.Services.StudUser;
 
 public class StudUserHttpClient : IStudUserClientService
 {

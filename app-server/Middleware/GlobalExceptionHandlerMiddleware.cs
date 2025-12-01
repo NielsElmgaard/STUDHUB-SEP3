@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net.Sockets;
+using System.Text.Json;
 using StudHub.SharedDTO.StoreCredentials;
 
 public class GlobalExceptionHandlerMiddleware : IMiddleware
@@ -17,25 +18,17 @@ public class GlobalExceptionHandlerMiddleware : IMiddleware
         {
             await next(context);
         }
-        catch (InvalidOperationException ex)
-        {
-            await HandleGenericExceptionAsync(context, ex, 503);
-        }
         catch (ArgumentException ex)
         {
             await HandleStoreExceptionAsync(context, ex, 400);
         }
-        catch (UnauthorizedAccessException ex)
-        {
-            await HandleGenericExceptionAsync(context, ex, 401);
-        }
         catch (Exception ex)
         {
-            await HandleGenericExceptionAsync(context, ex, 500);
+            await HandleAllExceptionsAsync(context, ex);
         }
     }
 
-    
+
     private async Task HandleStoreExceptionAsync(HttpContext context,
         ArgumentException exception, int statusCode)
     {
@@ -58,26 +51,34 @@ public class GlobalExceptionHandlerMiddleware : IMiddleware
         await context.Response.WriteAsync(jsonResponse);
     }
 
-    private async Task HandleGenericExceptionAsync(HttpContext context,
-        Exception exception, int statusCode)
+    private async Task HandleAllExceptionsAsync(HttpContext context,
+        Exception exception)
     {
         var traceId = context.TraceIdentifier;
-        _logger.LogError(exception, "Error occurred. TraceId: {TraceId}",
+
+        _logger.LogError(exception, "Unhandled exception. TraceId: {TraceId}",
             traceId);
-        
-        string title = (statusCode == 503) ? "Connection Error" : "Server Error";
-        
-        var genericError = new
+
+        var errorResponse = new BrickLinkCredentialsResponseDTO
         {
-            Title = title,
-            Status = statusCode,
-            Detail = exception.Message,
-            TraceId = traceId
+            IsSucces = false,
+            ErrorMessage = exception.Message
         };
 
         context.Response.ContentType = "application/json";
+
+        int statusCode = exception switch
+        {
+            HttpRequestException => 503,
+            SocketException => 503,
+            InvalidOperationException => 503,
+            ArgumentException => 400,
+            _ => 500
+        };
+
         context.Response.StatusCode = statusCode;
+
         await context.Response.WriteAsync(
-            JsonSerializer.Serialize(genericError));
+            JsonSerializer.Serialize(errorResponse));
     }
 }
