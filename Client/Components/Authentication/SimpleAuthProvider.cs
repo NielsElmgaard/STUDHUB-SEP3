@@ -14,10 +14,11 @@ public class SimpleAuthProvider : AuthenticationStateProvider
     private readonly IJSRuntime jsRuntime;
     private readonly ILoginClientService loginClientService;
 
-    public SimpleAuthProvider(HttpClient httpClient, IJSRuntime jsRuntime)
+    public SimpleAuthProvider(HttpClient httpClient, IJSRuntime jsRuntime, ILoginClientService loginClientService)
     {
         this.httpClient = httpClient;
         this.jsRuntime = jsRuntime;
+        this.loginClientService = loginClientService;
     }
 
     public override async Task<AuthenticationState>
