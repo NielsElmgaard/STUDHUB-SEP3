@@ -1,8 +1,9 @@
 ﻿using StudHub.SharedDTO;
+using StudHub.SharedDTO.Users;
 
-namespace Client.Services;
+namespace Client.Services.Auth_Login;
 
 public interface ILoginClientService
 {
-    Task<string> LoginUserAsync(LoginRequestDTO request);
+    Task<StudUserDTO> LoginUserAsync(LoginRequestDTO request);
 }

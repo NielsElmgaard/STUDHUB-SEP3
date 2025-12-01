@@ -1,6 +1,6 @@
 ﻿using StudHub.SharedDTO.Users;
 
-namespace Client.Services;
+namespace Client.Services.StudUser;
 
 public interface IStudUserClientService
 {

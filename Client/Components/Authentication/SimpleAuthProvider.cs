@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text.Json;
+using Client.Services.Auth_Login;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using StudHub.SharedDTO;
@@ -11,6 +12,7 @@ public class SimpleAuthProvider : AuthenticationStateProvider
 {
     private readonly HttpClient httpClient;
     private readonly IJSRuntime jsRuntime;
+    private readonly ILoginClientService loginClientService;
 
     public SimpleAuthProvider(HttpClient httpClient, IJSRuntime jsRuntime)
     {
@@ -18,12 +20,15 @@ public class SimpleAuthProvider : AuthenticationStateProvider
         this.jsRuntime = jsRuntime;
     }
 
-    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
+    public override async Task<AuthenticationState>
+        GetAuthenticationStateAsync()
     {
         string userAsJson = "";
         try
         {
-            userAsJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "currentUser");
+            userAsJson =
+                await jsRuntime.InvokeAsync<string>("sessionStorage.getItem",
+                    "currentUser");
         }
         catch
         {
@@ -58,36 +63,22 @@ public class SimpleAuthProvider : AuthenticationStateProvider
         return new AuthenticationState(principal);
     }
 
-    public async Task LoginASync(string email, string password)
+    public async Task LoginAsync(string email, string password)
     {
-        var response = await httpClient.PostAsJsonAsync("auth/login",
-            new LoginRequestDTO { Email = email, Password = password });
+        var request = new LoginRequestDTO
+            { Email = email.Trim(), Password = password.Trim() };
 
-        var content = await response.Content.ReadAsStringAsync();
-        if (!response.IsSuccessStatusCode)
-            throw new Exception(content);
+        StudUserDTO userDto = await loginClientService.LoginUserAsync(request);
 
-        LoginResponseDTO? loginResponse;
-        try
-        {
-            loginResponse = JsonSerializer.Deserialize<LoginResponseDTO>(content,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        }
-        catch
-        {
-            throw new Exception("Login response invalid");
-        }
-
-        if (loginResponse?.StudUser == null)
-            throw new Exception("Login failed: missing user data");
-
-        await RefreshUser(loginResponse.StudUser);
+        await RefreshUser(userDto);
     }
 
     public async Task Logout()
     {
-        await jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "currentUser", "");
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new ClaimsPrincipal())));
+        await jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "currentUser",
+            "");
+        NotifyAuthenticationStateChanged(
+            Task.FromResult(new AuthenticationState(new ClaimsPrincipal())));
     }
 
     public async Task RefreshUser(StudUserDTO? userDto)
@@ -95,7 +86,8 @@ public class SimpleAuthProvider : AuthenticationStateProvider
         if (userDto == null) throw new ArgumentNullException(nameof(userDto));
 
         string serializedData = JsonSerializer.Serialize(userDto);
-        await jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "currentUser", serializedData);
+        await jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "currentUser",
+            serializedData);
 
         var claims = new List<Claim>
         {
@@ -106,6 +98,7 @@ public class SimpleAuthProvider : AuthenticationStateProvider
         var identity = new ClaimsIdentity(claims, "apiauth");
         var principal = new ClaimsPrincipal(identity);
 
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(principal)));
+        NotifyAuthenticationStateChanged(
+            Task.FromResult(new AuthenticationState(principal)));
     }
 }

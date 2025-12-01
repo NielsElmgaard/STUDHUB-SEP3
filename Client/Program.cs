@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Studhub.AppServer.Services;
 using Client.Services;
+using Client.Services.Auth_Login;
+using Client.Services.StudUser;
 
 var builder = WebApplication.CreateBuilder(args);
 

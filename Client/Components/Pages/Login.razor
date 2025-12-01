@@ -1,5 +1,6 @@
 ﻿@page "/"
 @layout LoginLayout
+@using Client.Services.Auth_Login
 @using StudHub.SharedDTO
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Web
@@ -81,7 +82,7 @@
 
         try
         {
-            await AuthProvider.LoginASync(Email.Trim(), Password.Trim());
+            await AuthProvider.LoginAsync(Email.Trim(), Password.Trim());
             NavManager.NavigateTo("/Dashboard");
         }
         catch (Exception)
