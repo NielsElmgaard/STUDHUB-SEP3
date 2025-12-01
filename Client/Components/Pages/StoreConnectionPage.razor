@@ -28,24 +28,10 @@
 
         <!-- PAGE BODY -->
         <div class="store-page">
-
-            <!-- BrickLink -->
-            <section class="store-section">
-                <h4 class="store-connection-glow mb-2">BrickLink</h4>
-
-                @if (!IsBrickLinkConnected)
-                {
-                    <p class="store-body-text">Steps to obtain BrickLink
-                        credentials:</p>
-                    <ul class="store-body-list">
-                        <li>
-                            Visit
-                            <a href="https://www.bricklink.com/v2/api/register_consumer.page"
-                               target="_blank" rel="noopener noreferrer">BrickLink</a>
-                        </li>
-                        <li>Add access token</li>
-                        <li>We advise using 0.0.0.0 for IP Address + Mask</li>
-                    </ul>
+            {
+                <!-- BrickLink -->
+                <section class="store-section">
+                    <h4 class="store-connection-glow mb-2">BrickLink</h4>
 
                     @if (!string.IsNullOrEmpty(LastSubmitResultBL))
                     {
@@ -55,60 +41,60 @@
                         </div>
                     }
 
-                    <BrickLinkCredentialsForm
-                        BrickLinkCredentials="_brickLinkCredentials"
-                        OnValidSubmit="ValidBrickLinkFormSubmitted"
-                        OnInvalidSubmit="InvalidBrickLinkFormSubmitted"/>
-                }
-                else
-                {
-                    <div>
-                        <div class="alert alert-success store-alert">BrickLink
-                            is connected.
+                    @if (!IsBrickLinkConnected)
+                    {
+                        <p class="store-body-text">Steps to obtain BrickLink
+                            credentials:</p>
+                        <ul class="store-body-list">
+                            <li>
+                                Visit
+                                <a href="https://www.bricklink.com/v2/api/register_consumer.page"
+                                   target="_blank" rel="noopener noreferrer">BrickLink</a>
+                            </li>
+                            <li>Add access token</li>
+                            <li>We advise using 0.0.0.0 for IP Address + Mask</li>
+                        </ul>
+
+                        <BrickLinkCredentialsForm
+                            BrickLinkCredentials="_brickLinkCredentials"
+                            OnValidSubmit="ValidBrickLinkFormSubmitted"
+                            OnInvalidSubmit="InvalidBrickLinkFormSubmitted"/>
+                    }
+                    else
+                    {
+                        <div>
+                            <div class="alert alert-success store-alert">BrickLink
+                                is connected.
+                            </div>
+                            <PopUpConfirm Title="Disconnect"
+                                          Class="btn btn-logout-neon w-25"
+                                          Message="Are you sure you want to disconnect BrickLink?"
+                                          YesCssClass="btn-yes"
+                                          NoCssClass="btn-no"
+                                          ConfirmedChanged="((confirmed) => ConfirmDisconnectBrickLink(confirmed))">
+                                <MessageTemplate>
+                                    <div class="card pop-message-card">
+                                        <div class="card-header">
+                                            Disconnect BrickLink?
+                                        </div>
+                                        <div class="card-body">
+                                            <p>
+                                                This will disconnect the BrickLink
+                                                connection<br/>
+                                                Are you sure?
+                                            </p>
+                                        </div>
+                                    </div>
+                                </MessageTemplate>
+                            </PopUpConfirm>
                         </div>
-                        <PopUpConfirm Title="Disconnect"
-                                      Class="btn btn-logout-neon w-25"
-                                      Message="Are you sure you want to disconnect BrickLink?"
-                                      YesCssClass="btn-yes"
-                                      NoCssClass="btn-no"
-                                      ConfirmedChanged="((confirmed) => ConfirmDisconnectBrickLink(confirmed))">
-                            <MessageTemplate>
-                                <div class="card pop-message-card">
-                                    <div class="card-header">
-                                        Disconnect BrickLink?
-                                    </div>
-                                    <div class="card-body">
-                                        <p>
-                                            This will disconnect the BrickLink connection<br />
-                                            Are you sure?
-                                        </p>
-                                    </div>
-                                </div>
-                            </MessageTemplate>
-                        </PopUpConfirm>
-                    </div>
-                }
-            </section>
+                    }
+                </section>
 
 
-            <!-- BrickOwl -->
-            <section class="store-section mt-5">
-                <h4 class="store-connection-glow mb-2">BrickOwl</h4>
-
-                @if (!IsBrickOwlConnected)
-                {
-                    <p class="store-body-text">Steps to obtain BrickOwl
-                        credentials:</p>
-                    <ul class="store-body-list">
-                        <li>
-                            Visit <a href="https://www.brickowl.com/api_docs"
-                                     target="_blank" rel="noopener noreferrer">Brick
-                                Owl</a>
-                        </li>
-                        <li>Generate API key</li>
-                        <li>Add the API Key</li>
-                        <li>Ensure the key is enabled</li>
-                    </ul>
+                <!-- BrickOwl -->
+                <section class="store-section mt-5">
+                    <h4 class="store-connection-glow mb-2">BrickOwl</h4>
 
                     @if (!string.IsNullOrEmpty(LastSubmitResultBO))
                     {
@@ -118,41 +104,59 @@
                         </div>
                     }
 
-                    <BrickOwlCredentialsForm
-                        BrickOwlCredentials="_brickOwlCredentials"
-                        OnValidSubmit="ValidBrickOwlFormSubmitted"
-                        OnInvalidSubmit="InvalidBrickOwlFormSubmitted"/>
-                }
-                else
-                {
-                    <div>
-                        <div class="alert alert-success store-alert">BrickOwl is
-                            connected.
+                    @if (!IsBrickOwlConnected)
+                    {
+                        <p class="store-body-text">Steps to obtain BrickOwl
+                            credentials:</p>
+                        <ul class="store-body-list">
+                            <li>
+                                Visit
+                                <a href="https://www.brickowl.com/api_docs"
+                                   target="_blank" rel="noopener noreferrer">Brick
+                                    Owl</a>
+                            </li>
+                            <li>Generate API key</li>
+                            <li>Add the API Key</li>
+                            <li>Ensure the key is enabled</li>
+                        </ul>
+
+                        <BrickOwlCredentialsForm
+                            BrickOwlCredentials="_brickOwlCredentials"
+                            OnValidSubmit="ValidBrickOwlFormSubmitted"
+                            OnInvalidSubmit="InvalidBrickOwlFormSubmitted"/>
+                    }
+                    else
+                    {
+                        <div>
+                            <div class="alert alert-success store-alert">BrickOwl is
+                                connected.
+                            </div>
+                            <PopUpConfirm Title="Disconnect"
+                                          Class="btn btn-logout-neon w-25"
+                                          Message="Are you sure you want to disconnect Brick Owl?"
+                                          YesCssClass="btn-yes"
+                                          NoCssClass="btn-no"
+                                          ConfirmedChanged="((confirmed) => ConfirmDisconnectBrickOwl(confirmed))">
+                                <MessageTemplate>
+                                    <div class="card pop-message-card">
+                                        <div class="card-header">
+                                            Disconnect Brick Owl?
+                                        </div>
+                                        <div class="card-body">
+                                            <p>
+                                                This will disconnect the Brick Owl
+                                                connection<br/>
+                                                Are you sure?
+                                            </p>
+                                        </div>
+                                    </div>
+                                </MessageTemplate>
+                            </PopUpConfirm>
                         </div>
-                        <PopUpConfirm Title="Disconnect"
-                                      Class="btn btn-logout-neon w-25"
-                                      Message="Are you sure you want to disconnect Brick Owl?"
-                                      YesCssClass="btn-yes"
-                                      NoCssClass="btn-no"
-                                      ConfirmedChanged="((confirmed) => ConfirmDisconnectBrickOwl(confirmed))">
-                            <MessageTemplate>
-                                <div class="card pop-message-card">
-                                    <div class="card-header">
-                                        Disconnect Brick Owl?
-                                    </div>
-                                    <div class="card-body">
-                                        <p>
-                                            This will disconnect the Brick Owl connection<br />
-                                            Are you sure?
-                                        </p>
-                                    </div>
-                                </div>
-                            </MessageTemplate>
-                        </PopUpConfirm>
-                    </div>
-                }
-            </section>
-        </div>
+                    }
+                </section>
+        </div >
+      
     </Authorized>
 
     <NotAuthorized>
@@ -177,8 +181,7 @@
     private string? userEmail;
 
     [CascadingParameter] public Task<AuthenticationState> State { get; set; } = default!;
-
-
+    
     protected override async Task OnInitializedAsync()
     {
         // Get logged-in email for header
@@ -195,8 +198,14 @@
         var uid = cp.FindFirst(ClaimTypes.NameIdentifier);
         if (uid != null && long.TryParse(uid.Value, out long studUserId))
         {
-            IsBrickLinkConnected = await StoreAuthClientService.IsBrickLinkConnected(studUserId);
-            IsBrickOwlConnected = await StoreAuthClientService.IsBrickOwlConnected(studUserId);
+            try
+            {
+                IsBrickLinkConnected = await StoreAuthClientService.IsBrickLinkConnected(studUserId);
+                IsBrickOwlConnected = await StoreAuthClientService.IsBrickOwlConnected(studUserId);
+            }
+            catch (Exception e)
+            {
+            }
         }
     }
 
@@ -321,6 +330,7 @@
         {
             LastSubmitResultBL = $"Error disconnecting: {e.Message}";
             isSuccesBL = false;
+            StateHasChanged();
         }
     }
 
@@ -363,7 +373,8 @@
         {
             LastSubmitResultBO = $"Error disconnecting: {e.Message}";
             isSuccesBO = false;
+            StateHasChanged();
         }
     }
-
+// TODO Fejl: Når man reloader page når data-serveren er slukket, vises Form (da e.g. IsBrickLinkConnected = false). Lave så der vises besked om data-server er nede i stedet for.
 }
