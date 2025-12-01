@@ -1,4 +1,5 @@
 ﻿using StudHub.SharedDTO;
+using StudHub.SharedDTO.Inventory;
 
 namespace Client.Services;
 
@@ -23,5 +24,10 @@ public class InventoryHttpClient : IInventoryClientService
 
         var sets = await response.Content.ReadFromJsonAsync<List<SetDTO>>();
         return sets ?? new List<SetDTO>();
+    }
+
+    public async Task<List<BrickLinkInventoryDTO>> GetUserInventoryAsync(long studUserId)
+    {
+        throw new NotImplementedException();
     }
 }

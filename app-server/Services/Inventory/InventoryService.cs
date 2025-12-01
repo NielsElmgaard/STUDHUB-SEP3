@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using Studhub.AppServer.Services.Auth_Login;
 using StudHub.SharedDTO;
+using StudHub.SharedDTO.Inventory;
 
 
 namespace Studhub.AppServer.Services;
@@ -78,6 +79,11 @@ public class InventoryService : IInventoryService
                 $"An error occurred during Set mapping or processing for {studUserId}",
                 e);
         }
+    }
+
+    public async Task<List<BrickLinkInventoryDTO>> GetUserInventoryAsync(long studUserId)
+    {
+        throw new NotImplementedException();
     }
 
 
