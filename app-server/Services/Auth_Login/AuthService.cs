@@ -27,26 +27,35 @@ public class AuthService : IAuthService
     public async Task<StudUserDTO?> ValidateUserAsync(string email,
         string password)
     {
-        var grpcResponse = await _grpcClient.GetStudByEmailAsync(
-            new GetStudByEmailRequest()
+        try
+        {
+            var grpcResponse = await _grpcClient.GetStudByEmailAsync(
+                new GetStudByEmailRequest()
+                {
+                    Email = email,
+                    Password = password.Trim()
+                });
+
+            if (!string.IsNullOrEmpty(grpcResponse.ErrorMessage))
             {
-                Email = email,
-                Password = password.Trim()
-            });
+                Console.WriteLine("Error grpc: " + grpcResponse.ErrorMessage);
 
-        if (!string.IsNullOrEmpty(grpcResponse.ErrorMessage))
-        {
-            Console.WriteLine("Error grpc: " + grpcResponse.ErrorMessage);
+                return null;
+            }
 
-            return null;
+            return new StudUserDTO
+            {
+                Id = grpcResponse.Id,
+                Email = grpcResponse.Email,
+                Username = grpcResponse.Username
+            };
         }
-
-        return new StudUserDTO
+        catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable)
         {
-            Id = grpcResponse.Id,
-            Email = grpcResponse.Email,
-            Username = grpcResponse.Username
-        };
+            throw new InvalidOperationException(
+                "Could not establish connection to the data service. Please try again later.",
+                e);
+        }
     }
 
     public async Task<BrickLinkCredentialsDTO?> SetBrickLinkCredentialsAsync(
