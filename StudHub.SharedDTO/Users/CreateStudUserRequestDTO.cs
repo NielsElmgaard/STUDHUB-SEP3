@@ -13,6 +13,7 @@ public class CreateStudUserRequestDTO
 
     [Required(ErrorMessage = "Email is required and cannot be empty.")]
     [EmailAddress(ErrorMessage = "Email must be a valid format.")]
+    [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Email must have a valid domain format (e.g., user@domain.com).")] 
     public required string Email { get; set; }
 
     [Required(ErrorMessage = "Password is required and cannot be empty.")]

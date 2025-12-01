@@ -85,9 +85,9 @@
             await AuthProvider.LoginAsync(Email.Trim(), Password.Trim());
             NavManager.NavigateTo("/Dashboard");
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            _errorMessage = "error: invalid email or password";
+            _errorMessage = $"Server error: {e.Message}";
         }
     }
 }

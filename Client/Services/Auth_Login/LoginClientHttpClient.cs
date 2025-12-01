@@ -21,7 +21,29 @@ public class LoginClientHttpClient : ILoginClientService
         if (!httpResponse.IsSuccessStatusCode)
         {
             var error = await httpResponse.Content.ReadAsStringAsync();
-            throw new Exception($"Login failed: {error}");
+            try
+            {
+                using (var doc = JsonDocument.Parse(error))
+                {
+                    if (doc.RootElement.TryGetProperty("errorMessage",
+                            out var errorMessageElement) ||
+                        doc.RootElement.TryGetProperty("ErrorMessage",
+                            out errorMessageElement))
+                    {
+                        var errorMessage = errorMessageElement.GetString();
+                        throw new Exception(errorMessage ??
+                                            "Unknown server error occurred.");
+                    }
+                }
+            }
+            catch (JsonException)
+            {
+                throw new Exception(
+                    $"Login failed: Invalid server response format: {error}");
+            }
+
+            throw new Exception(
+                "Login failed: Unknown error structure from server.");
         }
 
         LoginResponseDTO? body;
