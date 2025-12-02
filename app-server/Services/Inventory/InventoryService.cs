@@ -8,16 +8,18 @@ using Studhub.AppServer.Services.Auth_Login;
 using StudHub.SharedDTO;
 using StudHub.SharedDTO.Inventory;
 
-
-namespace Studhub.AppServer.Services;
+namespace Studhub.AppServer.Services.Inventory;
 
 public class InventoryService : IInventoryService
 {
     private readonly HttpClient _httpClient;
     private readonly IAuthService _authService;
 
-    private static string url =
+    private static string brickLinkInventoriesUrl =
         "https://api.bricklink.com/api/store/v1/inventories";
+
+    private static string brickOwlInventoriesUrl =
+        "https://api.brickowl.com/v1/inventory/list";
 
     public InventoryService(IAuthService authService,
         HttpClient httpClient)
@@ -81,10 +83,255 @@ public class InventoryService : IInventoryService
         }
     }
 
-    public async Task<List<BrickLinkInventoryDTO>> GetUserInventoryAsync(long studUserId)
+    public async Task<List<BrickLinkInventoryDTO>>
+        GetUserBrickLinkInventoryAsync(
+            long studUserId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var credentials =
+                await _authService.GetBrickLinkCredentialsAsync(studUserId);
+            if (credentials == null)
+            {
+                throw new Exception(
+                    $"No BrickLink credentials for {studUserId}");
+            }
+
+            var jsonResponse = await OAuthHelper.ExecuteSignedApiCallAsync(
+                _httpClient, brickLinkInventoriesUrl, HttpMethod.Get,
+                credentials.ConsumerKey,
+                credentials.ConsumerSecret, credentials.TokenValue,
+                credentials.TokenSecret);
+
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            var brickLinkResponse =
+                JsonSerializer
+                    .Deserialize<
+                        BrickLinkApiResponse<List<BrickLinkInventoryDTO>>>(
+                        jsonResponse, options);
+
+            if (brickLinkResponse?.Data == null)
+            {
+                return new List<BrickLinkInventoryDTO>();
+            }
+
+            return brickLinkResponse.Data;
+        }
+        catch (JsonException e)
+        {
+            throw new JsonException(
+                $"Error deserializing BrickLink response content for {studUserId}",
+                e);
+        }
+        catch (Exception e)
+        {
+            throw new Exception(
+                $"An error occurred during processing BrickLink inventories for {studUserId}",
+                e);
+        }
     }
+
+    public async Task<List<BrickOwlLotDTO>> GetUserBrickOwlInventoryAsync(
+        long studUserId)
+    {
+        try
+        {
+            var credentials =
+                await _authService.GetBrickOwlCredentialsAsync(studUserId);
+            if (credentials == null)
+            {
+                throw new Exception(
+                    $"No Brick Owl credentials for {studUserId}");
+            }
+
+            var fullUrl =
+                $"{brickOwlInventoriesUrl}?key={credentials.BrickOwlApiKey}";
+            var request = new HttpRequestMessage(HttpMethod.Get, fullUrl);
+
+            var response = await _httpClient.SendAsync(request);
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+
+            Console.WriteLine(
+                $"===== Brick Owl RAW Response Body (Status: {response.StatusCode}) =====");
+            Console.WriteLine(jsonResponse.Substring(0,
+                Math.Min(jsonResponse.Length, 100)));
+            response.EnsureSuccessStatusCode();
+
+
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            var brickOwlResponse =
+                JsonSerializer
+                    .Deserialize<List<BrickOwlLotDTO>>(jsonResponse, options);
+
+            if (brickOwlResponse == null)
+            {
+                return new List<BrickOwlLotDTO>();
+            }
+
+            return brickOwlResponse;
+        }
+        catch (JsonException e)
+        {
+            throw new JsonException(
+                $"Error deserializing Brick Owl response content for {studUserId}",
+                e);
+        }
+        catch (Exception e)
+        {
+            throw new Exception(
+                $"An error occurred during processing Brick Owl inventories for {studUserId}",
+                e);
+        }
+    }
+
+    public async Task<List<string>> DiscoverBrickOwlInventoryKeysAsync(
+        long studUserId)
+    {
+        var credentials =
+            await _authService.GetBrickOwlCredentialsAsync(studUserId);
+        if (credentials == null)
+        {
+            throw new Exception($"No Brick Owl credentials for {studUserId}");
+        }
+
+        var fullUrl =
+            $"{brickOwlInventoriesUrl}?key={credentials.BrickOwlApiKey}";
+        var request = new HttpRequestMessage(HttpMethod.Get, fullUrl);
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var jsonResponse = await response.Content.ReadAsStringAsync();
+
+        Console.WriteLine(
+            $"===== Brick Owl RAW Response Body (Status: {response.StatusCode}) =====");
+        Console.WriteLine(
+            jsonResponse.Substring(0,
+                Math.Min(jsonResponse.Length,
+                    200))); // Log a bit more for context
+
+        // --- 2. Key Discovery Logic ---
+        var uniqueKeys = new HashSet<string>();
+
+        try
+        {
+            // Deserialize the root of the response into an array of generic JSON elements
+            var lotElements =
+                JsonSerializer.Deserialize<JsonElement[]>(jsonResponse);
+
+            if (lotElements == null || lotElements.Length == 0)
+            {
+                return new List<string>();
+            }
+
+            // We only need to examine the first element to get a full list of fields
+            var firstLot = lotElements[0];
+
+            if (firstLot.ValueKind != JsonValueKind.Object)
+            {
+                throw new JsonException(
+                    "First element in inventory array is not a JSON object.");
+            }
+
+            // Iterate over all properties (keys) in the first object
+            foreach (var property in firstLot.EnumerateObject())
+            {
+                uniqueKeys.Add(property.Name);
+            }
+
+            return uniqueKeys.ToList();
+        }
+        catch (JsonException e)
+        {
+            throw new JsonException(
+                $"Error parsing Brick Owl response content for key discovery for {studUserId}. Check if JSON is valid.",
+                e);
+        }
+        catch (Exception e)
+        {
+            throw new Exception(
+                $"An error occurred during key discovery for {studUserId}",
+                e);
+        }
+    }
+
+    public async Task<List<string>> DiscoverBrickLinkInventoryKeysAsync(long studUserId)
+    {
+var credentials = await _authService.GetBrickLinkCredentialsAsync(studUserId);
+    if (credentials == null)
+    {
+        throw new Exception($"No BrickLink credentials for {studUserId}");
+    }
+    
+    // Use the existing BrickLink helper function which handles OAuth 1.0a signing
+    var jsonResponse = await OAuthHelper.ExecuteSignedApiCallAsync(
+        _httpClient, brickLinkInventoriesUrl, HttpMethod.Get,
+        credentials.ConsumerKey,
+        credentials.ConsumerSecret, credentials.TokenValue,
+        credentials.TokenSecret);
+    
+    Console.WriteLine($"===== BrickLink RAW Response Body (Data Discovery) =====");
+    Console.WriteLine(jsonResponse.Substring(0, Math.Min(jsonResponse.Length, 200)));
+
+    // --- 2. Key Discovery Logic ---
+    var uniqueKeys = new HashSet<string>();
+
+    try
+    {
+        using (JsonDocument document = JsonDocument.Parse(jsonResponse))
+        {
+            var root = document.RootElement;
+            
+            // Navigate to the 'data' array
+            if (!root.TryGetProperty("data", out JsonElement dataElement) || 
+                dataElement.ValueKind != JsonValueKind.Array)
+            {
+                throw new JsonException("BrickLink response 'data' property is missing or not an array.");
+            }
+
+            // Check if the array is empty
+            if (dataElement.GetArrayLength() == 0)
+            {
+                return new List<string>();
+            }
+
+            // Get the first item object in the 'data' array
+            var firstLot = dataElement[0];
+
+            if (firstLot.ValueKind != JsonValueKind.Object)
+            {
+                throw new JsonException("First element in data array is not a JSON object.");
+            }
+
+            // Iterate over all properties (keys) in the first object
+            foreach (var property in firstLot.EnumerateObject())
+            {
+                uniqueKeys.Add(property.Name);
+            }
+        }
+        
+        return uniqueKeys.ToList();
+    }
+    catch (JsonException e)
+    {
+        throw new JsonException(
+            $"Error parsing BrickLink response content for key discovery for {studUserId}. Check JSON structure.",
+            e);
+    }
+    catch (Exception e)
+    {
+        throw new Exception(
+            $"An error occurred during key discovery for {studUserId}",
+            e);
+    }
+}
 
 
     // Encode string according to RFC 3986
@@ -199,15 +446,16 @@ public class InventoryService : IInventoryService
 
         try
         {
-            // Full request url with query parameters
+            // Full request brickLinkInventoriesUrl with query parameters
             var queryString = string.Join("&",
                 queryParams.Select(kvp =>
                     $"{UrlEncode(kvp.Key)}={UrlEncode(kvp.Value)}"));
-            var fullUrl = $"{url}?{queryString}";
+            var fullUrl = $"{brickLinkInventoriesUrl}?{queryString}";
 
             // Auth header value
             var authHeaderValue = CreateOAuth1Header(
-                url, "GET", queryParams, consumerKey, consumerSecret,
+                brickLinkInventoriesUrl, "GET", queryParams, consumerKey,
+                consumerSecret,
                 tokenValue, tokenSecret);
 
             // applying header to request

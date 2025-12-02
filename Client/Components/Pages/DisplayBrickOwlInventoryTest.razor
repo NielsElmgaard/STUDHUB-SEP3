@@ -1,0 +1,92 @@
+@page "/DisplayBrickOwlInventoryTest"
+@using System.Security.Claims
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Authorization
+@using StudHub.SharedDTO.Inventory
+@inject IInventoryClientService InventoryClientService
+<PageTitle>DisplayBrickOwlInventoryTest</PageTitle>
+<AuthorizeView>
+    <Authorized>
+        <h3>Inventory (@Inventories.Count)</h3>
+        <p role="status">@errorMessage</p>
+        @if (isLoading)
+        {
+            <div class="d-flex justify-content-center my-3">
+                <img src="spinner.gif" alt="Loading..."
+                     class="img-fluid w-25 mx-auto d-block"/>
+            </div>
+        }
+        else if (Inventories.Count == 0)
+        {
+            <p>No Inventory found.</p>
+        }
+        else
+        {
+            <pre style="background-color: black; color:white; padding: 10px; border: 1px solid green;">
+                @InventoryJson
+            </pre>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <NotAuthorizedContent/>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private List<BrickOwlLotDTO> Inventories { get; set; } = new();
+    private bool isLoading = true;
+    
+    [CascadingParameter] public Task<AuthenticationState> State { get; set; }
+
+    private string? errorMessage;
+    private string InventoryJson { get; set; } = "[]";
+    protected override async Task OnInitializedAsync()
+    {
+        AuthenticationState authenticationState = await State;
+        ClaimsPrincipal claimsPrincipal = authenticationState.User;
+
+
+        if (claimsPrincipal.Identity is null || !claimsPrincipal.Identity.IsAuthenticated)
+        {
+            // the user is not logged in
+            isLoading = false;
+            return;
+        }
+
+        var username = claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value;
+        var studUserIdClaim = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
+        if (studUserIdClaim == null || !long.TryParse(studUserIdClaim.Value, out var studUserId))
+        {
+            errorMessage = "Could not fetch stud ID.";
+            isLoading = false;
+            return;
+        }
+
+        isLoading = true;
+        try
+        {
+            Inventories = await InventoryClientService.GetUserBrickOwlInventoryAsync(studUserId);
+            var printOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+            InventoryJson = JsonSerializer.Serialize(Inventories, printOptions);
+        }
+        catch (Exception e)
+        {
+            if (e.Message.Contains($"No Brick Owl credentials for"))
+            {
+                errorMessage = $"No Brick Owl credentials for: {username}. Please link your account";
+                Inventories = new List<BrickOwlLotDTO>();
+            }
+            else
+            {
+                errorMessage = $"An error occurred while fetching inventories: {e.Message}";
+            }
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
