@@ -10,12 +10,13 @@ namespace StudHub.SharedDTO.Inventory
 
         [JsonPropertyName("color_id")] public int ColorId { get; set; }
 
+        [JsonPropertyName("color_name")] public string ColorName { get; set; }
+
         [JsonPropertyName("quantity")] public int Quantity { get; set; }
 
         [JsonPropertyName("new_or_used")]
         public string NewOrUsed { get; set; } // "N" or "U"
 
-        // Use string for currency fields to preserve API format ("X.XXXX")
         [JsonPropertyName("unit_price")] public string UnitPrice { get; set; }
 
         [JsonPropertyName("bind_id")] public int BindId { get; set; }
@@ -35,14 +36,11 @@ namespace StudHub.SharedDTO.Inventory
         [JsonPropertyName("date_created")]
         public DateTime DateCreated { get; set; }
 
+        [JsonPropertyName("my_cost")] public string MyCost { get; set; }
+
         [JsonPropertyName("sale_rate")] public int SaleRate { get; set; }
 
         // Tiered Pricing Fields
-        [JsonPropertyName("my_cost")] public string MyCost { get; set; }
-
-        [JsonPropertyName("tier_quantity1")]
-        public int TierQuantity1 { get; set; }
-
         [JsonPropertyName("tier_price1")] public string TierPrice1 { get; set; }
 
         [JsonPropertyName("tier_quantity2")]
@@ -54,5 +52,7 @@ namespace StudHub.SharedDTO.Inventory
         public int TierQuantity3 { get; set; }
 
         [JsonPropertyName("tier_price3")] public string TierPrice3 { get; set; }
+
+        [JsonPropertyName("my_weight")] public string MyWeight { get; set; }
     }
 }
