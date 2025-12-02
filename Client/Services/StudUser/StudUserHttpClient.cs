@@ -11,16 +11,36 @@ public class StudUserHttpClient : IStudUserClientService
     {
         _httpClient = httpClient;
     }
-    public async Task<CreateStudUserResponseDTO> CreateStudUser(CreateStudUserRequestDTO request)
+
+    public async Task<CreateStudUserResponseDTO> CreateStudUser(
+        CreateStudUserRequestDTO request)
     {
-        HttpResponseMessage httpResponse = await _httpClient.PostAsJsonAsync("StudUsers", request);
+        HttpResponseMessage httpResponse =
+            await _httpClient.PostAsJsonAsync("StudUsers", request);
         string response = await httpResponse.Content.ReadAsStringAsync();
 
         if (!httpResponse.IsSuccessStatusCode)
         {
-            throw new Exception(response);
+            CreateStudUserResponseDTO? errorDto = null;
+            try
+            {
+                errorDto =
+                    JsonSerializer.Deserialize<CreateStudUserResponseDTO>(
+                        response,
+                        new JsonSerializerOptions
+                            { PropertyNameCaseInsensitive = true });
+            }
+            catch (JsonException)
+            {
+            }
+
+            string userFacingMessage = errorDto?.ErrorMessage ??
+                                       $"User registration failed (HTTP {(int)httpResponse.StatusCode}).";
+            throw new Exception(userFacingMessage);
         }
-        return JsonSerializer.Deserialize<CreateStudUserResponseDTO>(response,
+
+        return JsonSerializer.Deserialize<CreateStudUserResponseDTO>(
+            response,
             new JsonSerializerOptions
                 { PropertyNameCaseInsensitive = true })!;
     }

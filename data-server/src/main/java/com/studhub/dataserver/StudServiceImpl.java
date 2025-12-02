@@ -4,6 +4,8 @@ import com.studhub.dataserver.storeconnection.BrickLinkConnection;
 import com.studhub.dataserver.storeconnection.BrickOwlConnection;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @GrpcService public class StudServiceImpl
@@ -30,7 +32,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
     stud.setUsername(request.getUsername());
     stud.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
-
     // Empty connection objects for new users
     BrickLinkConnection blConnection = new BrickLinkConnection();
     BrickOwlConnection boConnection = new BrickOwlConnection();
@@ -41,13 +42,35 @@ import org.springframework.security.crypto.password.PasswordEncoder;
     stud.setBrickOwlConnection(boConnection);
     boConnection.setStud(stud);
 
-    Stud savedStud = studRepository.save(stud);
+    try
+    {
+      Stud savedStud = studRepository.save(stud);
 
+      CreateStudResponse response = CreateStudResponse.newBuilder()
+          .setIsSuccess(true).setId(savedStud.getId()).build();
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+
+    }
     // TODO: handle exception when create stud fail
-    CreateStudResponse response = CreateStudResponse.newBuilder()
-        .setIsSuccess(true).setId(savedStud.getId()).build();
-    responseObserver.onNext(response);
-    responseObserver.onCompleted();
+    catch (DataIntegrityViolationException e)
+    {
+      if (e.getCause() instanceof ConstraintViolationException)
+      {
+        String detail = ((ConstraintViolationException) e.getCause()).getSQLException()
+            .getMessage();
+        throw new io.grpc.StatusRuntimeException(
+            io.grpc.Status.ALREADY_EXISTS.withDescription(
+                "A stud user with this email already exists."));
+      }
+      throw new io.grpc.StatusRuntimeException(
+          io.grpc.Status.UNKNOWN.withCause(e));
+    }
+    catch (Exception e)
+    {
+      throw new io.grpc.StatusRuntimeException(
+          io.grpc.Status.UNKNOWN.withCause(e));
+    }
   }
 
   @Override public void getStudByEmail(GetStudByEmailRequest request,
@@ -63,14 +86,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
       // Compare password
       if (passwordEncoder.matches(password, stud.getPasswordHash()))
       {
-        responseBuilder.setId(stud.getId()).setEmail(stud.getEmail()).setUsername(stud.getUsername()).setErrorMessage("");
+        responseBuilder.setId(stud.getId()).setEmail(stud.getEmail())
+            .setUsername(stud.getUsername()).setErrorMessage("");
       }
       else
       {
-        responseBuilder.setId(-1).setEmail("").setUsername("").setErrorMessage("Invalid password");
+        responseBuilder.setId(-1).setEmail("").setUsername("")
+            .setErrorMessage("Invalid password");
       }
     }, () -> {
-      responseBuilder.setId(-1).setEmail("").setUsername("").setErrorMessage("User not found");
+      responseBuilder.setId(-1).setEmail("").setUsername("")
+          .setErrorMessage("User not found");
     });
 
     responseObserver.onNext(responseBuilder.build());
@@ -115,7 +141,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
     studRepository.findById(id).ifPresentOrElse(stud -> {
       BrickLinkConnection connection = stud.getBrickLinkConnection();
 
-      if (connection == null) {
+      if (connection == null)
+      {
         b.setConsumerKey("").setConsumerSecret("").setTokenValue("")
             .setTokenSecret("");
         return;
@@ -150,7 +177,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
     studRepository.findById(id).ifPresentOrElse(stud -> {
       BrickOwlConnection connection = stud.getBrickOwlConnection();
 
-      if (connection == null) {
+      if (connection == null)
+      {
         b.setApiKey("");
         return;
       }
@@ -184,7 +212,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
         var stud = optionalStud.get();
         BrickLinkConnection connection = stud.getBrickLinkConnection();
 
-        if (connection == null) {
+        if (connection == null)
+        {
           connection = new BrickLinkConnection();
           stud.setBrickLinkConnection(connection);
           connection.setStud(stud);
@@ -227,7 +256,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
         var stud = optionalStud.get();
         BrickOwlConnection connection = stud.getBrickOwlConnection();
 
-        if (connection == null) {
+        if (connection == null)
+        {
           connection = new BrickOwlConnection();
           stud.setBrickOwlConnection(connection);
           connection.setStud(stud);

@@ -1,29 +1,45 @@
-﻿@using StudHub.SharedDTO.Users
+﻿@using System.ComponentModel.DataAnnotations
+@using StudHub.SharedDTO.Users
 <EditForm Model=@StudUserUser OnValidSubmit=@OnValidSubmit
           OnInvalidSubmit=@OnInvalidSubmit>
     <DataAnnotationsValidator/>
-    <ValidationSummary class="alert alert-warning"/>
+    <div class="login-form-container gap-3">
     <div class="form-group">
         <label for="Email">Email</label>
-        <InputText @bind-Value="StudUserUser.Email" class="form-control" id="Email"/>
+        <InputText @bind-Value="StudUserUser.Email" class="form-control"
+                   id="Email" placeholder="enter email..."
+        />
         <!-- Display specific error message -->
         <ValidationMessage For="@(() => StudUserUser.Email)"/>
     </div>
     <div class="form-group">
         <label for="Username">Username</label>
-        <InputText @bind-Value="StudUserUser.Username" class="form-control" id="Username"/>
+        <InputText @bind-Value="StudUserUser.Username" class="form-control"
+                   id="Username" placeholder="enter username..."
+        />
         <ValidationMessage For="@(() => StudUserUser.Username)"/>
     </div>
     <div class="form-group">
         <label for="Password">Password</label>
-        <InputText type="password" @bind-Value="StudUserUser.Password" class="form-control" id="Password"/>
+        <input @bind="StudUserUser.Password" class="form-control"
+               autocomplete="current-password" aria-required="true"
+               placeholder="enter password..."
+               type="@(ShowPassword ? "text" : "password")"/>
         <ValidationMessage For="@(() => StudUserUser.Password)"/>
     </div>
-    <input type="submit" class="btn btn-primary" value="Sign up"/>
+    <div class="form-check mb-3">
+        <input type="checkbox" @bind="ShowPassword" class="form-check-input"/>
+        <label class="form-check-label" for="showPassword">Show Password</label>
+    </div>
+    <input type="submit" class="btn btn-primary w-100 p-3" value="Sign up >>"/>
+    </div>
 </EditForm>
 
 
 @code {
+
+    private bool ShowPassword { get; set; } = false;
+    
     [Parameter] public CreateStudUserRequestDTO StudUserUser { get; set; }
 
     [Parameter] public EventCallback OnValidSubmit { get; set; }
