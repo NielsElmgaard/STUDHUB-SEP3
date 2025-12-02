@@ -1,5 +1,6 @@
 ﻿using StudHub.SharedDTO;
 using StudHub.SharedDTO.Inventory;
+using StudHub.SharedDTO.StoreCredentials;
 
 namespace Client.Services;
 
@@ -36,7 +37,24 @@ public class InventoryHttpClient : IInventoryClientService
         if (!response.IsSuccessStatusCode)
         {
             var error = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Error fetching inventories: {error}");
+
+            try
+            {
+                var apiError =
+                    System.Text.Json.JsonSerializer
+                        .Deserialize<BrickLinkCredentialsResponseDTO>(error,
+                            new System.Text.Json.JsonSerializerOptions
+                                { PropertyNameCaseInsensitive = true });
+
+                throw new Exception(
+                    $"Error fetching inventories: {apiError?.ErrorMessage ?? "Unknown server error"}");
+            }
+            catch (Exception e) when (e is System.Text.Json.JsonException ||
+                                      e is InvalidOperationException)
+            {
+                throw new Exception(
+                    $"Error fetching inventories (Status: {response.StatusCode}): {error}");
+            }
         }
 
         var inventories = await response.Content
@@ -54,7 +72,23 @@ public class InventoryHttpClient : IInventoryClientService
         if (!response.IsSuccessStatusCode)
         {
             var error = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Error fetching inventories: {error}");
+            try
+            {
+                var apiError =
+                    System.Text.Json.JsonSerializer
+                        .Deserialize<BrickOwlCredentialsResponseDTO>(error,
+                            new System.Text.Json.JsonSerializerOptions
+                                { PropertyNameCaseInsensitive = true });
+
+                throw new Exception(
+                    $"Error fetching inventories: {apiError?.ErrorMessage ?? "Unknown server error"}");
+            }
+            catch (Exception e) when (e is System.Text.Json.JsonException ||
+                                      e is InvalidOperationException)
+            {
+                throw new Exception(
+                    $"Error fetching inventories (Status: {response.StatusCode}): {error}");
+            }
         }
 
         var inventories = await response.Content

@@ -1,37 +1,52 @@
 ﻿@using System.ComponentModel.DataAnnotations
 @using StudHub.SharedDTO.Users
+@inject NavigationManager NavManager
 <EditForm Model=@StudUserUser OnValidSubmit=@OnValidSubmit
           OnInvalidSubmit=@OnInvalidSubmit>
     <DataAnnotationsValidator/>
+
     <div class="login-form-container gap-3">
-    <div class="form-group">
-        <label for="Email">Email</label>
-        <InputText @bind-Value="StudUserUser.Email" class="form-control"
-                   id="Email" placeholder="enter email..."
-        />
-        <!-- Display specific error message -->
-        <ValidationMessage For="@(() => StudUserUser.Email)"/>
-    </div>
-    <div class="form-group">
-        <label for="Username">Username</label>
-        <InputText @bind-Value="StudUserUser.Username" class="form-control"
-                   id="Username" placeholder="enter username..."
-        />
-        <ValidationMessage For="@(() => StudUserUser.Username)"/>
-    </div>
-    <div class="form-group">
-        <label for="Password">Password</label>
-        <input @bind="StudUserUser.Password" class="form-control"
-               autocomplete="current-password" aria-required="true"
-               placeholder="enter password..."
-               type="@(ShowPassword ? "text" : "password")"/>
-        <ValidationMessage For="@(() => StudUserUser.Password)"/>
-    </div>
-    <div class="form-check mb-3">
-        <input type="checkbox" @bind="ShowPassword" class="form-check-input"/>
-        <label class="form-check-label" for="showPassword">Show Password</label>
-    </div>
-    <input type="submit" class="btn btn-primary w-100 p-3" value="Sign up >>"/>
+        @if (!IsSuccess)
+        {
+            <div class="form-group">
+                <label for="Email">Email</label>
+                <InputText @bind-Value="StudUserUser.Email" class="form-control"
+                           id="Email" placeholder="enter email..."
+                />
+                <ValidationMessage For="@(() => StudUserUser.Email)"/>
+            </div>
+            <div class="form-group">
+                <label for="Username">Username</label>
+                <InputText @bind-Value="StudUserUser.Username"
+                           class="form-control"
+                           id="Username" placeholder="enter username..."
+                />
+                <ValidationMessage For="@(() => StudUserUser.Username)"/>
+            </div>
+            <div class="form-group">
+                <label for="Password">Password</label>
+                <input @bind="StudUserUser.Password" class="form-control"
+                       autocomplete="current-password" aria-required="true"
+                       placeholder="enter password..."
+                       type="@(ShowPassword ? "text" : "password")"/>
+                <ValidationMessage For="@(() => StudUserUser.Password)"/>
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" @bind="ShowPassword"
+                       class="form-check-input"/>
+                <label class="form-check-label" for="showPassword">Show
+                    Password</label>
+            </div>
+
+            <input type="submit" class="btn btn-primary w-100 p-3"
+                   value="Sign up >>"/>
+        }
+        else
+        {
+            <input class="btn btn-primary w-100 p-3" value="sign in >>"
+                   @onclick="@(() => NavManager.NavigateTo("/"))"
+            />
+        }
     </div>
 </EditForm>
 
@@ -39,7 +54,9 @@
 @code {
 
     private bool ShowPassword { get; set; } = false;
-    
+
+    [Parameter] public bool IsSuccess { get; set; }
+
     [Parameter] public CreateStudUserRequestDTO StudUserUser { get; set; }
 
     [Parameter] public EventCallback OnValidSubmit { get; set; }

@@ -25,7 +25,8 @@
         }
         else
         {
-            <pre style="background-color: black; color:white; padding: 10px; border: 1px solid green;">
+            <pre
+                style="background-color: black; color:white; padding: 10px; border: 1px solid green;">
                 @InventoryJson
             </pre>
         }
@@ -38,11 +39,12 @@
 @code {
     private List<BrickLinkInventoryDTO> Inventories { get; set; } = new();
     private bool isLoading = true;
-    
+
     [CascadingParameter] public Task<AuthenticationState> State { get; set; }
 
     private string? errorMessage;
     private string InventoryJson { get; set; } = "[]";
+
     protected override async Task OnInitializedAsync()
     {
         AuthenticationState authenticationState = await State;
@@ -77,7 +79,7 @@
         }
         catch (Exception e)
         {
-            if (e.Message.Contains($"No BrickLink credentials for"))
+            if (e.Message.Contains($"processing BrickLink inventories for {studUserId}"))
             {
                 errorMessage = $"No BrickLink credentials for: {username}. Please link your account";
                 Inventories = new List<BrickLinkInventoryDTO>();
@@ -92,4 +94,5 @@
             isLoading = false;
         }
     }
+
 }
