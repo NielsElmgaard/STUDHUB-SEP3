@@ -1,20 +1,26 @@
 ﻿@page "/CreateStudUser"
+@layout LoginLayout
 @using Client.Components.Forms
 @using Client.Services
 @using Client.Services.StudUser
 @using StudHub.SharedDTO.Users
 @inject IStudUserClientService StudUserClientService
-<h3>Create Stud User</h3>
+<div
+    class="d-flex flex-column align-items-center mx-auto m-5">
 
-@if (!string.IsNullOrEmpty(LastSubmitResult))
-{
-    <h2 class="alert @(IsSucces ? "alert-success" : "alert-danger")">
-        @LastSubmitResult
-    </h2>
-}
-<UserForm StudUserUser="_studUserUser"
-          OnValidSubmit="ValidFormSubmitted"
-          OnInvalidSubmit="InvalidFormSubmitted"/>
+    <h1>Create Stud User</h1>
+
+    @if (!string.IsNullOrEmpty(LastSubmitResult))
+    {
+        <h2 class="alert @(IsSucces ? "alert-success" : "alert-danger")">
+            @LastSubmitResult
+        </h2>
+    }
+    <UserForm StudUserUser="_studUserUser"
+              OnValidSubmit="ValidFormSubmitted"
+              OnInvalidSubmit="InvalidFormSubmitted"/>
+</div>
+
 @code {
 
     CreateStudUserRequestDTO _studUserUser = new CreateStudUserRequestDTO
@@ -56,7 +62,6 @@
 
     void InvalidFormSubmitted()
     {
-        LastSubmitResult = "Failure! Please correct the highlighted errors.";
         IsSucces = false;
     }
 
