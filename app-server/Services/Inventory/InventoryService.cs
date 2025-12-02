@@ -210,19 +210,10 @@ public class InventoryService : IInventoryService
 
         var jsonResponse = await response.Content.ReadAsStringAsync();
 
-        Console.WriteLine(
-            $"===== Brick Owl RAW Response Body (Status: {response.StatusCode}) =====");
-        Console.WriteLine(
-            jsonResponse.Substring(0,
-                Math.Min(jsonResponse.Length,
-                    200))); // Log a bit more for context
-
-        // --- 2. Key Discovery Logic ---
         var uniqueKeys = new HashSet<string>();
 
         try
         {
-            // Deserialize the root of the response into an array of generic JSON elements
             var lotElements =
                 JsonSerializer.Deserialize<JsonElement[]>(jsonResponse);
 
@@ -231,7 +222,6 @@ public class InventoryService : IInventoryService
                 return new List<string>();
             }
 
-            // We only need to examine the first element to get a full list of fields
             var firstLot = lotElements[0];
 
             if (firstLot.ValueKind != JsonValueKind.Object)
@@ -240,7 +230,6 @@ public class InventoryService : IInventoryService
                     "First element in inventory array is not a JSON object.");
             }
 
-            // Iterate over all properties (keys) in the first object
             foreach (var property in firstLot.EnumerateObject())
             {
                 uniqueKeys.Add(property.Name);
@@ -270,17 +259,12 @@ var credentials = await _authService.GetBrickLinkCredentialsAsync(studUserId);
         throw new Exception($"No BrickLink credentials for {studUserId}");
     }
     
-    // Use the existing BrickLink helper function which handles OAuth 1.0a signing
     var jsonResponse = await OAuthHelper.ExecuteSignedApiCallAsync(
         _httpClient, brickLinkInventoriesUrl, HttpMethod.Get,
         credentials.ConsumerKey,
         credentials.ConsumerSecret, credentials.TokenValue,
         credentials.TokenSecret);
     
-    Console.WriteLine($"===== BrickLink RAW Response Body (Data Discovery) =====");
-    Console.WriteLine(jsonResponse.Substring(0, Math.Min(jsonResponse.Length, 200)));
-
-    // --- 2. Key Discovery Logic ---
     var uniqueKeys = new HashSet<string>();
 
     try
@@ -289,20 +273,17 @@ var credentials = await _authService.GetBrickLinkCredentialsAsync(studUserId);
         {
             var root = document.RootElement;
             
-            // Navigate to the 'data' array
             if (!root.TryGetProperty("data", out JsonElement dataElement) || 
                 dataElement.ValueKind != JsonValueKind.Array)
             {
                 throw new JsonException("BrickLink response 'data' property is missing or not an array.");
             }
 
-            // Check if the array is empty
             if (dataElement.GetArrayLength() == 0)
             {
                 return new List<string>();
             }
 
-            // Get the first item object in the 'data' array
             var firstLot = dataElement[0];
 
             if (firstLot.ValueKind != JsonValueKind.Object)
@@ -310,7 +291,6 @@ var credentials = await _authService.GetBrickLinkCredentialsAsync(studUserId);
                 throw new JsonException("First element in data array is not a JSON object.");
             }
 
-            // Iterate over all properties (keys) in the first object
             foreach (var property in firstLot.EnumerateObject())
             {
                 uniqueKeys.Add(property.Name);
