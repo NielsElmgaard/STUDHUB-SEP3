@@ -154,11 +154,7 @@ public class InventoryService : IInventoryService
             var response = await _httpClient.SendAsync(request);
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            Console.WriteLine(
-                $"===== Brick Owl RAW Response Body (Status: {response.StatusCode}) =====");
-            Console.WriteLine(jsonResponse.Substring(0,
-                Math.Min(jsonResponse.Length, 100)));
+            
             response.EnsureSuccessStatusCode();
 
 

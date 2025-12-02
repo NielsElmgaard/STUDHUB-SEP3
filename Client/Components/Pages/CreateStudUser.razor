@@ -18,7 +18,8 @@
     }
     <UserForm StudUserUser="_studUserUser"
               OnValidSubmit="ValidFormSubmitted"
-              OnInvalidSubmit="InvalidFormSubmitted"/>
+              OnInvalidSubmit="InvalidFormSubmitted"
+              IsSuccess="IsSucces"/>
 </div>
 
 @code {
@@ -42,7 +43,7 @@
         {
             CreatedUser = await StudUserClientService.CreateStudUser(_studUserUser);
 
-            LastSubmitResult = $"Success! Stud uer created with email: {_studUserUser.Email}.";
+            LastSubmitResult = $"Success! Stud user created with email: {_studUserUser.Email}.";
             IsSucces = true;
 
             _studUserUser = new CreateStudUserRequestDTO() // reset

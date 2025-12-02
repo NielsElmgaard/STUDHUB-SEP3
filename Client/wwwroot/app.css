@@ -613,18 +613,3 @@ h1, .store-connection-glow
   0 0 24px #ff0000;
 }
 
-/* Create stud user */
-.create-user-container {
-  max-width: 400px;
-  margin: 80px auto;
-  padding: 30px;
-  border-radius: 12px;
-  background-color: #f8f9fa;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.create-user-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-weight: 600;
-}
