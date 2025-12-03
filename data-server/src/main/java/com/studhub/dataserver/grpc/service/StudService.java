@@ -1,5 +1,8 @@
-package com.studhub.dataserver;
+package com.studhub.dataserver.grpc.service;
 
+import com.studhub.dataserver.*;
+import com.studhub.dataserver.model.entity.Stud;
+import com.studhub.dataserver.repository.StudRepository;
 import com.studhub.dataserver.storeconnection.BrickLinkConnection;
 import com.studhub.dataserver.storeconnection.BrickOwlConnection;
 import io.grpc.stub.StreamObserver;
@@ -8,22 +11,22 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@GrpcService public class StudServiceImpl
-    extends StudServiceGrpc.StudServiceImplBase
+@GrpcService public class StudService
+    extends UserServiceGrpc.UserServiceImplBase
 {
 
   private final StudRepository studRepository;
   private final PasswordEncoder passwordEncoder;
 
-  public StudServiceImpl(StudRepository studRepository,
-      PasswordEncoder passwordEncoder)
+  public StudService(StudRepository studRepository,
+                     PasswordEncoder passwordEncoder)
   {
     this.studRepository = studRepository;
     this.passwordEncoder = passwordEncoder;
   }
 
   @Override public void createStud(CreateStudRequest request,
-      StreamObserver<CreateStudResponse> responseObserver)
+                                   StreamObserver<CreateStudResponse> responseObserver)
   {
 
     // Hash password before saving
@@ -131,7 +134,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
   }
 
   @Override public void getBrickLinkAuthById(
-      GetBrickLinkAuthByIdRequest request,
+      UserId request,
       StreamObserver<GetBrickLinkAuthByIdResponse> responseObserver)
   {
     Long id = request.getId();
@@ -167,7 +170,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
     responseObserver.onCompleted();
   }
 
-  @Override public void getBrickOwlAuthById(GetBrickOwlAuthByIdRequest request,
+  @Override public void getBrickOwlAuthById(UserId request,
       StreamObserver<GetBrickOwlAuthByIdResponse> responseObserver)
   {
     Long id = request.getId();

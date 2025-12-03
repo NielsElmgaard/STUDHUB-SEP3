@@ -1,6 +1,6 @@
 package com.studhub.dataserver.storeconnection;
 
-import com.studhub.dataserver.Stud;
+import com.studhub.dataserver.model.entity.Stud;
 import jakarta.persistence.*;
 
 @Entity public class BrickOwlConnection

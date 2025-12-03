@@ -1,5 +1,6 @@
-package com.studhub.dataserver;
+package com.studhub.dataserver.repository;
 
+import com.studhub.dataserver.model.entity.Stud;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

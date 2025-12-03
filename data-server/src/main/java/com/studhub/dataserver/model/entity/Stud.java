@@ -1,4 +1,4 @@
-package com.studhub.dataserver;
+package com.studhub.dataserver.model.entity;
 
 import com.studhub.dataserver.storeconnection.BrickLinkConnection;
 import com.studhub.dataserver.storeconnection.BrickOwlConnection;
