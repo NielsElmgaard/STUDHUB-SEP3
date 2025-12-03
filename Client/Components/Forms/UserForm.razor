@@ -23,6 +23,7 @@
                 />
                 <ValidationMessage For="@(() => StudUserUser.Username)"/>
             </div>
+            /* https://stackoverflow.com/questions/78396748/toggling-between-showing-and-hiding-password-on-blazor */
             <div class="form-group">
                 <label for="Password">Password</label>
                 <input @bind="StudUserUser.Password" class="form-control"
