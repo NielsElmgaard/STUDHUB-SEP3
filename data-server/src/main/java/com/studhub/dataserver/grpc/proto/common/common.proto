@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "com.studhub.dataserver";
+option java_multiple_files = true;
+
+package com.studhub.common;
+
+option csharp_namespace = "Studhub.Grpc.Data";
+
+message UserId {
+  int64 id = 1;
+}

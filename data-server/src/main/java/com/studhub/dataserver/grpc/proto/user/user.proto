@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+import "common/common.proto";
+
+option java_package = "com.studhub.dataserver";
+option java_multiple_files = true;
+option java_outer_classname = "StudProto";
+
+package com.studhub.user;
+
+option csharp_namespace = "Studhub.Grpc.Data";
+
+message CreateStudRequest {
+  string email = 1;
+  string username = 2;
+  string password = 3;
+}
+
+message CreateStudResponse {
+  bool is_success = 1;
+  string error_message = 2;
+  int64 id = 3;
+}
+
+message GetStudByIdRequest {
+  int64 id = 1;
+  string password = 2;
+}
+
+message GetStudByEmailRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message GetStudByEmailResponse {
+  int64 id = 1;
+  string email = 2;
+  string username = 3;
+  string error_message = 4;
+}
+
+message GetStudByIdResponse {
+  string username = 1;
+  string error_message = 2;
+}
+
+message GetBrickLinkAuthByIdResponse {
+  string consumer_key = 1;
+  string consumer_secret = 2;
+  string token_value = 3;
+  string token_secret = 4;
+}
+
+message GetBrickOwlAuthByIdResponse {
+  string api_key = 1;
+}
+
+// changed from email to id
+message SetBrickLinkAuthByIdRequest {
+  int64 id = 1;
+  string consumer_key = 2;
+  string consumer_secret = 3;
+  string token_value = 4;
+  string token_secret = 5;
+}
+
+message SetBrickOwlAuthByIdRequest {
+  int64 id = 1;
+  string api_key = 2;
+}
+
+// changed from email to id
+message SetBrickLinkAuthByIdResponse {
+  bool is_success = 1;
+  string error_message = 2;
+}
+
+message SetBrickOwlAuthByIdResponse {
+  bool is_success = 1;
+  string error_message = 2;
+}
+
+service UserService {
+  rpc CreateStud (CreateStudRequest) returns (CreateStudResponse);
+  rpc GetStudById (GetStudByIdRequest) returns (GetStudByIdResponse); // for internal service logic
+  rpc GetStudByEmail (GetStudByEmailRequest) returns (GetStudByEmailResponse); // user-facing validation e.g. login
+  rpc GetBrickLinkAuthById (com.studhub.common.UserId) returns (GetBrickLinkAuthByIdResponse);
+  rpc GetBrickOwlAuthById (com.studhub.common.UserId) returns (GetBrickOwlAuthByIdResponse);
+  rpc SetBrickLinkAuthById (SetBrickLinkAuthByIdRequest) returns (SetBrickLinkAuthByIdResponse);
+  rpc SetBrickOwlAuthById (SetBrickOwlAuthByIdRequest) returns (SetBrickOwlAuthByIdResponse);
+}
+

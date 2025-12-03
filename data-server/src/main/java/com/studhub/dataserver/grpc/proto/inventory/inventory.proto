@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+
+option java_package = "com.studhub.dataserver";
+option java_multiple_files = true;
+
+package com.studhub.inventory;
+
+option csharp_namespace = "Studhub.Grpc.Data";
+
+message SetBrickLinkInventoryRequest {
+  google.protobuf.ListValue inventories = 1;
+  int64 id = 2;
+}
+
+message SetBrickLinkInventoryResponse {
+  bool is_success = 1;
+  string message = 2;
+  string error_message = 3;
+}
+
+service StudInventory {
+  rpc SetBrickLinkInventories(SetBrickLinkInventoryRequest) returns(SetBrickLinkInventoryResponse);
+}
+
