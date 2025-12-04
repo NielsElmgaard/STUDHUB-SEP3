@@ -12,6 +12,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data:/data
 
 volumes:
   pgdata:
