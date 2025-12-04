@@ -1,132 +1,126 @@
 package com.studhub.dataserver.inventorysync;
 
-import com.studhub.dataserver.Stud;
+import com.studhub.dataserver.model.entity.Stud;
 import jakarta.persistence.*;
 
 import java.time.Instant;
 
-@Entity public class InventorySyncSession
-{
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long sessionId;
+@Entity
+public class InventorySyncSession {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long sessionId;
 
-  @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "stud_id", nullable = false) private Stud stud; // FK
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stud_id", nullable = false)
+    private Stud stud; // FK
 
-  @Column(nullable = false) private Instant startTimestamp;
+    @Column(nullable = false)
+    private Instant startTimestamp;
 
-  @Column private Instant endTimestamp;
+    @Column
+    private Instant endTimestamp;
 
-  @Enumerated(EnumType.STRING) @Column(nullable = false) private SyncStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SyncStatus status;
 
-  @Column(name = "items_updated_to_brickowl_count") private int itemsUpdatedToBrickOwlCount=0;
+    @Column(name = "items_updated_to_brickowl_count")
+    private int itemsUpdatedToBrickOwlCount = 0;
 
-  @Column(name = "items_fetched_from_bricklink_count") private int itemsFetchedFromBrickLinkCount=0;
+    @Column(name = "items_fetched_from_bricklink_count")
+    private int itemsFetchedFromBrickLinkCount = 0;
 
-  @Column private Instant lastSuccessfulSyncTime;
+    @Column
+    private Instant lastSuccessfulSyncTime;
 
-  @Column(nullable = false) private int errorCount;
+    @Column(nullable = false)
+    private int errorCount;
 
-  @Column(nullable = false) private boolean isManual = false;
+    @Column(nullable = false)
+    private boolean isManual = false;
 
-  public InventorySyncSession(){}
+    public InventorySyncSession() {
+    }
 
-  public void setSessionId(Long sessionId)
-  {
-    this.sessionId = sessionId;
-  }
+    public Long getSessionId() {
+        return sessionId;
+    }
 
-  public void setStud(Stud stud)
-  {
-    this.stud = stud;
-  }
+    public void setSessionId(Long sessionId) {
+        this.sessionId = sessionId;
+    }
 
-  public void setStartTimestamp(Instant startTimestamp)
-  {
-    this.startTimestamp = startTimestamp;
-  }
+    public Stud getStud() {
+        return stud;
+    }
 
-  public void setEndTimestamp(Instant endTimestamp)
-  {
-    this.endTimestamp = endTimestamp;
-  }
+    public void setStud(Stud stud) {
+        this.stud = stud;
+    }
 
-  public void setStatus(SyncStatus status)
-  {
-    this.status = status;
-  }
+    public Instant getStartTimestamp() {
+        return startTimestamp;
+    }
 
-  public void setItemsUpdatedToBrickOwlCount(int itemsUpdatedToBrickOwlCount)
-  {
-    this.itemsUpdatedToBrickOwlCount = itemsUpdatedToBrickOwlCount;
-  }
+    public void setStartTimestamp(Instant startTimestamp) {
+        this.startTimestamp = startTimestamp;
+    }
 
-  public void setItemsFetchedFromBrickLinkCount(
-      int itemsFetchedFromBrickLinkCount)
-  {
-    this.itemsFetchedFromBrickLinkCount = itemsFetchedFromBrickLinkCount;
-  }
+    public Instant getEndTimestamp() {
+        return endTimestamp;
+    }
 
-  public void setLastSuccessfulSyncTime(Instant lastSuccessfulSyncTime)
-  {
-    this.lastSuccessfulSyncTime = lastSuccessfulSyncTime;
-  }
+    public void setEndTimestamp(Instant endTimestamp) {
+        this.endTimestamp = endTimestamp;
+    }
 
-  public void setErrorCount(int errorCount)
-  {
-    this.errorCount = errorCount;
-  }
+    public SyncStatus getStatus() {
+        return status;
+    }
 
-  public void setManual(boolean manual)
-  {
-    isManual = manual;
-  }
+    public void setStatus(SyncStatus status) {
+        this.status = status;
+    }
 
-  public Long getSessionId()
-  {
-    return sessionId;
-  }
+    public int getItemsUpdatedToBrickOwlCount() {
+        return itemsUpdatedToBrickOwlCount;
+    }
 
-  public Stud getStud()
-  {
-    return stud;
-  }
+    public void setItemsUpdatedToBrickOwlCount(int itemsUpdatedToBrickOwlCount) {
+        this.itemsUpdatedToBrickOwlCount = itemsUpdatedToBrickOwlCount;
+    }
 
-  public Instant getStartTimestamp()
-  {
-    return startTimestamp;
-  }
+    public int getItemsFetchedFromBrickLinkCount() {
+        return itemsFetchedFromBrickLinkCount;
+    }
 
-  public Instant getEndTimestamp()
-  {
-    return endTimestamp;
-  }
+    public void setItemsFetchedFromBrickLinkCount(
+            int itemsFetchedFromBrickLinkCount) {
+        this.itemsFetchedFromBrickLinkCount = itemsFetchedFromBrickLinkCount;
+    }
 
-  public SyncStatus getStatus()
-  {
-    return status;
-  }
+    public Instant getLastSuccessfulSyncTime() {
+        return lastSuccessfulSyncTime;
+    }
 
-  public int getItemsUpdatedToBrickOwlCount()
-  {
-    return itemsUpdatedToBrickOwlCount;
-  }
+    public void setLastSuccessfulSyncTime(Instant lastSuccessfulSyncTime) {
+        this.lastSuccessfulSyncTime = lastSuccessfulSyncTime;
+    }
 
-  public int getItemsFetchedFromBrickLinkCount()
-  {
-    return itemsFetchedFromBrickLinkCount;
-  }
+    public int getErrorCount() {
+        return errorCount;
+    }
 
-  public Instant getLastSuccessfulSyncTime()
-  {
-    return lastSuccessfulSyncTime;
-  }
+    public void setErrorCount(int errorCount) {
+        this.errorCount = errorCount;
+    }
 
-  public int getErrorCount()
-  {
-    return errorCount;
-  }
+    public boolean isManual() {
+        return isManual;
+    }
 
-  public boolean isManual()
-  {
-    return isManual;
-  }
+    public void setManual(boolean manual) {
+        isManual = manual;
+    }
 }

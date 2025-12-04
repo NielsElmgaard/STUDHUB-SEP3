@@ -1,49 +1,51 @@
 package com.studhub.dataserver.inventorysync;
 
-import com.studhub.dataserver.Stud;
 import jakarta.persistence.*;
 
 import java.time.Instant;
 
-@Entity public class SyncLog
-{
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long logId;
+@Entity
+public class SyncLog {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long logId;
 
-  @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "session_id", nullable = false) private InventorySyncSession session; // FK
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_id", nullable = false)
+    private InventorySyncSession session; // FK
 
-  @Column(nullable = false) private Instant timestamp;
+    @Column(nullable = false)
+    private Instant timestamp;
 
-  @Enumerated(EnumType.STRING) @Column(nullable = false) private SyncLogType type;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SyncLogType type;
 
   /*
   @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "inventory_lot_id") private InventoryLot inventoryLot; // FK
    */
 
-  @Column private String errorMessage;
+    @Column
+    private String errorMessage;
 
-  public void setLogId(Long logId)
-  {
-    this.logId = logId;
-  }
+    public SyncLog() {
+    }
 
-  public SyncLog()
-  {
-  }
+    public Long getLogId() {
+        return logId;
+    }
 
-  public void setSession(InventorySyncSession session)
-  {
-    this.session = session;
-  }
+    public void setLogId(Long logId) {
+        this.logId = logId;
+    }
 
-  public void setTimestamp(Instant timestamp)
-  {
-    this.timestamp = timestamp;
-  }
+    public InventorySyncSession getSession() {
+        return session;
+    }
 
-  public void setType(SyncLogType type)
-  {
-    this.type = type;
-  }
+    public void setSession(InventorySyncSession session) {
+        this.session = session;
+    }
 
   /*
   public void setInventoryLot(InventoryLot inventoryLot)
@@ -52,30 +54,25 @@ import java.time.Instant;
   }
   */
 
-  public void setErrorMessage(String errorMessage)
-  {
-    this.errorMessage = errorMessage;
-  }
+    public Instant getTimestamp() {
+        return timestamp;
+    }
 
-  public Long getLogId()
-  {
-    return logId;
-  }
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
+    }
 
-  public InventorySyncSession getSession()
-  {
-    return session;
-  }
+    public SyncLogType getType() {
+        return type;
+    }
 
-  public Instant getTimestamp()
-  {
-    return timestamp;
-  }
+    public void setType(SyncLogType type) {
+        this.type = type;
+    }
 
-  public SyncLogType getType()
-  {
-    return type;
-  }
+    public String getErrorMessage() {
+        return errorMessage;
+    }
 
   /*
   public InventoryLot getInventoryLot()
@@ -84,8 +81,7 @@ import java.time.Instant;
   }
   */
 
-  public String getErrorMessage()
-  {
-    return errorMessage;
-  }
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
 }
