@@ -59,7 +59,7 @@ public class AuthService : IAuthService
     }
 
     public async Task<BrickLinkCredentialsDTO?> SetBrickLinkCredentialsAsync(
-        long studUserId, string consumerKey,
+        int studUserId, string consumerKey,
         string consumerSecret, string tokenValue, string tokenSecret)
     {
         var connectionTest = await TestBrickLinkConnectionAsync(consumerKey,
@@ -113,12 +113,12 @@ public class AuthService : IAuthService
     }
 
     public async Task<BrickLinkCredentialsDTO?> GetBrickLinkCredentialsAsync(
-        long studUserId)
+        int studUserId)
     {
         try
         {
             var res = await _grpcClient.GetBrickLinkAuthByIdAsync(
-                new GetBrickLinkAuthByIdRequest
+                new UserId
                 {
                     Id = studUserId
                 });
@@ -181,7 +181,7 @@ public class AuthService : IAuthService
 
 
     public async Task<BrickOwlCredentialsDTO?>
-        SetBrickOwlCredentialsAsync(long studUserId, string brickOwlApiKey)
+        SetBrickOwlCredentialsAsync(int studUserId, string brickOwlApiKey)
     {
         var connectionTest = await TestBrickOwlConnectionAsync(brickOwlApiKey);
 
@@ -227,12 +227,12 @@ public class AuthService : IAuthService
     }
 
     public async Task<BrickOwlCredentialsDTO?> GetBrickOwlCredentialsAsync(
-        long studUserId)
+        int studUserId)
     {
         try
         {
             var res = await _grpcClient.GetBrickOwlAuthByIdAsync(
-                new GetBrickOwlAuthByIdRequest()
+                new UserId()
                 {
                     Id = studUserId
                 });
@@ -290,7 +290,7 @@ public class AuthService : IAuthService
     }
 
     public async Task<BrickLinkCredentialsDTO?> ClearBrickLinkCredentialsAsync(
-        long studUserId, string consumerKey,
+        int studUserId, string consumerKey,
         string consumerSecret, string tokenValue, string tokenSecret)
     {
         try
@@ -326,7 +326,7 @@ public class AuthService : IAuthService
     }
 
     public async Task<BrickOwlCredentialsDTO?>
-        ClearBrickOwlCredentialsAsync(long studUserId, string brickOwlApiKey)
+        ClearBrickOwlCredentialsAsync(int studUserId, string brickOwlApiKey)
     {
         try
         {
@@ -357,9 +357,9 @@ public class AuthService : IAuthService
         }
     }
 
-    public async Task<bool> IsBrickLinkConnectedAsync(long studUserId)
+    public async Task<bool> IsBrickLinkConnectedAsync(int studUserId)
     {
-        var request = new GetBrickLinkAuthByIdRequest
+        var request = new UserId
         {
             Id = studUserId
         };
@@ -380,9 +380,9 @@ public class AuthService : IAuthService
         }
     }
 
-    public async Task<bool> IsBrickOwlConnectedAsync(long studUserId)
+    public async Task<bool> IsBrickOwlConnectedAsync(int studUserId)
     {
-        var request = new GetBrickOwlAuthByIdRequest
+        var request = new UserId
         {
             Id = studUserId
         };

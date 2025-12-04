@@ -28,7 +28,7 @@ public class InventoryService : IInventoryService
         _httpClient = httpClient;
     }
 
-    public async Task<List<SetDTO>> GetUserSetsAsync(long studUserId)
+    public async Task<List<SetDTO>> GetUserSetsAsync(int studUserId)
     {
         try
         {
@@ -85,7 +85,7 @@ public class InventoryService : IInventoryService
 
     public async Task<List<BrickLinkInventoryDTO>>
         GetUserBrickLinkInventoryAsync(
-            long studUserId)
+            int studUserId)
     {
         try
         {
@@ -135,7 +135,7 @@ public class InventoryService : IInventoryService
     }
 
     public async Task<List<BrickOwlLotDTO>> GetUserBrickOwlInventoryAsync(
-        long studUserId)
+        int studUserId)
     {
         try
         {
@@ -188,7 +188,7 @@ public class InventoryService : IInventoryService
     }
 
     public async Task<List<string>> DiscoverBrickOwlInventoryKeysAsync(
-        long studUserId)
+        int studUserId)
     {
         var credentials =
             await _authService.GetBrickOwlCredentialsAsync(studUserId);
@@ -247,7 +247,7 @@ public class InventoryService : IInventoryService
         }
     }
 
-    public async Task<List<string>> DiscoverBrickLinkInventoryKeysAsync(long studUserId)
+    public async Task<List<string>> DiscoverBrickLinkInventoryKeysAsync(int studUserId)
     {
 var credentials = await _authService.GetBrickLinkCredentialsAsync(studUserId);
     if (credentials == null)
@@ -404,7 +404,7 @@ var credentials = await _authService.GetBrickLinkCredentialsAsync(studUserId);
 
 
     // OAuth 1.0a Helper Method
-    private async Task<string> ExecuteSignedApiCallAsync(long studUserId,
+    private async Task<string> ExecuteSignedApiCallAsync(int studUserId,
         Dictionary<string, string> queryParams)
     {
         var credentials =

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "common/common.proto";
 
-option java_package = "com.studhub.dataserver";
+option java_package = "com.studhub.dataserver.stud";
 option java_multiple_files = true;
 option java_outer_classname = "StudProto";
 
@@ -19,11 +19,11 @@ message CreateStudRequest {
 message CreateStudResponse {
   bool is_success = 1;
   string error_message = 2;
-  int64 id = 3;
+  int32 id = 3;
 }
 
 message GetStudByIdRequest {
-  int64 id = 1;
+  int32 id = 1;
   string password = 2;
 }
 
@@ -33,7 +33,7 @@ message GetStudByEmailRequest {
 }
 
 message GetStudByEmailResponse {
-  int64 id = 1;
+  int32 id = 1;
   string email = 2;
   string username = 3;
   string error_message = 4;
@@ -55,9 +55,8 @@ message GetBrickOwlAuthByIdResponse {
   string api_key = 1;
 }
 
-// changed from email to id
 message SetBrickLinkAuthByIdRequest {
-  int64 id = 1;
+  int32 id = 1;
   string consumer_key = 2;
   string consumer_secret = 3;
   string token_value = 4;
@@ -65,11 +64,10 @@ message SetBrickLinkAuthByIdRequest {
 }
 
 message SetBrickOwlAuthByIdRequest {
-  int64 id = 1;
+  int32 id = 1;
   string api_key = 2;
 }
 
-// changed from email to id
 message SetBrickLinkAuthByIdResponse {
   bool is_success = 1;
   string error_message = 2;
@@ -80,7 +78,7 @@ message SetBrickOwlAuthByIdResponse {
   string error_message = 2;
 }
 
-service UserService {
+service StudService {
   rpc CreateStud (CreateStudRequest) returns (CreateStudResponse);
   rpc GetStudById (GetStudByIdRequest) returns (GetStudByIdResponse); // for internal service logic
   rpc GetStudByEmail (GetStudByEmailRequest) returns (GetStudByEmailResponse); // user-facing validation e.g. login

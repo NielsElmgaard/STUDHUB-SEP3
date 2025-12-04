@@ -73,7 +73,7 @@ public class AuthController : ControllerBase
 
     [HttpDelete("bricklink-connect/{studUserId:long}")]
     public async Task<ActionResult<BrickLinkCredentialsResponseDTO>>
-        ClearBrickLinkCredentials(long studUserId)
+        ClearBrickLinkCredentials(int studUserId)
     {
         await _authService.ClearBrickLinkCredentialsAsync(studUserId, "",
             "", "", "");
@@ -83,7 +83,7 @@ public class AuthController : ControllerBase
 
     [HttpDelete("brickowl-connect/{studUserId:long}")]
     public async Task<ActionResult<BrickOwlCredentialsResponseDTO>>
-        ClearBrickOwlCredentials(long studUserId)
+        ClearBrickOwlCredentials(int studUserId)
     {
         await _authService.ClearBrickOwlCredentialsAsync(studUserId, "");
 
@@ -91,7 +91,7 @@ public class AuthController : ControllerBase
     }
     
     [HttpGet("bricklink-status/{studUserId:long}")]
-    public async Task<ActionResult> GetBrickLinkConnectionStatus(long studUserId)
+    public async Task<ActionResult> GetBrickLinkConnectionStatus(int studUserId)
     {
         bool isConnected = await _authService.IsBrickLinkConnectedAsync(studUserId);
 
@@ -104,7 +104,7 @@ public class AuthController : ControllerBase
     }
     
     [HttpGet("brickowl-status/{studUserId:long}")]
-    public async Task<ActionResult> GetBrickOwlConnectionStatus(long studUserId)
+    public async Task<ActionResult> GetBrickOwlConnectionStatus(int studUserId)
     {
         bool isConnected = await _authService.IsBrickOwlConnectedAsync(studUserId);
 

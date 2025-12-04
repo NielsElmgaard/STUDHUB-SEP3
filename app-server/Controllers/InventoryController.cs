@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.Json;
+using Google.Protobuf.WellKnownTypes;
+using Microsoft.AspNetCore.Mvc;
 using Studhub.AppServer.Services;
+using Studhub.Grpc.Data;
 
 namespace Studhub.AppServer.Controllers;
 
@@ -8,14 +11,16 @@ namespace Studhub.AppServer.Controllers;
 public class InventoryController : ControllerBase
 {
     private readonly IInventoryService _inventoryService;
+    private readonly InventoryService.InventoryServiceClient _inventoryClient;
 
-    public InventoryController(IInventoryService inventoryService)
+    public InventoryController(IInventoryService inventoryService, InventoryService.InventoryServiceClient inventoryServiceClient)
     {
         _inventoryService = inventoryService;
+        _inventoryClient = inventoryServiceClient;
     }
 
     [HttpGet("sets")]
-    public async Task<ActionResult> GetSets([FromQuery] long studUserId)
+    public async Task<ActionResult> GetSets([FromQuery] int studUserId)
     {
         var sets = await _inventoryService.GetUserSetsAsync(studUserId);
         return Ok(sets);
@@ -23,16 +28,35 @@ public class InventoryController : ControllerBase
 
     [HttpGet("bricklink")]
     public async Task<ActionResult> GetAllBrickLinkInventoriesForStud(
-        [FromQuery] long studUserId)
+        [FromQuery] int studUserId)
     {
         var inventories =
             await _inventoryService.GetUserBrickLinkInventoryAsync(studUserId);
+        // Update inventories to data server using SetBrickLinkInventories
+        var setBrickLinkInventoryRequest = new SetBrickLinkInventoryRequest
+        {
+            UserId = studUserId
+        };
+        foreach (var inv in inventories)
+        {
+            var invJson = JsonSerializer.Serialize(inv);
+            setBrickLinkInventoryRequest.Inventories.Add((Struct.Parser.ParseJson(invJson)));
+        }
+        var setBrickLinkInventoryResponse =
+            await _inventoryClient.SetBrickLinkInventoriesAsync(setBrickLinkInventoryRequest);
+        
+        if (!setBrickLinkInventoryResponse.IsSuccess)
+        {
+            return StatusCode(
+                500,
+                $"gRPC error: {setBrickLinkInventoryResponse.ErrorMessage ?? "Unknown error"}");
+        }
         return Ok(inventories);
     }
     
     [HttpGet("brickowl")]
     public async Task<ActionResult> GetAllBrickOwlInventoriesForStud(
-        [FromQuery] long studUserId)
+        [FromQuery] int studUserId)
     {
         var inventories =
             await _inventoryService.GetUserBrickOwlInventoryAsync(studUserId);
@@ -41,7 +65,7 @@ public class InventoryController : ControllerBase
 
     [HttpGet("brickowl-identifiers")]
     public async Task<ActionResult> DiscoverBrickOwlInventoryKeysAsync(
-        [FromQuery] long studUserId)
+        [FromQuery] int studUserId)
     {
         var identifiers =
             await _inventoryService.DiscoverBrickOwlInventoryKeysAsync(studUserId);
@@ -50,7 +74,7 @@ public class InventoryController : ControllerBase
     
     [HttpGet("bricklink-identifiers")]
     public async Task<ActionResult> DiscoverBrickLinkInventoryKeysAsync(
-        [FromQuery] long studUserId)
+        [FromQuery] int studUserId)
     {
         var identifiers =
             await _inventoryService.DiscoverBrickLinkInventoryKeysAsync(studUserId);

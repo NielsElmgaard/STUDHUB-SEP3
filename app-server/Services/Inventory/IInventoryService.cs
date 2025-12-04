@@ -5,11 +5,11 @@ namespace Studhub.AppServer.Services;
 
 public interface IInventoryService
 {
-    Task<List<SetDTO>> GetUserSetsAsync(long studUserId);
-    Task<List<BrickLinkInventoryDTO>> GetUserBrickLinkInventoryAsync(long studUserId);
+    Task<List<SetDTO>> GetUserSetsAsync(int studUserId);
+    Task<List<BrickLinkInventoryDTO>> GetUserBrickLinkInventoryAsync(int studUserId);
 
-    Task<List<BrickOwlLotDTO>> GetUserBrickOwlInventoryAsync(long studUserId);
-    Task<List<string>> DiscoverBrickOwlInventoryKeysAsync(long studUserId);
-    Task<List<string>> DiscoverBrickLinkInventoryKeysAsync(long studUserId);
+    Task<List<BrickOwlLotDTO>> GetUserBrickOwlInventoryAsync(int studUserId);
+    Task<List<string>> DiscoverBrickOwlInventoryKeysAsync(int studUserId);
+    Task<List<string>> DiscoverBrickLinkInventoryKeysAsync(int studUserId);
 
 }
