@@ -17,4 +17,11 @@ CREATE TABLE IF NOT EXISTS bricklink_inventory (
     CONSTRAINT fk_user_id
             FOREIGN KEY(user_id) REFERENCES stud(id)
             ON DELETE CASCADE
-)
+);
+
+CREATE TABLE IF NOT EXISTS parts_map (
+    bricklink_id VARCHAR(20),
+    brickowl_id  VARCHAR(20),
+
+    PRIMARY KEY (bricklink_id, brickowl_id)
+);
