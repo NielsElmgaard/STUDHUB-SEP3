@@ -8,11 +8,11 @@ public interface IAuthService
 {
     Task<StudUserDTO?> ValidateUserAsync(string email, string password);
 
-    Task<BrickLinkCredentialsDTO?> SetBrickLinkCredentialsAsync(long studUserId,
+    Task<BrickLinkCredentialsDTO?> SetBrickLinkCredentialsAsync(int studUserId,
         string consumerKey, string consumerSecret, string tokenValue,
         string tokenSecret);
 
-    Task<BrickLinkCredentialsDTO?> GetBrickLinkCredentialsAsync(long studUserId);
+    Task<BrickLinkCredentialsDTO?> GetBrickLinkCredentialsAsync(int studUserId);
 
     Task<BrickLinkConnectionTestDTO?>
         TestBrickLinkConnectionAsync(
@@ -20,23 +20,23 @@ public interface IAuthService
             string tokenSecret);
 
     Task<BrickOwlCredentialsDTO?> SetBrickOwlCredentialsAsync(
-        long studUserId,
+        int studUserId,
         string brickOwlApiKey);
 
-    Task<BrickOwlCredentialsDTO?> GetBrickOwlCredentialsAsync(long studUserId);
+    Task<BrickOwlCredentialsDTO?> GetBrickOwlCredentialsAsync(int studUserId);
 
     Task<BrickOwlConnectionTestDTO?> TestBrickOwlConnectionAsync(
         string brickOwlApiKey);
     
-    Task<BrickLinkCredentialsDTO?> ClearBrickLinkCredentialsAsync(long studUserId,
+    Task<BrickLinkCredentialsDTO?> ClearBrickLinkCredentialsAsync(int studUserId,
         string consumerKey, string consumerSecret, string tokenValue,
         string tokenSecret);
     
     Task<BrickOwlCredentialsDTO?> ClearBrickOwlCredentialsAsync(
-        long studUserId,
+        int studUserId,
         string brickOwlApiKey);
 
-    Task<bool> IsBrickLinkConnectedAsync(long studUserId);
+    Task<bool> IsBrickLinkConnectedAsync(int studUserId);
 
-    Task<bool> IsBrickOwlConnectedAsync(long studUserId);
+    Task<bool> IsBrickOwlConnectedAsync(int studUserId);
 }

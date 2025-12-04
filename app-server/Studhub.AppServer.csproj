@@ -16,15 +16,20 @@
         <PackageReference Include="Google.Protobuf" Version="3.32.1"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
     </ItemGroup>
+    
 
     <ItemGroup>
-        <Protobuf Include="contracts\stud_service.proto" GrpcServices="Client" />
-    </ItemGroup>
+        <Protobuf Include="contracts/common/common.proto"
+                  ProtoRoot="contracts"
+                  GrpcServices="Client" />
 
-    <ItemGroup>
-      <Content Include="contracts\stud_service.proto">
-        <Link>contracts\stud_service.proto</Link>
-      </Content>
+        <Protobuf Include="contracts/stud/stud.proto"
+                  ProtoRoot="contracts"
+                  GrpcServices="Client" />
+        
+        <Protobuf Include="contracts/inventory/inventory.proto"
+                  ProtoRoot="contracts"
+                  GrpcServices="Client" />
     </ItemGroup>
 
     <ItemGroup>

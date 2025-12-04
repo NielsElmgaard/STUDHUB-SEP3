@@ -221,7 +221,7 @@
         }
 
         var uid = cp.FindFirst(ClaimTypes.NameIdentifier);
-        if (uid == null || !long.TryParse(uid.Value, out long studUserId))
+        if (uid == null || !int.TryParse(uid.Value, out int studUserId))
         {
             LastSubmitResultBL = "Error: Invalid user ID.";
             isSuccesBL = false;
@@ -262,7 +262,7 @@
         }
 
         var uid = cp.FindFirst(ClaimTypes.NameIdentifier);
-        if (uid == null || !long.TryParse(uid.Value, out long studUserId))
+        if (uid == null || !int.TryParse(uid.Value, out int studUserId))
         {
             LastSubmitResultBO = "Error: Invalid user ID.";
             isSuccesBO = false;

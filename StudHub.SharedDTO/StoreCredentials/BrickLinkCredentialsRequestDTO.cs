@@ -16,5 +16,5 @@ public class BrickLinkCredentialsRequestDTO
     [Required(ErrorMessage = "The Token Secret field is required.")]
     public string TokenSecret { get; set; } = "";
 
-    public long StudUserId { get; set; }
+    public int StudUserId { get; set; }
 }
