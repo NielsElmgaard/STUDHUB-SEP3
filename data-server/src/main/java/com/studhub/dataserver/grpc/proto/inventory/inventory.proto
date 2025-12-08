@@ -9,18 +9,24 @@ package com.studhub.inventory;
 
 option csharp_namespace = "Studhub.Grpc.Data";
 
-message SetBrickLinkInventoryRequest {
-  repeated google.protobuf.Struct inventories = 1;
-  int32 user_id = 2;
+enum InventorySource {
+  BRICKLINK = 0;
+  BRICKOWL = 1;
 }
 
-message SetBrickLinkInventoryResponse {
+message SetInventoryRequest {
+  repeated google.protobuf.Struct inventories = 1;
+  InventorySource source = 2;
+  int32 user_id = 3;
+}
+
+message SetInventoryResponse {
   bool is_success = 1;
   string message = 2;
   string error_message = 3;
 }
 
 service InventoryService {
-  rpc SetBrickLinkInventories(SetBrickLinkInventoryRequest) returns(SetBrickLinkInventoryResponse);
+  rpc SetInventories(SetInventoryRequest) returns(SetInventoryResponse);
 }
 

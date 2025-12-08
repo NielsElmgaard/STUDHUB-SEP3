@@ -32,24 +32,25 @@ public class InventoryController : ControllerBase
     {
         var inventories =
             await _inventoryService.GetUserBrickLinkInventoryAsync(studUserId);
-        // Update inventories to data server using SetBrickLinkInventories
-        var setBrickLinkInventoryRequest = new SetBrickLinkInventoryRequest
+        
+        var request = new SetInventoryRequest()
         {
-            UserId = studUserId
+            UserId = studUserId,
+            Source = InventorySource.Bricklink
         };
         foreach (var inv in inventories)
         {
             var invJson = JsonSerializer.Serialize(inv);
-            setBrickLinkInventoryRequest.Inventories.Add((Struct.Parser.ParseJson(invJson)));
+            request.Inventories.Add((Struct.Parser.ParseJson(invJson)));
         }
-        var setBrickLinkInventoryResponse =
-            await _inventoryClient.SetBrickLinkInventoriesAsync(setBrickLinkInventoryRequest);
+        var response =
+            await _inventoryClient.SetInventoriesAsync(request);
         
-        if (!setBrickLinkInventoryResponse.IsSuccess)
+        if (!response.IsSuccess)
         {
             return StatusCode(
                 500,
-                $"gRPC error: {setBrickLinkInventoryResponse.ErrorMessage ?? "Unknown error"}");
+                $"gRPC error: {response.ErrorMessage ?? "Unknown error"}");
         }
         return Ok(inventories);
     }
@@ -60,6 +61,27 @@ public class InventoryController : ControllerBase
     {
         var inventories =
             await _inventoryService.GetUserBrickOwlInventoryAsync(studUserId);
+        var request = new SetInventoryRequest()
+        {
+            UserId = studUserId,
+            Source = InventorySource.Brickowl
+        };
+        foreach (var inv in inventories)
+        {
+            var invJson = JsonSerializer.Serialize(inv);
+            request.Inventories.Add((Struct.Parser.ParseJson(invJson)));
+            Console.WriteLine(request.Inventories);
+        }
+        
+        var response =
+            await _inventoryClient.SetInventoriesAsync(request);
+        
+        if (!response.IsSuccess)
+        {
+            return StatusCode(
+                500,
+                $"gRPC error: {response.ErrorMessage ?? "Unknown error"}");
+        }
         return Ok(inventories);
     }
 
