@@ -11,12 +11,10 @@ namespace Studhub.AppServer.Controllers;
 public class InventoryController : ControllerBase
 {
     private readonly IInventoryService _inventoryService;
-    private readonly InventoryService.InventoryServiceClient _inventoryClient;
 
-    public InventoryController(IInventoryService inventoryService, InventoryService.InventoryServiceClient inventoryServiceClient)
+    public InventoryController(IInventoryService inventoryService)
     {
         _inventoryService = inventoryService;
-        _inventoryClient = inventoryServiceClient;
     }
 
     [HttpGet("sets")]
@@ -33,18 +31,8 @@ public class InventoryController : ControllerBase
         var inventories =
             await _inventoryService.GetUserBrickLinkInventoryAsync(studUserId);
         
-        var request = new SetInventoryRequest()
-        {
-            UserId = studUserId,
-            Source = InventorySource.Bricklink
-        };
-        foreach (var inv in inventories)
-        {
-            var invJson = JsonSerializer.Serialize(inv);
-            request.Inventories.Add((Struct.Parser.ParseJson(invJson)));
-        }
         var response =
-            await _inventoryClient.SetInventoriesAsync(request);
+            await _inventoryService.UpdateBrickLinkInventoryAsync(studUserId, inventories);
         
         if (!response.IsSuccess)
         {
@@ -61,27 +49,6 @@ public class InventoryController : ControllerBase
     {
         var inventories =
             await _inventoryService.GetUserBrickOwlInventoryAsync(studUserId);
-        var request = new SetInventoryRequest()
-        {
-            UserId = studUserId,
-            Source = InventorySource.Brickowl
-        };
-        foreach (var inv in inventories)
-        {
-            var invJson = JsonSerializer.Serialize(inv);
-            request.Inventories.Add((Struct.Parser.ParseJson(invJson)));
-            Console.WriteLine(request.Inventories);
-        }
-        
-        var response =
-            await _inventoryClient.SetInventoriesAsync(request);
-        
-        if (!response.IsSuccess)
-        {
-            return StatusCode(
-                500,
-                $"gRPC error: {response.ErrorMessage ?? "Unknown error"}");
-        }
         return Ok(inventories);
     }
 
@@ -100,15 +67,6 @@ public class InventoryController : ControllerBase
     {
         var identifiers =
             await _inventoryService.DiscoverBrickLinkInventoryKeysAsync(studUserId);
-        return Ok(identifiers);
-    }
-    
-    [HttpPost("brickowl-lots")]
-    public async Task<ActionResult> PostInventoryChange(
-        [FromQuery] int studUserId)
-    {
-        var identifiers =
-            await _inventoryService.PostInventoryChangesFromBLOrders(studUserId);
         return Ok(identifiers);
     }
 }

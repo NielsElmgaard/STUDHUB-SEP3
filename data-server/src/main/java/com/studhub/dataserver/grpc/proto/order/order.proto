@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+import "common/common.proto";
+
+option java_package = "com.studhub.dataserver.order";
+option java_multiple_files = true;
+
+package com.studhub.order;
+
+option csharp_namespace = "Studhub.Grpc.Data";
+
+service OrderService {
+  rpc UpdateOrders(com.studhub.common.UpdateRequest) returns(com.studhub.common.UpdateResponse);
+}
+

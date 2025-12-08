@@ -2,10 +2,10 @@ package com.studhub.dataserver.grpc.service;
 
 import com.google.protobuf.Struct;
 import com.google.protobuf.Value;
+import com.studhub.dataserver.common.DataSource;
+import com.studhub.dataserver.common.UpdateRequest;
+import com.studhub.dataserver.common.UpdateResponse;
 import com.studhub.dataserver.inventory.InventoryServiceGrpc;
-import com.studhub.dataserver.inventory.InventorySource;
-import com.studhub.dataserver.inventory.SetInventoryRequest;
-import com.studhub.dataserver.inventory.SetInventoryResponse;
 import com.studhub.dataserver.model.dto.InventoryDTO;
 import com.studhub.dataserver.model.entity.Stud;
 import com.studhub.dataserver.model.mapper.InventoryMapper;
@@ -33,16 +33,16 @@ public class InventoryService extends InventoryServiceGrpc.InventoryServiceImplB
 
 
     @Override
-    public void setInventories(SetInventoryRequest request,
-                               StreamObserver<SetInventoryResponse> responseObserver) {
+    public void setInventories(UpdateRequest request,
+                               StreamObserver<UpdateResponse> responseObserver) {
 
         Integer userId = request.getUserId();
-        InventorySource source = request.getSource();
+        DataSource source = request.getSource();
         IInventoryRepository repository;
 
-        if (source == InventorySource.BRICKLINK) {
+        if (source == DataSource.BRICKLINK) {
             repository = blInventoryRepo;
-        } else if (source == InventorySource.BRICKOWL) {
+        } else if (source == DataSource.BRICKOWL) {
             repository = boInventoryRepo;
         } else {
             throw new IllegalArgumentException("Unknown inventory source: " + source);
@@ -52,15 +52,15 @@ public class InventoryService extends InventoryServiceGrpc.InventoryServiceImplB
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         try {
-            String idKey = (source == InventorySource.BRICKLINK) ? "inventory_id" : "lot_id";
+            String idKey = (source == DataSource.BRICKLINK) ? "inventory_id" : "lot_id";
 
-            for (Struct s : request.getInventoriesList()) {
+            for (Struct s : request.getDataList()) {
                 Integer id = getInventoryId(s, idKey);
                 InventoryDTO dto = inventoryMapper.fromStruct(s, userId, id);
                 repository.upsertInventory(dto.getInventoryId(), dto.getJson(), dto.getUserId());
             }
 
-            SetInventoryResponse response = SetInventoryResponse.newBuilder()
+            UpdateResponse response = UpdateResponse.newBuilder()
                     .setIsSuccess(true)
                     .setMessage("Inventories saved successfully for user " + stud.getUsername())
                     .build();
@@ -69,7 +69,7 @@ public class InventoryService extends InventoryServiceGrpc.InventoryServiceImplB
             responseObserver.onCompleted();
 
         } catch (Exception e) {
-            SetInventoryResponse error = SetInventoryResponse.newBuilder()
+            UpdateResponse error = UpdateResponse.newBuilder()
                     .setIsSuccess(false)
                     .setErrorMessage(e.getMessage())
                     .build();

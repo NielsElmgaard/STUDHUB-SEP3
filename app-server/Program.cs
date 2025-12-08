@@ -6,7 +6,9 @@ using Studhub.AppServer.Services.Auth_Login;
 using Studhub.AppServer.Services.Order;
 using Studhub.AppServer.Services.StudUser;
 using AppInv = Studhub.AppServer.Services.Inventory;
-    
+using AppOrder = Studhub.AppServer.Services.Order;
+using OrderClient = Studhub.Grpc.Data.OrderService.OrderServiceClient;
+
 AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,13 +28,17 @@ builder.Services.AddGrpcClient<InventoryService.InventoryServiceClient>(o =>
 {
     o.Address = new Uri(builder.Configuration["DataServer:GrpcAddress"]!);
 });
+builder.Services.AddGrpcClient<OrderClient>(o =>
+{
+    o.Address = new Uri(builder.Configuration["DataServer:GrpcAddress"]!);
+});
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IApiAuthService, ApiAuthService>();
 builder.Services.AddScoped<IInventoryService, AppInv.InventoryService>();
 builder.Services.AddScoped<IStudUserService, StudUserService>();
 builder.Services.AddScoped<IStudUserService, StudUserService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderService, AppOrder.OrderService>();
 
 
 var app = builder.Build();
