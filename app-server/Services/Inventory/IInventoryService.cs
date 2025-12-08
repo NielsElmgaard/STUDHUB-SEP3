@@ -12,4 +12,5 @@ public interface IInventoryService
     Task<List<string>> DiscoverBrickOwlInventoryKeysAsync(int studUserId);
     Task<List<string>> DiscoverBrickLinkInventoryKeysAsync(int studUserId);
 
+    Task<List<string>> PostInventoryChangesFromBLOrders(int studUserId);
 }

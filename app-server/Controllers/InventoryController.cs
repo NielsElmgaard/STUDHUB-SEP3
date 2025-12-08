@@ -102,4 +102,13 @@ public class InventoryController : ControllerBase
             await _inventoryService.DiscoverBrickLinkInventoryKeysAsync(studUserId);
         return Ok(identifiers);
     }
+    
+    [HttpPost("brickowl-lots")]
+    public async Task<ActionResult> PostInventoryChange(
+        [FromQuery] int studUserId)
+    {
+        var identifiers =
+            await _inventoryService.PostInventoryChangesFromBLOrders(studUserId);
+        return Ok(identifiers);
+    }
 }

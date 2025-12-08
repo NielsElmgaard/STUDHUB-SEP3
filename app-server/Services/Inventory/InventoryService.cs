@@ -484,4 +484,9 @@ var credentials = await _authService.GetBrickLinkCredentialsAsync(studUserId);
                 e);
         }
     }
+
+    public async Task<List<string>> PostInventoryChangesFromBLOrders(int studUserId)
+    {
+        return [];
+    }
 }
