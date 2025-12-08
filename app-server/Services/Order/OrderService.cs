@@ -1,13 +1,16 @@
 using System.Text.Json;
+using Google.Protobuf.WellKnownTypes;
 using Studhub.AppServer.Services.Api_Auth;
-using Studhub.AppServer.Services.Auth_Login;
+using Studhub.Grpc.Data;
 using StudHub.SharedDTO.Order;
+using OrderClient = Studhub.Grpc.Data.OrderService.OrderServiceClient;
 
 namespace Studhub.AppServer.Services.Order;
 
 public class OrderService : IOrderService
 {
     private readonly IApiAuthService _apiAuthService;
+    private readonly OrderClient _orderClinet;
 
     private static string brickLinkOrdersUrl =
         "https://api.bricklink.com/api/store/v1/orders";
@@ -16,9 +19,10 @@ public class OrderService : IOrderService
         "https://api.brickowl.com/v1/order/list";
 
     
-    public OrderService(IApiAuthService apiAuthService)
+    public OrderService(IApiAuthService apiAuthService, OrderClient orderClinet)
     {
         _apiAuthService = apiAuthService;
+        _orderClinet = orderClinet;
     }
 
     public async Task<List<BrickLinkOrderDTO>> GetBricklinikOrderAsync(int studUserId)
@@ -26,8 +30,8 @@ public class OrderService : IOrderService
         try
         {
             var desiredSatus = "Pending,Updated,Processing,Ready,Paid,Packed,Shipped,Received,Completed";
-            var quryParams = new Dictionary<string, string> { { "status", desiredSatus } };
-            var data = await _apiAuthService.GetBrickLinkResponse<BrickLinkOrderDTO>(studUserId, brickLinkOrdersUrl, quryParams);
+            var queryParams = new Dictionary<string, string> { { "status", desiredSatus } };
+            var data = await _apiAuthService.GetBrickLinkResponse<BrickLinkOrderDTO>(studUserId, brickLinkOrdersUrl, queryParams);
             return data;
         }
         catch (JsonException e)
@@ -42,5 +46,20 @@ public class OrderService : IOrderService
                 $"An error occurred during fetching order from BrickLink for {studUserId}",
                 e);
         }
+    }
+
+    public async Task<UpdateResponse> UpdateBricklinkOrderAsync(int studUserId, List<BrickLinkOrderDTO> bricklinikOrders)
+    {
+        var request = new UpdateRequest()
+        {
+            UserId = studUserId,
+            Source = DataSource.Bricklink
+        };
+        foreach (var inv in bricklinikOrders)
+        {
+            var invJson = JsonSerializer.Serialize(inv);
+            request.Inventories.Add((Struct.Parser.ParseJson(invJson)));
+        }
+        return await _orderClinet.UpdateOrdersAsync(request);
     }
 }
