@@ -6,8 +6,19 @@ public class StudhubLagerRepository
 {
     public Task<List<LagerItemDTO>> GetAllItemsAsync()
     {
+        
+        var items = new List<LagerItemDTO>
+        {
+            new LagerItemDTO 
+            {
+                Id = 1, 
+                Name = "LEGO sut"
+            }
+        };
+
+        return Task.FromResult(items);
         // Database implementeres af din ven
-        return Task.FromResult(new List<LagerItemDTO>());
+        //return Task.FromResult(new List<LagerItemDTO>());
     }
 
     public Task<LagerDetaljerDTO?> GetItemDetailsAsync(int id)
