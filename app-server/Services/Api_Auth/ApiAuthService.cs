@@ -1,0 +1,121 @@
+using System.Text.Json;
+using Studhub.AppServer.Services.Auth_Login;
+using StudHub.SharedDTO;
+
+namespace Studhub.AppServer.Services.Api_Auth;
+
+public class ApiAuthService : IApiAuthService
+{
+    private readonly IAuthService _authService;
+    private readonly HttpClient _httpClient;
+
+    public ApiAuthService(IAuthService authService, HttpClient httpClient)
+    {
+        _authService = authService;
+        _httpClient = httpClient;
+    }
+
+    public async Task<List<T>> GetBrickLinkResponse<T>(int studUserId, string url, Dictionary<string, string>? queryParams = null)
+    {
+        try
+        {
+            var credentials = await _authService.GetBrickLinkCredentialsAsync(studUserId);
+            if (credentials == null)
+            {
+                throw new Exception($"No BrickLink credentials for {studUserId}");
+            }
+
+            var jsonResponse = await OAuthHelper.ExecuteSignedApiCallAsync(
+                _httpClient,
+                url,
+                HttpMethod.Get,
+                credentials.ConsumerKey,
+                credentials.ConsumerSecret,
+                credentials.TokenValue,
+                credentials.TokenSecret,
+                queryParams);
+        
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNameCaseInsensitive = true
+            };
+        
+            var brickLinkResponse =
+                JsonSerializer
+                    .Deserialize<
+                        BrickLinkApiResponse<List<T>>>(
+                        jsonResponse, options);
+
+            if (brickLinkResponse?.Data == null)
+            {
+                return new List<T>();
+            }
+
+            return brickLinkResponse.Data;
+        }
+        catch (JsonException e)
+        {
+            throw new JsonException(
+                $"Error deserializing BrickLink response content for {studUserId}",
+                e);
+        }
+        catch (Exception e)
+        {
+            throw new Exception(
+                $"An error occurred during fetching order from BrickLink for {studUserId}",
+                e);
+        }
+    }
+
+    public async Task<List<T>> GetBrickOwlResponse<T>(int studUserId, string url)
+    {
+        try
+        {
+            var credentials =
+                await _authService.GetBrickOwlCredentialsAsync(studUserId);
+            if (credentials == null)
+            {
+                throw new Exception(
+                    $"No Brick Owl credentials for {studUserId}");
+            }
+
+            var fullUrl =
+                $"{url}?key={credentials.BrickOwlApiKey}";
+            var request = new HttpRequestMessage(HttpMethod.Get, fullUrl);
+
+            var response = await _httpClient.SendAsync(request);
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            
+            response.EnsureSuccessStatusCode();
+
+
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            var brickOwlResponse =
+                JsonSerializer
+                    .Deserialize<List<T>>(jsonResponse, options);
+
+            if (brickOwlResponse == null)
+            {
+                return new List<T>();
+            }
+
+            return brickOwlResponse;
+        }
+        catch (JsonException e)
+        {
+            throw new JsonException(
+                $"Error deserializing Brick Owl response content for {studUserId}",
+                e);
+        }
+        catch (Exception e)
+        {
+            throw new Exception(
+                $"An error occurred during processing Brick Owl inventories for {studUserId}",
+                e);
+        }
+    }
+}

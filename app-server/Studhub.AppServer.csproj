@@ -30,6 +30,10 @@
         <Protobuf Include="contracts/inventory/inventory.proto"
                   ProtoRoot="contracts"
                   GrpcServices="Client" />
+
+        <Protobuf Include="contracts/order/order.proto"
+                  ProtoRoot="contracts"
+                  GrpcServices="Client" />
     </ItemGroup>
 
     <ItemGroup>
