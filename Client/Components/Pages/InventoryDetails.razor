@@ -1,0 +1,29 @@
+@page "/inventory/{id:int}"
+@inject HttpClient Http
+@using StudHub.SharedDTO.Lager
+
+
+<h3>Vare detaljer</h3>
+
+@if (details == null)
+{
+    <p>Henter detaljer...</p>
+}
+else
+{
+    <p><b>ID:</b> @details.Id</p>
+    <p><b>Navn:</b> @details.Name</p>
+    <p><b>Beskrivelse:</b> @details.Description</p>
+
+    <a href="/inventory">Tilbage til lager</a>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    private LagerDetaljerDTO? details;
+
+    protected override async Task OnInitializedAsync()
+    {
+        details = await Http.GetFromJsonAsync<LagerDetaljerDTO>($"StudhubLager/{id}");
+    }
+}

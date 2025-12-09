@@ -6,6 +6,8 @@ using Studhub.AppServer.Services.Auth_Login;
 using Studhub.AppServer.Services.Order;
 using Studhub.AppServer.Services.StudUser;
 using AppInv = Studhub.AppServer.Services.Inventory;
+using Studhub.AppServer.Services.Lager;
+
 using AppOrder = Studhub.AppServer.Services.Order;
 using OrderClient = Studhub.Grpc.Data.OrderService.OrderServiceClient;
 
@@ -39,6 +41,8 @@ builder.Services.AddScoped<IInventoryService, AppInv.InventoryService>();
 builder.Services.AddScoped<IStudUserService, StudUserService>();
 builder.Services.AddScoped<IStudUserService, StudUserService>();
 builder.Services.AddScoped<IOrderService, AppOrder.OrderService>();
+builder.Services.AddScoped<StudhubLagerRepository>();
+builder.Services.AddScoped<StudhubLagerService>();
 
 
 var app = builder.Build();

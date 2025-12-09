@@ -1,0 +1,35 @@
+@page "/inventory"
+@inject HttpClient Http
+@using StudHub.SharedDTO.Lager
+
+
+<h3>Lageroversigt</h3>
+
+@if (items == null)
+{
+    <p>Henter lager...</p>
+}
+else if (!items.Any())
+{
+    <p>Ingen varer fundet.</p>
+}
+else
+{
+    <ul>
+        @foreach (var item in items)
+        {
+            <li>
+                <a href="/inventory/@item.Id">@item.Name</a>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<LagerItemDTO>? items;
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = await Http.GetFromJsonAsync<List<LagerItemDTO>>("StudhubLager");
+    }
+}
