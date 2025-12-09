@@ -11,12 +11,10 @@ namespace Studhub.AppServer.Controllers;
 public class InventoryController : ControllerBase
 {
     private readonly IInventoryService _inventoryService;
-    private readonly InventoryService.InventoryServiceClient _inventoryClient;
 
-    public InventoryController(IInventoryService inventoryService, InventoryService.InventoryServiceClient inventoryServiceClient)
+    public InventoryController(IInventoryService inventoryService)
     {
         _inventoryService = inventoryService;
-        _inventoryClient = inventoryServiceClient;
     }
 
     [HttpGet("sets")]
@@ -32,24 +30,15 @@ public class InventoryController : ControllerBase
     {
         var inventories =
             await _inventoryService.GetUserBrickLinkInventoryAsync(studUserId);
-        // Update inventories to data server using SetBrickLinkInventories
-        var setBrickLinkInventoryRequest = new SetBrickLinkInventoryRequest
-        {
-            UserId = studUserId
-        };
-        foreach (var inv in inventories)
-        {
-            var invJson = JsonSerializer.Serialize(inv);
-            setBrickLinkInventoryRequest.Inventories.Add((Struct.Parser.ParseJson(invJson)));
-        }
-        var setBrickLinkInventoryResponse =
-            await _inventoryClient.SetBrickLinkInventoriesAsync(setBrickLinkInventoryRequest);
         
-        if (!setBrickLinkInventoryResponse.IsSuccess)
+        var response =
+            await _inventoryService.UpdateBrickLinkInventoryAsync(studUserId, inventories);
+        
+        if (!response.IsSuccess)
         {
             return StatusCode(
                 500,
-                $"gRPC error: {setBrickLinkInventoryResponse.ErrorMessage ?? "Unknown error"}");
+                $"gRPC error: {response.ErrorMessage ?? "Unknown error"}");
         }
         return Ok(inventories);
     }

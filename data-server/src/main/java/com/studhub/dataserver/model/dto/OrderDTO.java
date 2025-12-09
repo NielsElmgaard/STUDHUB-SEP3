@@ -1,22 +1,22 @@
 package com.studhub.dataserver.model.dto;
 
-public class InventoryDTO {
-    Integer inventoryId;
+public class OrderDTO {
+    Integer orderId;
     String json;
     Integer userId;
 
-    public InventoryDTO(Integer inventoryId, String json, Integer userId) {
-        this.inventoryId = inventoryId;
+    public OrderDTO(Integer orderId, String json, Integer userId) {
+        this.orderId = orderId;
         this.json = json;
         this.userId = userId;
     }
 
-    public Integer getInventoryId() {
-        return inventoryId;
+    public Integer getOrderId() {
+        return orderId;
     }
 
-    public void setInventoryId(Integer inventoryId) {
-        this.inventoryId = inventoryId;
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
     }
 
     public String getJson() {
