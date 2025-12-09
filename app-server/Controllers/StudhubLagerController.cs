@@ -21,7 +21,7 @@ public class StudhubLagerController : ControllerBase
         return await _service.HentLagerOversigtAsync();
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<LagerDetaljerDTO?> GetDetaljer(int id)
     {
         return await _service.HentElementDetaljerAsync(id);
