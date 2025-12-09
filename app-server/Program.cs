@@ -4,7 +4,8 @@ using Studhub.AppServer.Services;
 using Studhub.AppServer.Services.Auth_Login;
 using Studhub.AppServer.Services.StudUser;
 using AppInv = Studhub.AppServer.Services.Inventory;
-    
+using Studhub.AppServer.Services.Lager;
+
 AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +29,8 @@ builder.Services.AddGrpcClient<InventoryService.InventoryServiceClient>(o =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IInventoryService, AppInv.InventoryService>();
 builder.Services.AddScoped<IStudUserService, StudUserService>();
+builder.Services.AddScoped<StudhubLagerRepository>();
+builder.Services.AddScoped<StudhubLagerService>();
 
 
 var app = builder.Build();
