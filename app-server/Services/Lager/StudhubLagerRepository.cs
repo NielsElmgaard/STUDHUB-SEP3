@@ -12,6 +12,16 @@ public class StudhubLagerRepository
 
     public Task<LagerDetaljerDTO?> GetItemDetailsAsync(int id)
     {
+        if (id == 1)
+        {
+            var test = new LagerDetaljerDTO 
+            {
+                Id = 1,
+                Name = "LEGO sut",
+                Description = "LEGO Sutten kan bruges af alle. Savl sælges separat."
+            };
+            return Task.FromResult<LagerDetaljerDTO?>(test);
+        }
         // Database implementeres af din ven
         return Task.FromResult<LagerDetaljerDTO?>(null);
     }
