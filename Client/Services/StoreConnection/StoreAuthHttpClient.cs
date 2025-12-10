@@ -1,4 +1,5 @@
 using System.Text.Json;
+using StudHub.SharedDTO;
 using StudHub.SharedDTO.StoreCredentials;
 
 namespace Client.Services.StoreConnection;
@@ -180,19 +181,43 @@ public class StoreAuthHttpClient : IStoreAuthClientService
         return new BrickOwlCredentialsResponseDTO { IsSucces = true };
     }
 
-    public async Task<bool> IsBrickLinkConnected(long studUserId)
+    public async Task<ConnectionStatusDTO?> IsBrickLinkConnected(
+        long studUserId)
     {
         HttpResponseMessage httpResponse =
             await _httpClient.GetAsync($"auth/bricklink-status/{studUserId}");
 
-        return httpResponse.IsSuccessStatusCode;
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            return await httpResponse.Content
+                .ReadFromJsonAsync<ConnectionStatusDTO>();
+        }
+
+        return new ConnectionStatusDTO
+        {
+            IsConnected = false,
+            ErrorMessage =
+                $"HTTP Error: {httpResponse.StatusCode} - {await httpResponse.Content.ReadAsStringAsync()}"
+        };
     }
 
-    public async Task<bool> IsBrickOwlConnected(long studUserId)
+    public async Task<ConnectionStatusDTO?> IsBrickOwlConnected(long studUserId)
     {
         HttpResponseMessage httpResponse =
             await _httpClient.GetAsync($"auth/brickowl-status/{studUserId}");
 
-        return httpResponse.IsSuccessStatusCode;
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            return await httpResponse.Content
+                .ReadFromJsonAsync<ConnectionStatusDTO>();
+        }
+
+        return new ConnectionStatusDTO
+        {
+            IsConnected = false,
+            ErrorMessage =
+                $"HTTP Error: {httpResponse.StatusCode} - {await httpResponse.Content.ReadAsStringAsync()}"
+        };
     }
 }

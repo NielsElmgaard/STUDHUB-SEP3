@@ -1,6 +1,7 @@
 @using System.Security.Claims
 @using Client.Services.StoreConnection
 @using Microsoft.AspNetCore.Components.Authorization
+@using StudHub.SharedDTO
 @namespace Client.Components.Dashboard
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IStoreAuthClientService StoreAuthClientService
@@ -8,32 +9,40 @@
 <div class="store-widget">
     <div class="store-status-row">
         <span class="store-label">BrickLink</span>
-        @if (IsBrickLinkConnected)
+        @if (IsBrickLinkConnected?.IsConnected == true)
         {
             <span class="badge bg-success">connected</span>
         }
-        else
+        else if (IsBrickLinkConnected != null)
         {
             <span class="badge bg-secondary">not connected</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">loading...</span>
         }
     </div>
     <div class="store-status-row">
         <span class="store-label">BrickOwl</span>
-        @if (IsBrickOwlConnected)
+        @if (IsBrickOwlConnected?.IsConnected == true)
         {
             <span class="badge bg-success">connected</span>
         }
-        else
+        else if (IsBrickOwlConnected != null)
         {
             <span class="badge bg-secondary">not connected</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">loading...</span>
         }
     </div>
 </div>
 
 @code {
 
-    private bool IsBrickLinkConnected { get; set; }
-    private bool IsBrickOwlConnected { get; set; }
+    private ConnectionStatusDTO? IsBrickLinkConnected { get; set; }
+    private ConnectionStatusDTO? IsBrickOwlConnected { get; set; }
     [CascadingParameter] public Task<AuthenticationState> State { get; set; } = default!;
 
 

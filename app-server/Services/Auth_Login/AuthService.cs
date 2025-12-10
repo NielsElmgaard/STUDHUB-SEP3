@@ -357,7 +357,8 @@ public class AuthService : IAuthService
         }
     }
 
-    public async Task<bool> IsBrickLinkConnectedAsync(int studUserId)
+    public async Task<ConnectionStatusDTO> IsBrickLinkConnectedAsync(
+        int studUserId)
     {
         var request = new UserId
         {
@@ -368,19 +369,40 @@ public class AuthService : IAuthService
         {
             GetBrickLinkAuthByIdResponse response =
                 await _grpcClient.GetBrickLinkAuthByIdAsync(request);
-            return
+
+            bool isConnected =
                 !string.IsNullOrEmpty(response
                     .ConsumerKey); // If Consumer Key is not empty (assumes the other api keys is empty as well), the user is connected.
+
+            return new ConnectionStatusDTO
+            {
+                IsConnected = isConnected,
+                ErrorMessage = null
+            };
         }
-        catch (RpcException e)
+        catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable)
         {
             Console.WriteLine(
                 $"gRPC Error calling GetBrickLinkAuthById: {e.Status.Detail}");
-            return false;
+            return new ConnectionStatusDTO
+            {
+                IsConnected = false,
+                ErrorMessage = $"gRPC Error: {e.Status.Detail}"
+            };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Unexpected Error: {e.Message}");
+            return new ConnectionStatusDTO
+            {
+                IsConnected = false,
+                ErrorMessage = $"Unexpected Error: {e.Message}"
+            };
         }
     }
 
-    public async Task<bool> IsBrickOwlConnectedAsync(int studUserId)
+    public async Task<ConnectionStatusDTO> IsBrickOwlConnectedAsync(
+        int studUserId)
     {
         var request = new UserId
         {
@@ -391,15 +413,34 @@ public class AuthService : IAuthService
         {
             GetBrickOwlAuthByIdResponse response =
                 await _grpcClient.GetBrickOwlAuthByIdAsync(request);
-            return
+            bool isConnected =
                 !string.IsNullOrEmpty(response
                     .ApiKey); // If Api Key is not empty, the user is connected.
+
+            return new ConnectionStatusDTO
+            {
+                IsConnected = isConnected,
+                ErrorMessage = null
+            };
         }
-        catch (RpcException e)
+        catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable)
         {
             Console.WriteLine(
                 $"gRPC Error calling GetBrickOwlAuthById: {e.Status.Detail}");
-            return false;
+            return new ConnectionStatusDTO
+            {
+                IsConnected = false,
+                ErrorMessage = $"gRPC Error: {e.Status.Detail}"
+            };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Unexpected Error: {e.Message}");
+            return new ConnectionStatusDTO
+            {
+                IsConnected = false,
+                ErrorMessage = $"Unexpected Error: {e.Message}"
+            };
         }
     }
 }
