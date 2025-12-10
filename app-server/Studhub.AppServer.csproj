@@ -17,21 +17,8 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
     </ItemGroup>
     
-
     <ItemGroup>
-        <Protobuf Include="contracts/common/common.proto"
-                  ProtoRoot="contracts"
-                  GrpcServices="Client" />
-
-        <Protobuf Include="contracts/stud/stud.proto"
-                  ProtoRoot="contracts"
-                  GrpcServices="Client" />
-        
-        <Protobuf Include="contracts/inventory/inventory.proto"
-                  ProtoRoot="contracts"
-                  GrpcServices="Client" />
-
-        <Protobuf Include="contracts/order/order.proto"
+        <Protobuf Include="contracts/**/*.proto"
                   ProtoRoot="contracts"
                   GrpcServices="Client" />
     </ItemGroup>

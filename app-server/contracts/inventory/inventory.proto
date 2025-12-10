@@ -9,8 +9,24 @@ package com.studhub.inventory;
 
 option csharp_namespace = "Studhub.Grpc.Data";
 
+message BrickowlInventory {
+  string type = 1;
+  string quantity = 2;
+  string price = 3;
+  string boid = 4;
+  string lot_id = 5;
+  string action = 6;
+
+}
+
+message BrickOwlDiffResponse {
+  repeated BrickowlInventory diffs = 1;
+  bool is_success = 2;
+  string error_message = 3;
+}
 
 service InventoryService {
   rpc SetInventories(com.studhub.common.UpdateRequest) returns(com.studhub.common.UpdateResponse);
+  rpc GetDiffInventoryForBrickOwl(com.studhub.common.UserId) returns(BrickOwlDiffResponse);
 }
 
