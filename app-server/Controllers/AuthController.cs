@@ -89,30 +89,32 @@ public class AuthController : ControllerBase
 
         return NoContent();
     }
-    
+
     [HttpGet("bricklink-status/{studUserId:long}")]
     public async Task<ActionResult> GetBrickLinkConnectionStatus(int studUserId)
     {
-        bool isConnected = await _authService.IsBrickLinkConnectedAsync(studUserId);
+        ConnectionStatusDTO status =
+            await _authService.IsBrickLinkConnectedAsync(studUserId);
 
-        if (isConnected)
+        if (!status.IsConnected && status.ErrorMessage != null)
         {
-            return Ok();
+            return StatusCode(503, status); // Service unavailable
         }
 
-        return NotFound();
+        return Ok(status);
     }
-    
+
     [HttpGet("brickowl-status/{studUserId:long}")]
     public async Task<ActionResult> GetBrickOwlConnectionStatus(int studUserId)
     {
-        bool isConnected = await _authService.IsBrickOwlConnectedAsync(studUserId);
+        ConnectionStatusDTO status =
+            await _authService.IsBrickOwlConnectedAsync(studUserId);
 
-        if (isConnected)
+        if (!status.IsConnected && status.ErrorMessage != null)
         {
-            return Ok();
+            return StatusCode(503, status); // Service unavailable
         }
 
-        return NotFound();
+        return Ok(status);
     }
 }

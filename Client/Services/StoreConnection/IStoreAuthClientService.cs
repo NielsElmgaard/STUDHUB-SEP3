@@ -1,3 +1,4 @@
+using StudHub.SharedDTO;
 using StudHub.SharedDTO.StoreCredentials;
 
 namespace Client.Services.StoreConnection;
@@ -14,7 +15,7 @@ public interface IStoreAuthClientService
     
     Task<BrickOwlCredentialsResponseDTO> ClearBrickOwlCredentials(long studUserId);
 
-    Task<bool> IsBrickLinkConnected(long studUserId);
-    Task<bool> IsBrickOwlConnected(long studUserId);
+    Task<ConnectionStatusDTO?> IsBrickLinkConnected(long studUserId);
+    Task<ConnectionStatusDTO?> IsBrickOwlConnected(long studUserId);
 
 }

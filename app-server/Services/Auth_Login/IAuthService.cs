@@ -36,7 +36,7 @@ public interface IAuthService
         int studUserId,
         string brickOwlApiKey);
 
-    Task<bool> IsBrickLinkConnectedAsync(int studUserId);
+    Task<ConnectionStatusDTO> IsBrickLinkConnectedAsync(int studUserId);
 
-    Task<bool> IsBrickOwlConnectedAsync(int studUserId);
+    Task<ConnectionStatusDTO> IsBrickOwlConnectedAsync(int studUserId);
 }
