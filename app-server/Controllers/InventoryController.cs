@@ -32,7 +32,7 @@ public class InventoryController : ControllerBase
             await _inventoryService.GetUserBrickLinkInventoryAsync(studUserId);
         
         var response =
-            await _inventoryService.UpdateBrickLinkInventoryAsync(studUserId, inventories);
+            await _inventoryService.UpdateInventoryAsync(studUserId, inventories, DataSource.Bricklink);
         
         if (!response.IsSuccess)
         {

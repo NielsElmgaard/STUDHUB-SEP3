@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Text.Json;
 using Studhub.AppServer.Services.Auth_Login;
 using StudHub.SharedDTO;
@@ -15,15 +16,13 @@ public class ApiAuthService : IApiAuthService
         _httpClient = httpClient;
     }
 
-    public async Task<List<T>> GetBrickLinkResponse<T>(int studUserId, string url, Dictionary<string, string>? queryParams = null)
+    public async Task<List<T>> GetBrickLinkResponse<T>(int studUserId, string url,
+        Dictionary<string, string>? queryParams = null)
     {
         try
         {
             var credentials = await _authService.GetBrickLinkCredentialsAsync(studUserId);
-            if (credentials == null)
-            {
-                throw new Exception($"No BrickLink credentials for {studUserId}");
-            }
+            if (credentials == null) throw new Exception($"No BrickLink credentials for {studUserId}");
 
             var jsonResponse = await OAuthHelper.ExecuteSignedApiCallAsync(
                 _httpClient,
@@ -34,22 +33,19 @@ public class ApiAuthService : IApiAuthService
                 credentials.TokenValue,
                 credentials.TokenSecret,
                 queryParams);
-        
-            var options = new JsonSerializerOptions()
+
+            var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
-        
+
             var brickLinkResponse =
                 JsonSerializer
                     .Deserialize<
                         BrickLinkApiResponse<List<T>>>(
                         jsonResponse, options);
 
-            if (brickLinkResponse?.Data == null)
-            {
-                return new List<T>();
-            }
+            if (brickLinkResponse?.Data == null) return new List<T>();
 
             return brickLinkResponse.Data;
         }
@@ -74,10 +70,8 @@ public class ApiAuthService : IApiAuthService
             var credentials =
                 await _authService.GetBrickOwlCredentialsAsync(studUserId);
             if (credentials == null)
-            {
                 throw new Exception(
                     $"No Brick Owl credentials for {studUserId}");
-            }
 
             var fullUrl =
                 $"{url}?key={credentials.BrickOwlApiKey}";
@@ -86,11 +80,11 @@ public class ApiAuthService : IApiAuthService
             var response = await _httpClient.SendAsync(request);
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
-            
+
             response.EnsureSuccessStatusCode();
 
 
-            var options = new JsonSerializerOptions()
+            var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
@@ -98,10 +92,7 @@ public class ApiAuthService : IApiAuthService
                 JsonSerializer
                     .Deserialize<List<T>>(jsonResponse, options);
 
-            if (brickOwlResponse == null)
-            {
-                return new List<T>();
-            }
+            if (brickOwlResponse == null) return new List<T>();
 
             return brickOwlResponse;
         }
@@ -113,6 +104,52 @@ public class ApiAuthService : IApiAuthService
         }
         catch (Exception e)
         {
+            throw new Exception(
+                $"An error occurred during processing Brick Owl inventories for {studUserId}",
+                e);
+        }
+    }
+
+    public async Task<T> PostBrickOwlResponse<T>(int studUserId, string url, Dictionary<string, string> formData)
+    {
+        try
+        {
+            var credentials =
+                await _authService.GetBrickOwlCredentialsAsync(studUserId);
+            if (credentials == null)
+                throw new Exception(
+                    $"No Brick Owl credentials for {studUserId}");
+
+            formData.Add("key", credentials.BrickOwlApiKey);
+            using var content = new FormUrlEncodedContent(formData);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
+
+            var response = await _httpClient.PostAsync(url, content);
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("response: " + jsonResponse);
+            response.EnsureSuccessStatusCode();
+
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            var brickOwlResponse = JsonSerializer.Deserialize<T>(jsonResponse, options)
+                                   ?? throw new JsonException("Error deserializing Brick Owl post response content");
+
+            return brickOwlResponse;
+        }
+        catch (JsonException e)
+        {
+            throw new JsonException(
+                $"Error deserializing Brick Owl response content for {studUserId}",
+                e);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: " + e.Message);
+            Console.WriteLine("Stack Trace: " + e.StackTrace);
             throw new Exception(
                 $"An error occurred during processing Brick Owl inventories for {studUserId}",
                 e);

@@ -2,6 +2,8 @@ package com.studhub.dataserver.model.entity;
 
 import jakarta.persistence.*;
 
+import java.time.OffsetDateTime;
+
 @Entity
 @Table(name = "bricklink_inventory")
 public class BricklinkInventory {
@@ -12,6 +14,9 @@ public class BricklinkInventory {
     @Column(name = "inventory_data", columnDefinition = "jsonb")
     private String inventoryData;
 
+    @Column(name = "updated_at", columnDefinition = "timestamptz")
+    private OffsetDateTime updatedAt;
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Stud user;

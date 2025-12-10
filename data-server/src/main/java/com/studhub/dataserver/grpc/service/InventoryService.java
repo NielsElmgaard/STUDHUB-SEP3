@@ -5,28 +5,35 @@ import com.google.protobuf.Value;
 import com.studhub.dataserver.common.DataSource;
 import com.studhub.dataserver.common.UpdateRequest;
 import com.studhub.dataserver.common.UpdateResponse;
+import com.studhub.dataserver.common.UserId;
+import com.studhub.dataserver.inventory.BrickOwlDiffResponse;
+import com.studhub.dataserver.inventory.BrickowlInventory;
 import com.studhub.dataserver.inventory.InventoryServiceGrpc;
 import com.studhub.dataserver.model.dto.InventoryDTO;
 import com.studhub.dataserver.model.entity.Stud;
 import com.studhub.dataserver.model.mapper.InventoryMapper;
-import com.studhub.dataserver.repository.BricklinkInventoryRepository;
-import com.studhub.dataserver.repository.BrickowlInventoryRepository;
-import com.studhub.dataserver.repository.IInventoryRepository;
-import com.studhub.dataserver.repository.StudRepository;
+import com.studhub.dataserver.repository.*;
+import com.studhub.dataserver.repository.projection.BrickOwlDiffProjection;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
+
+import java.util.List;
 
 @GrpcService
 public class InventoryService extends InventoryServiceGrpc.InventoryServiceImplBase {
 
     private final BricklinkInventoryRepository blInventoryRepo;
     private final BrickowlInventoryRepository boInventoryRepo;
+    private final BlBoInventoryMapRepository blBoInventoryMapRepo;
     private final StudRepository studRepository;
     private final InventoryMapper inventoryMapper;
 
-    public InventoryService(BricklinkInventoryRepository blInventoryRepo, BrickowlInventoryRepository boInventoryRepo, StudRepository studRepository, InventoryMapper inventoryMapper) {
+    public InventoryService(BricklinkInventoryRepository blInventoryRepo, BrickowlInventoryRepository boInventoryRepo,
+                            BlBoInventoryMapRepository blBoInventoryMapRepo, StudRepository studRepository,
+                            InventoryMapper inventoryMapper) {
         this.blInventoryRepo = blInventoryRepo;
         this.boInventoryRepo = boInventoryRepo;
+        this.blBoInventoryMapRepo = blBoInventoryMapRepo;
         this.studRepository = studRepository;
         this.inventoryMapper = inventoryMapper;
     }
@@ -98,5 +105,42 @@ public class InventoryService extends InventoryServiceGrpc.InventoryServiceImplB
         }
 
         return id;
+    }
+
+    @Override
+    public void getDiffInventoryForBrickOwl(UserId request,
+                                            StreamObserver<BrickOwlDiffResponse> responseObserver) {
+
+        try {
+            Integer userId = request.getId();
+            Stud stud = studRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            List<BrickOwlDiffProjection> boDiffs = blInventoryRepo.findAllForBrickOwl(stud.getId());
+
+            BrickOwlDiffResponse.Builder responseBuilder = BrickOwlDiffResponse.newBuilder();
+            for (var diff : boDiffs) {
+                BrickowlInventory builder = BrickowlInventory.newBuilder()
+                        .setType(diff.getType() != null ? diff.getType() : "")
+                        .setQuantity(diff.getQuantity() != null ? diff.getQuantity() : "0.0")
+                        .setPrice(diff.getPrice() != null ? diff.getPrice() : "0.00")
+                        .setBoid(diff.getBoid() != null ? diff.getBoid() : "")
+                        .setLotId(diff.getLotId() != null ? diff.getLotId() : "")
+                        .setAction(diff.getAction() != null ? diff.getAction() : "")
+                        .build();
+
+                responseBuilder.addDiffs(builder);
+            }
+            responseObserver.onNext(responseBuilder.setIsSuccess(true).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            e.printStackTrace();
+            BrickOwlDiffResponse error = BrickOwlDiffResponse.newBuilder()
+                    .setIsSuccess(false)
+                    .setErrorMessage(e.getMessage() != null ? e.getMessage() : "Unknown error").build();
+
+            responseObserver.onNext(error);
+            responseObserver.onCompleted();
+        }
     }
 }

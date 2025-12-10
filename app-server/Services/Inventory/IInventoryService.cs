@@ -12,5 +12,6 @@ public interface IInventoryService
     Task<List<string>> DiscoverBrickOwlInventoryKeysAsync(int studUserId);
     Task<List<string>> DiscoverBrickLinkInventoryKeysAsync(int studUserId);
 
-    Task<UpdateResponse> UpdateBrickLinkInventoryAsync(int studUserId, List<BrickLinkInventoryDTO> inventories);
+    Task<UpdateResponse> UpdateInventoryAsync<T>(int studUserId, List<T> inventories, DataSource source);
+    Task<Dictionary<string, List<string>>> UpdateBrickOwlDiffInventoryAsync(int studUserId);
 }
