@@ -12,8 +12,9 @@ import java.util.Base64;
 // https://thorben-janssen.com/how-to-use-jpa-type-converter-to/
 // chat-gpt - Ikke brugt endnu
 // Hvis brugt, tilføj @Convert(converter = EncryptionConverter.class) til api-nøglerne
-@Converter
-public class EncryptionConverter implements AttributeConverter<String, String> {
+@Converter public class EncryptionConverter
+    implements AttributeConverter<String, String>
+{
 
   private static final String ALGORITHM = "AES/GCM/NoPadding";
   private static final int GCM_TAG_LENGTH = 128;
@@ -22,18 +23,25 @@ public class EncryptionConverter implements AttributeConverter<String, String> {
 
   private final SecretKeySpec keySpec;
 
-  public EncryptionConverter() {
+  public EncryptionConverter()
+  {
     String key = System.getenv(SECRET_KEY_ENV);
-    if (key == null || key.length() != 16) {
-      throw new IllegalStateException("Environment variable APP_SECRET_KEY must be 16 chars for AES-128");
+    if (key == null || key.length() != 16)
+    {
+      throw new IllegalStateException(
+          "Environment variable APP_SECRET_KEY must be 16 chars for AES-128");
     }
     this.keySpec = new SecretKeySpec(key.getBytes(), "AES");
   }
 
-  @Override
-  public String convertToDatabaseColumn(String attribute) {
-    if (attribute == null) return null;
-    try {
+  @Override public String convertToDatabaseColumn(String attribute)
+  {
+    if (attribute == null || attribute.isEmpty())
+    {
+      return attribute;
+    }
+    try
+    {
       // Generate random IV
       byte[] iv = new byte[IV_LENGTH];
       SecureRandom random = new SecureRandom();
@@ -50,16 +58,26 @@ public class EncryptionConverter implements AttributeConverter<String, String> {
       System.arraycopy(encrypted, 0, combined, iv.length, encrypted.length);
 
       return Base64.getEncoder().encodeToString(combined);
-    } catch (Exception e) {
+    }
+    catch (Exception e)
+    {
       throw new RuntimeException("Error encrypting attribute", e);
     }
   }
 
-  @Override
-  public String convertToEntityAttribute(String dbData) {
-    if (dbData == null) return null;
-    try {
+  @Override public String convertToEntityAttribute(String dbData)
+  {
+    if (dbData == null || dbData.isEmpty())
+      return dbData;
+    try
+    {
       byte[] combined = Base64.getDecoder().decode(dbData);
+
+      if (combined.length<IV_LENGTH){
+        throw new RuntimeException(
+            "Corrupted encrypted data: length " + combined.length + " is shorter than required IV length " + IV_LENGTH
+        );
+      }
 
       byte[] iv = new byte[IV_LENGTH];
       byte[] encrypted = new byte[combined.length - IV_LENGTH];
@@ -71,8 +89,9 @@ public class EncryptionConverter implements AttributeConverter<String, String> {
       cipher.init(Cipher.DECRYPT_MODE, keySpec, spec);
 
       return new String(cipher.doFinal(encrypted));
-    } catch (Exception e) {
-      throw new RuntimeException("Error decrypting attribute", e);
     }
+    catch (Exception e)
+    {
+      throw new RuntimeException("Error decrypting attribute: " + e.getMessage(), e);    }
   }
 }
