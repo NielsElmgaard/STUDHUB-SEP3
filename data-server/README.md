@@ -16,9 +16,10 @@
 
 ## Amazon RDS (cloud database)
 
-Connect to database with tool at your choice, e.g. DataGrip. Database is running
+1. Connect to database with tool at your choice, e.g. DataGrip. Database is running
 at <br>`studhub.c982ess8k9td.eu-north-1.rds.amazonaws.com:5432`, with postgres
 as both username and password. Database name is studhub_db.
+2. Add DB_PASSWORD as environment variable (shared elsewhere)
 ---
 
 ## Encryption 
