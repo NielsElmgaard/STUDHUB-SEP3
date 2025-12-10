@@ -6,11 +6,11 @@
 2. Run command `docker compose up -d` to run postgres in background.
 3. Connect to database with tool at your choice, e.g. DataGrip. Database is running at `localhost:4444`, with postgres
    as both username and password. Database name is studhub_db.
-
+---
 > [!Note]  
 > If you have an existed db that has outdated tables, run `docker compose down --volumes` to
 > remove existing db first.
-
+---
 > [!Note]  
 > The API keys stored in the database are protected using AES encryption.
 >
@@ -19,7 +19,18 @@
 > **`APP_SECRET_KEY=YOUR_16_CHAR_SECRET_KEY`**
 >
 > *Replace* `YOUR_16_CHAR_SECRET_KEY` with the actual 16-character secret key value.
+---
+### Local HTTPS Setup (For Blazor Client)
 
+If you are running the Blazor Client project and the API Server locally using HTTPS (e.g., in Development mode), you must trust the .NET Core development certificate to prevent SSL connection errors:
+
+1. **Trust Certificate:** Open a terminal as an **Administrator** and run the following command once:
+    ```bash
+    dotnet dev-certs https --trust
+    ```
+2. **Restart:** Restart all running ASP.NET Core projects after running the trust command.
+
+---
 
 ### Seed csv file
 
@@ -42,3 +53,4 @@
     ```bash
     docker exec -it studhub_db psql -U postgres -d studhub_db -c "\COPY parts_map FROM './data/parts_mapping_clean.csv' CSV HEADER"
     ```
+---

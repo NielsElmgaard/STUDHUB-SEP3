@@ -53,7 +53,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection(); // Uncomment for HTTP
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 
