@@ -14,16 +14,30 @@ public class StudhubLagerController : ControllerBase
     {
         _service = service;
     }
-
+    
     [HttpGet]
-    public async Task<List<LagerItemDTO>> GetLager()
+    public Task<List<LagerItemDTO>> GetLager()
     {
-        return await _service.HentLagerOversigtAsync();
+        return _service.HentLagerOversigtAsync();
     }
-
-    [HttpGet("{id:int}")]
-    public async Task<LagerDetaljerDTO?> GetDetaljer(int id)
+    
+    [HttpGet("{id}")]
+    public Task<LagerDetaljerDTO?> GetDetaljer(int id)
     {
-        return await _service.HentElementDetaljerAsync(id);
+        return _service.HentElementDetaljerAsync(id);
+    }
+    
+    [HttpGet("search")]
+    public Task<List<LagerItemDTO>> Search(
+        [FromQuery(Name = "q")] string? searchText,
+        [FromQuery] string? color,
+        [FromQuery] string? partId,
+        [FromQuery] string? platform)
+    {
+        return _service.SøgOgFiltrerAsync(
+            searchText,
+            color,
+            partId,
+            platform);
     }
 }

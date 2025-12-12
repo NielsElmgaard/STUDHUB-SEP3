@@ -11,13 +11,29 @@ public class StudhubLagerService
         _repository = repository;
     }
 
+    
     public async Task<List<LagerItemDTO>> HentLagerOversigtAsync()
     {
         return await _repository.GetAllItemsAsync();
     }
 
+    
     public async Task<LagerDetaljerDTO?> HentElementDetaljerAsync(int id)
     {
         return await _repository.GetItemDetailsAsync(id);
+    }
+
+    
+    public async Task<List<LagerItemDTO>> SøgOgFiltrerAsync(
+        string? searchText,
+        string? color,
+        string? partId,
+        string? platform)
+    {
+        return await _repository.SearchAsync(
+            searchText,
+            color,
+            partId,
+            platform);
     }
 }

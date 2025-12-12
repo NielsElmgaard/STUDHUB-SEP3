@@ -1,9 +1,27 @@
 @page "/inventory"
-@inject HttpClient Http
 @using StudHub.SharedDTO.Lager
-
+@inject HttpClient Http
 
 <h3>Lageroversigt</h3>
+
+<div>
+    <h4>Søg og filtrér</h4>
+
+    <label>Søgetekst (navn / part id / remarks): </label>
+    <input @bind="searchText" />
+
+    <label style="margin-left:1rem;">Platform: </label>
+    <select @bind="platform">
+        <option value="">(Alle)</option>
+        <option value="BrickLink">BrickLink</option>
+        <option value="BrickOwl">BrickOwl</option>
+    </select>
+
+    <button style="margin-left:1rem;" @onclick="ApplyFilter">Søg</button>
+    <button style="margin-left:0.5rem;" @onclick="ClearFilter">Ryd</button>
+</div>
+
+<hr />
 
 @if (items == null)
 {
@@ -28,8 +46,34 @@ else
 @code {
     private List<LagerItemDTO>? items;
 
+    private string? searchText;
+    private string? platform;
+
     protected override async Task OnInitializedAsync()
     {
+        items = await Http.GetFromJsonAsync<List<LagerItemDTO>>("StudhubLager");
+    }
+
+    private async Task ApplyFilter()
+    {
+        var query = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(searchText))
+            query.Add($"q={Uri.EscapeDataString(searchText)}");
+        if (!string.IsNullOrWhiteSpace(platform))
+            query.Add($"platform={Uri.EscapeDataString(platform)}");
+
+        var url = "StudhubLager/search";
+        if (query.Any())
+            url += "?" + string.Join("&", query);
+
+        items = await Http.GetFromJsonAsync<List<LagerItemDTO>>(url);
+    }
+
+    private async Task ClearFilter()
+    {
+        searchText = null;
+        platform = null;
         items = await Http.GetFromJsonAsync<List<LagerItemDTO>>("StudhubLager");
     }
 }

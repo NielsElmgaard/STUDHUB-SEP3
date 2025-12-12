@@ -6,34 +6,44 @@ public class StudhubLagerRepository
 {
     public Task<List<LagerItemDTO>> GetAllItemsAsync()
     {
-        
         var items = new List<LagerItemDTO>
         {
-            new LagerItemDTO 
+            new LagerItemDTO
             {
-                Id = 1, 
-                Name = "LEGO sut"
+                Id = 1,
+                Name = "2x4 Brick"
             }
         };
 
         return Task.FromResult(items);
-        // Database implementeres af din ven
-        //return Task.FromResult(new List<LagerItemDTO>());
     }
 
     public Task<LagerDetaljerDTO?> GetItemDetailsAsync(int id)
     {
         if (id == 1)
         {
-            var test = new LagerDetaljerDTO 
+            var test = new LagerDetaljerDTO
             {
                 Id = 1,
-                Name = "LEGO sut",
-                Description = "LEGO Sutten kan bruges af alle. Savl sælges separat."
+                Name = "2x4 Brick",
+                Description = "Klassisk LEGO 2x4 klods i rød farve."
             };
+
             return Task.FromResult<LagerDetaljerDTO?>(test);
         }
-        // Database implementeres af din ven
+
         return Task.FromResult<LagerDetaljerDTO?>(null);
     }
-}
+    
+
+    
+    public Task<List<LagerItemDTO>> SearchAsync(
+        string? searchText,
+        string? color,
+        string? partId,
+        string? platform)
+    {
+        
+        return Task.FromResult(new List<LagerItemDTO>());
+    }
+}   
