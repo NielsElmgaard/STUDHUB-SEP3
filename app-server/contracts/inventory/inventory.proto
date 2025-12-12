@@ -1,6 +1,8 @@
 syntax = "proto3";
 
 import "common/common.proto";
+import "google/protobuf/struct.proto";
+
 
 option java_package = "com.studhub.dataserver.inventory";
 option java_multiple_files = true;
@@ -25,8 +27,19 @@ message BrickOwlDiffResponse {
   string error_message = 3;
 }
 
-service InventoryService {
-  rpc SetInventories(com.studhub.common.UpdateRequest) returns(com.studhub.common.UpdateResponse);
-  rpc GetDiffInventoryForBrickOwl(com.studhub.common.UserId) returns(BrickOwlDiffResponse);
+message BrickLinkInventoryRequest {
+  int32 stud_user_id = 1;
 }
 
+message BrickLinkInventoryResponse {
+  bool is_success = 1;
+  string message = 2;
+  string error_message = 3;
+  repeated google.protobuf.Struct data = 4;
+}
+
+service InventoryService {
+  rpc SetInventories (com.studhub.common.UpdateRequest) returns (com.studhub.common.UpdateResponse);
+  rpc GetDiffInventoryForBrickOwl (com.studhub.common.UserId) returns (BrickOwlDiffResponse);
+  rpc GetBrickLinkInventory (BrickLinkInventoryRequest) returns (BrickLinkInventoryResponse); // For UC-1.1
+}

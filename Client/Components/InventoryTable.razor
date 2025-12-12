@@ -1,0 +1,35 @@
+@using StudHub.SharedDTO.Inventory
+<table class="inventory-table">
+    <thead>
+    <tr>
+        <th>Part Id</th>
+        <th>Name</th>
+        <th>Quantity</th>
+        <th>Color</th>
+        <th class="col-unit-price">Unit price</th>
+        <th class="col-remarks">Remarks</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Items)
+    {
+        <tr @onclick="() => OnItemSelected.InvokeAsync(item)"
+            class="@(SelectedItem == item ? "table-primary" : "")">
+            <td>@item.Item.No</td>
+            <td>@item.Item.Name</td>
+            <td>@item.Quantity</td>
+            <td>@item.ColorName</td>
+            <td class="col-unit-price">@item.UnitPrice</td>
+            <td class="col-remarks">@(item.Remarks?.Length > 20 ? item.Remarks.Substring(0, 20) + "..." : item.Remarks)</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@code {
+    [Parameter] public required List<BrickLinkInventoryDTO> Items { get; set; }
+
+    [Parameter] public BrickLinkInventoryDTO? SelectedItem { get; set; }
+
+    [Parameter] public EventCallback<BrickLinkInventoryDTO> OnItemSelected { get; set; }
+}

@@ -1,6 +1,8 @@
 syntax = "proto3";
 
 import "common/common.proto";
+import "google/protobuf/struct.proto";
+
 
 option java_package = "com.studhub.dataserver.inventory";
 option java_multiple_files = true;
@@ -10,23 +12,35 @@ package com.studhub.inventory;
 option csharp_namespace = "Studhub.Grpc.Data";
 
 message BrickowlInventory {
-  string type = 1;
-  string quantity = 2;
-  string price = 3;
-  string boid = 4;
-  string lot_id = 5;
-  string action = 6;
+    string type = 1;
+    string quantity = 2;
+    string price = 3;
+    string boid = 4;
+    string lot_id = 5;
+    string action = 6;
 
 }
 
 message BrickOwlDiffResponse {
-  repeated BrickowlInventory diffs = 1;
-  bool is_success = 2;
-  string error_message = 3;
+    repeated BrickowlInventory diffs = 1;
+    bool is_success = 2;
+    string error_message = 3;
+}
+
+message BrickLinkInventoryRequest {
+    int32 stud_user_id = 1;
+}
+
+message BrickLinkInventoryResponse {
+    bool is_success = 1;
+    string message = 2;
+    string error_message = 3;
+    repeated google.protobuf.Struct data = 4;
 }
 
 service InventoryService {
-  rpc SetInventories(com.studhub.common.UpdateRequest) returns(com.studhub.common.UpdateResponse);
-  rpc GetDiffInventoryForBrickOwl(com.studhub.common.UserId) returns(BrickOwlDiffResponse);
+    rpc SetInventories (com.studhub.common.UpdateRequest) returns (com.studhub.common.UpdateResponse);
+    rpc GetDiffInventoryForBrickOwl (com.studhub.common.UserId) returns (BrickOwlDiffResponse);
+    rpc GetBrickLinkInventory (BrickLinkInventoryRequest) returns (BrickLinkInventoryResponse); // For UC-1.1
 }
 

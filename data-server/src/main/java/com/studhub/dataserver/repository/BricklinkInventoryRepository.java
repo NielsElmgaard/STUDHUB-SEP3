@@ -82,4 +82,6 @@ public interface BricklinkInventoryRepository extends JpaRepository<BricklinkInv
     List<BrickOwlDiffProjection> findAllForBrickOwl(@Param("userId") Integer userId);
 
 
+    List<BricklinkInventory> findAllByUserId(Integer studUserID);
+
 }
