@@ -1,4 +1,5 @@
-﻿using StudHub.SharedDTO;
+﻿using Client.Services.Inventory;
+using StudHub.SharedDTO;
 using StudHub.SharedDTO.Inventory;
 using StudHub.SharedDTO.StoreCredentials;
 
@@ -131,5 +132,32 @@ public class InventoryHttpClient : IInventoryClientService
             .ReadFromJsonAsync<List<string>>();
 
         return identifiers ?? new List<string>();
+    }
+
+    public async Task<PagedResultDTO<BrickLinkInventoryDTO>>
+        GetUserBrickLinkInventoryFromDatabaseAsync(long studUserId, int page,
+            int pageSize)
+    {
+        var response =
+            await _httpClient.GetAsync(
+                $"StudHubLager?studUserId={studUserId}&page={page}&pageSize={pageSize}");
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+
+            throw new Exception(
+                $"Error fetching database BrickLink inventory (Status: {response.StatusCode}): {error}");
+        }
+
+        var pagedInventories = await response.Content
+            .ReadFromJsonAsync<PagedResultDTO<BrickLinkInventoryDTO>>();
+
+        if (pagedInventories == null)
+        {
+            throw new InvalidOperationException(
+                "Failed to deserialize paged inventory response.");
+        }
+
+        return pagedInventories;
     }
 }

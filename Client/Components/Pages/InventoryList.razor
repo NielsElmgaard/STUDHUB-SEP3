@@ -1,35 +1,143 @@
 @page "/inventory"
 @inject HttpClient Http
+@using System.Security.Claims
+@using Client.Services.Inventory
+@using Microsoft.AspNetCore.Components.Authorization
+@using StudHub.SharedDTO
+@using StudHub.SharedDTO.Inventory
 @using StudHub.SharedDTO.Lager
+@inject IInventoryClientService InventoryClientService
 
+<div class="inventory-container d-flex">
+    <div class="inventory-list-pane">
 
-<h3>Lageroversigt</h3>
+        <h3>Lageroversigt (Page @currentPage of @totalPages)</h3>
 
-@if (items == null)
-{
-    <p>Henter lager...</p>
-}
-else if (!items.Any())
-{
-    <p>Ingen varer fundet.</p>
-}
-else
-{
-    <ul>
-        @foreach (var item in items)
+        <!-- https://dev.to/rijwanansari/creating-a-reusable-dynamic-pagination-component-in-blazor-3hgb -->
+        @if (items != null && items.TotalPages > 1)
         {
-            <li>
-                <a href="/inventory/@item.Id">@item.Name</a>
-            </li>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <button class="btn btn-primary mt-3"
+                        disabled="@(currentPage == 1)"
+                        @onclick="() => ChangePage(currentPage - 1)">
+                    Previous
+                </button>
+                <span>Page @currentPage of @totalPages (@items.TotalCount lots in total)</span>
+                <button class="btn btn-primary mt-3"
+                        disabled="@(currentPage == totalPages)"
+                        @onclick="() => ChangePage(currentPage + 1)">
+                    Next
+                </button>
+            </div>
         }
-    </ul>
-}
+
+        @if (items == null)
+        {
+            <p>Henter lager...</p>
+        }
+        else if (!items.Items.Any())
+        {
+            <p>Ingen varer fundet.</p>
+        }
+        else
+        {
+            <div class="table-responsive-lg mt-3">
+                <InventoryTable Items="items.Items"
+                                SelectedItem="selectedItem"
+                                OnItemSelected="SelectItem"/>
+            </div>
+        }
+
+        <!-- https://dev.to/rijwanansari/creating-a-reusable-dynamic-pagination-component-in-blazor-3hgb -->
+        @if (items != null && items.TotalPages > 1)
+        {
+            <div
+                class="d-flex justify-content-between align-items-center mt-3">
+                <button class="btn btn-primary mt-3"
+                        disabled="@(currentPage == 1)"
+                        @onclick="() => ChangePage(currentPage - 1)">
+                    Previous
+                </button>
+                <span>Page @currentPage of @totalPages (@items.TotalCount lots in total)</span>
+                <button class="btn btn-primary mt-3"
+                        disabled="@(currentPage == totalPages)"
+                        @onclick="() => ChangePage(currentPage + 1)">
+                    Next
+                </button>
+            </div>
+        }
+    </div>
+
+    <div
+        class="inventory-details-pane @(selectedItem == null ? "d-none d-lg-flex" : "")">
+        @if (selectedItem != null)
+        {
+            <div class="inventory-details-card">
+                <h4><b>Details for:</b> <br/> @selectedItem.Item.Name
+                </h4>
+                <pre
+                    style="max-height: 400px; overflow-y: auto;">@System.Text.Json.JsonSerializer.Serialize(selectedItem, new System.Text.Json.JsonSerializerOptions { WriteIndented = true })</pre>
+            </div>
+        }
+        else if (items?.Items.Any() == true)
+        {
+            <p>Select a row to view details.</p>
+        }
+    </div>
+</div>
 
 @code {
-    private List<LagerItemDTO>? items;
+    private PagedResultDTO<BrickLinkInventoryDTO>? items;
+    private BrickLinkInventoryDTO? selectedItem;
+
+    private int currentPage = 1;
+    private int pageSize = 25; // default
+    private int totalPages => items?.TotalPages ?? 1;
+
+    private long? studUserId;
+
+    [CascadingParameter] public Task<AuthenticationState> State { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
-        items = await Http.GetFromJsonAsync<List<LagerItemDTO>>("StudhubLager");
+        var authState = await State;
+        var studUserIdClaim = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (long.TryParse(studUserIdClaim, out long id))
+        {
+            studUserId = id;
+            await LoadInventory();
+        }
+        else
+        {
+            items = new PagedResultDTO<BrickLinkInventoryDTO>();
+        }
     }
+
+    private async Task LoadInventory()
+    {
+        if (studUserId.HasValue)
+        {
+            selectedItem = null;
+
+            items = await InventoryClientService.GetUserBrickLinkInventoryFromDatabaseAsync(
+                studUserId.Value, currentPage, pageSize);
+        }
+    }
+
+    private void SelectItem(BrickLinkInventoryDTO item)
+    {
+        selectedItem = item;
+    }
+
+    private async Task ChangePage(int newPage)
+    {
+        if (newPage >= 1 && newPage <= totalPages)
+        {
+            currentPage = newPage;
+            await LoadInventory();
+        }
+    }
+
 }

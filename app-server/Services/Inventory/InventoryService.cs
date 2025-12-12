@@ -434,6 +434,8 @@ public class InventoryService : IInventoryService
             throw new Exception(
                 $"An unexpected error occurred during API execution for {studUserId}",
                 e);
+            
+            
         }
     }
 

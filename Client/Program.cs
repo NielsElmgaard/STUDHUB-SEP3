@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Studhub.AppServer.Services;
 using Client.Services;
 using Client.Services.Auth_Login;
+using Client.Services.Inventory;
 using Client.Services.StudUser;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,7 +38,6 @@ builder.Services.AddScoped<SimpleAuthProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
     sp.GetRequiredService<SimpleAuthProvider>());
 builder.Services.AddScoped<Client.Services.Dashboard.DashboardSettingsService>();
-
 
 var app = builder.Build();
 

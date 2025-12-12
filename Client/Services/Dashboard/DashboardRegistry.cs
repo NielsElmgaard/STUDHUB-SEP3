@@ -27,7 +27,15 @@ public class DashboardRegistry
             DetailsRoute: null,
             DefaultEnabled: true
         ));
-
+        Register(new DashboardWidgetDescriptor(
+            Id: "studhub-inventory",
+            Title: "STUDHUB Inventory",
+            Tags: new[] { "store","inventory" },
+            ComponentType: typeof(InventoryWidget),
+            DetailsRoute: "/Inventory",
+            DefaultEnabled: true
+        ));
+        
         // …add more widgets
     }
 
