@@ -30,6 +30,19 @@
                 </button>
             </div>
         }
+        <div>
+            <h4>Søg og filtrér</h4>
+            <div class="mb-2 w-25">
+                <SearchBox Type="text" Label="name / part id / remarks etc."
+                           Placeholder="search..." @bind-SearchText="searchText"
+                           OnSearchChanged="ApplyFilter"/>
+                <button style="margin-left:0.5rem;" @onclick="ClearFilter">
+                    Clear
+                </button>
+            </div>
+        </div>
+
+        <hr/>
 
         @if (items == null)
         {
@@ -98,6 +111,10 @@
 
     [CascadingParameter] public Task<AuthenticationState> State { get; set; }
 
+    private string? searchText;
+
+    private PagedResultDTO<BrickLinkInventoryDTO>? filteredItems = new PagedResultDTO<BrickLinkInventoryDTO>();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -112,6 +129,7 @@
         else
         {
             items = new PagedResultDTO<BrickLinkInventoryDTO>();
+            filteredItems = items;
         }
     }
 
@@ -122,7 +140,7 @@
             selectedItem = null;
 
             items = await InventoryClientService.GetUserBrickLinkInventoryFromDatabaseAsync(
-                studUserId.Value, currentPage, pageSize);
+                studUserId.Value, currentPage, pageSize, searchText);
         }
     }
 
@@ -138,6 +156,20 @@
             currentPage = newPage;
             await LoadInventory();
         }
+    }
+
+    private async Task ApplyFilter(string newSearchText)
+    {
+        searchText = newSearchText;
+        currentPage = 1;
+        await LoadInventory();
+    }
+
+    private async Task ClearFilter()
+    {
+        searchText = String.Empty;
+        currentPage = 1;
+        await LoadInventory();
     }
 
 }

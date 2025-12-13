@@ -19,14 +19,18 @@ public class StudhubLagerController : ControllerBase
 
     [HttpGet]
     public async Task<ActionResult> GetLager([FromQuery] int studUserId,
-        [FromQuery] int page = 1, [FromQuery] int pageSize = 25)
+        [FromQuery] string? search,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 25)
     {
-        if (page<1 || pageSize<1)
+        if (page < 1 || pageSize < 1)
         {
             return BadRequest("Invalid page or pageSize value.");
         }
+
         var inventoryList =
-            await _service.GetAllBrickLinkInventoryAsync(studUserId,page,pageSize);
+            await _service.GetAllBrickLinkInventoryAsync(studUserId, page,
+                pageSize, search);
 
         return Ok(inventoryList);
     }
