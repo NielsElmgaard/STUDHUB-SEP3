@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Studhub.Grpc.Data;
 using StudHub.SharedDTO;
@@ -30,7 +31,8 @@ public class StudhubLagerService : IStudhubLagerService
     }
 
     public async Task<PagedResultDTO<BrickLinkInventoryDTO>>
-        GetAllBrickLinkInventoryAsync(int studUserId, int page, int pageSize)
+        GetAllBrickLinkInventoryAsync(int studUserId, int page, int pageSize,
+            string? search)
     {
         var request = new BrickLinkInventoryRequest()
         {
@@ -76,15 +78,42 @@ public class StudhubLagerService : IStudhubLagerService
             }
         }
 
+        IEnumerable<BrickLinkInventoryDTO> filteredInventory = inventory;
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            string lowerSearch = search.ToLowerInvariant();
+
+            filteredInventory = inventory.Where(item =>
+                item.Item?.Name?.ToLowerInvariant().Contains(lowerSearch) ==
+                true ||
+                item.Item?.No?.ToLowerInvariant().Contains(lowerSearch) ==
+                true ||
+                item.Item?.Type?.ToLowerInvariant().Contains(lowerSearch) ==
+                true ||
+                item.ColorName?.ToLowerInvariant().Contains(lowerSearch) ==
+                true ||
+                item.NewOrUsed?.ToLowerInvariant().Contains(lowerSearch) ==
+                true ||
+                item.Remarks?.ToLowerInvariant().Contains(lowerSearch) ==
+                true ||
+                item.Description?.ToLowerInvariant().Contains(lowerSearch) ==
+                true ||
+                item.InventoryId.ToString().Contains(lowerSearch) ||
+                item.UnitPrice?.Contains(lowerSearch) == true ||
+                item.DateCreated.ToString().ToLowerInvariant()
+                    .Contains(lowerSearch));
+        }
+
+        int totalCount = filteredInventory.Count();
         int skip = (page - 1) * pageSize;
 
-        var pagedItems = inventory.Skip(skip).Take(pageSize).ToList();
+        var pagedItems = filteredInventory.Skip(skip).Take(pageSize).ToList();
 
         var pagedResult = new PagedResultDTO<BrickLinkInventoryDTO>
         {
             Items = pagedItems,
-            TotalCount =
-                inventory.Count,
+            TotalCount = totalCount,
             PageSize = pageSize,
             CurrentPage = page
         };
