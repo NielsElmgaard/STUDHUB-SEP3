@@ -32,7 +32,7 @@ public class StudhubLagerService : IStudhubLagerService
 
     public async Task<PagedResultDTO<BrickLinkInventoryDTO>>
         GetAllBrickLinkInventoryAsync(int studUserId, int page, int pageSize,
-            string? search)
+            string? search, string? color, string? itemType)
     {
         var request = new BrickLinkInventoryRequest()
         {
@@ -89,10 +89,6 @@ public class StudhubLagerService : IStudhubLagerService
                 true ||
                 item.Item?.No?.ToLowerInvariant().Contains(lowerSearch) ==
                 true ||
-                item.Item?.Type?.ToLowerInvariant().Contains(lowerSearch) ==
-                true ||
-                item.ColorName?.ToLowerInvariant().Contains(lowerSearch) ==
-                true ||
                 item.NewOrUsed?.ToLowerInvariant().Contains(lowerSearch) ==
                 true ||
                 item.Remarks?.ToLowerInvariant().Contains(lowerSearch) ==
@@ -104,6 +100,25 @@ public class StudhubLagerService : IStudhubLagerService
                 item.DateCreated.ToString().ToLowerInvariant()
                     .Contains(lowerSearch));
         }
+
+        // For dropdown menu of colors
+        if (!string.IsNullOrWhiteSpace(color))
+        {
+            string lowerColor = color.ToLowerInvariant();
+
+            filteredInventory = filteredInventory.Where(item =>
+                item.ColorName?.ToLowerInvariant().Equals(lowerColor) == true);
+        }
+        
+        // For dropdown menu of type
+        if (!string.IsNullOrWhiteSpace(itemType))
+        {
+            string lowerItemType = itemType.ToLowerInvariant();
+
+            filteredInventory = filteredInventory.Where(item =>
+                item.Item.Type?.ToLowerInvariant().Equals(lowerItemType) == true);
+        }
+        
 
         int totalCount = filteredInventory.Count();
         int skip = (page - 1) * pageSize;

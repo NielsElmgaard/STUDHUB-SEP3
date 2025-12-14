@@ -6,5 +6,5 @@ namespace Studhub.AppServer.Services.Lager;
 public interface IStudhubLagerService
 {
     Task<PagedResultDTO<BrickLinkInventoryDTO>> GetAllBrickLinkInventoryAsync(
-        int studUserId, int page, int pageSize, string? search);
+        int studUserId, int page, int pageSize, string? search, string? color, string? itemType);
 }
