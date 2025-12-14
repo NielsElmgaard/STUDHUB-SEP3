@@ -18,5 +18,5 @@ public interface IInventoryClientService
 
     Task<PagedResultDTO<BrickLinkInventoryDTO>>
         GetUserBrickLinkInventoryFromDatabaseAsync(long studUserId, int page,
-            int pageSize,string searchText);
+            int pageSize,string? searchText, string? selectedColor, string? selectedItemType);
 }

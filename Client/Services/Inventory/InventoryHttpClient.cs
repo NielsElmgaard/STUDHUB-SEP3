@@ -136,7 +136,7 @@ public class InventoryHttpClient : IInventoryClientService
 
     public async Task<PagedResultDTO<BrickLinkInventoryDTO>>
         GetUserBrickLinkInventoryFromDatabaseAsync(long studUserId, int page,
-            int pageSize, string? searchText)
+            int pageSize, string? searchText, string? selectedColor, string? selectedItemType)
     {
         var url =
             $"StudHubLager?studUserId={studUserId}&page={page}&pageSize={pageSize}";
@@ -144,6 +144,16 @@ public class InventoryHttpClient : IInventoryClientService
         if (!string.IsNullOrWhiteSpace(searchText))
         {
             url += $"&search={Uri.EscapeDataString(searchText)}";
+        }
+        
+        if (!string.IsNullOrWhiteSpace(selectedColor))
+        {
+            url += $"&color={Uri.EscapeDataString(selectedColor)}";
+        }
+        
+        if (!string.IsNullOrWhiteSpace(selectedItemType))
+        {
+            url += $"&itemType={Uri.EscapeDataString(selectedItemType)}";
         }
 
         var response = await _httpClient.GetAsync(url);

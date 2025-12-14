@@ -18,11 +18,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-    builder.Services.AddScoped(sp => new HttpClient
-    {
-        BaseAddress = new Uri("https://localhost:7245/")
-        //BaseAddress = new Uri("http://localhost:5299/")
-    });
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri("https://localhost:7245/")
+    //BaseAddress = new Uri("http://localhost:5299/")
+});
 
 builder.Services.AddSingleton<Client.Services.Dashboard.DashboardRegistry>();
 builder.Services.AddScoped<ILoginClientService, LoginClientHttpClient>();
@@ -37,7 +37,10 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<SimpleAuthProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
     sp.GetRequiredService<SimpleAuthProvider>());
-builder.Services.AddScoped<Client.Services.Dashboard.DashboardSettingsService>();
+builder.Services
+    .AddScoped<Client.Services.Dashboard.DashboardSettingsService>();
+builder.Services.AddBlazorBootstrap();
+
 
 var app = builder.Build();
 
