@@ -15,51 +15,67 @@ public class OrderService : IOrderService
     private static string brickLinkOrdersUrl =
         "https://api.bricklink.com/api/store/v1/orders";
 
-    private static string brickOwlOrderUrl =
-        "https://api.brickowl.com/v1/order/list";
+    private static string brickOwlBaseOrderUrl =
+        "https://api.brickowl.com/v1/order";
 
-    
+
     public OrderService(IApiAuthService apiAuthService, OrderClient orderClinet)
     {
         _apiAuthService = apiAuthService;
         _orderClinet = orderClinet;
     }
 
-    public async Task<List<BrickLinkOrderDTO>> GetBricklinikOrderAsync(int studUserId)
+    public async Task<List<BrickLinkOrderDto>> GetBricklinkOrderAsync(int studUserId)
     {
-        try
-        {
-            var desiredSatus = "Pending,Updated,Processing,Ready,Paid,Packed,Shipped,Received,Completed";
-            var queryParams = new Dictionary<string, string> { { "status", desiredSatus } };
-            var data = await _apiAuthService.GetBrickLinkResponse<BrickLinkOrderDTO>(studUserId, brickLinkOrdersUrl, queryParams);
-            return data;
-        }
-        catch (JsonException e)
-        {
-            throw new JsonException(
-                $"Error deserializing BrickLink response content for {studUserId}",
-                e);
-        }
-        catch (Exception e)
-        {
-            throw new Exception(
-                $"An error occurred during fetching order from BrickLink for {studUserId}",
-                e);
-        }
+        var desiredSatus = "Pending,Updated,Processing,Ready,Paid,Packed,Shipped,Received,Completed";
+        var queryParams = new Dictionary<string, string> { { "status", desiredSatus } };
+        var orders = await _apiAuthService.GetBrickLinkResponse<BrickLinkOrderDto>(studUserId, brickLinkOrdersUrl,
+            queryParams);
+        var res = await UpdateBricklinkOrderAsync(studUserId, orders);
+        return orders;
     }
 
-    public async Task<UpdateResponse> UpdateBricklinkOrderAsync(int studUserId, List<BrickLinkOrderDTO> bricklinikOrders)
+    public async Task<List<BrickOwlOrderListDto>> GetBrickOwlOrderAsync(int studUserId)
     {
-        var request = new UpdateRequest()
+        var quryParams = new Dictionary<string, string> { { "list_type", "store" } };
+        var orders = await _apiAuthService.GetBrickOwlResponse<BrickOwlOrderListDto>(studUserId,
+            $"{brickOwlBaseOrderUrl}/list", quryParams);
+        Console.WriteLine(orders);
+        var res = await UpdateBrickOwlOrderAsync(studUserId, orders);
+        return orders;
+    }
+
+
+    public async Task<UpdateResponse> UpdateBricklinkOrderAsync(int studUserId, List<BrickLinkOrderDto> brickLinkOrders)
+    {
+        var request = new UpdateRequest
         {
             UserId = studUserId,
             Source = DataSource.Bricklink
         };
-        foreach (var inv in bricklinikOrders)
+        foreach (var inv in brickLinkOrders)
         {
             var invJson = JsonSerializer.Serialize(inv);
-            request.Inventories.Add((Struct.Parser.ParseJson(invJson)));
+            request.Inventories.Add(Struct.Parser.ParseJson(invJson));
         }
+
+        return await _orderClinet.UpdateOrdersAsync(request);
+    }
+
+    public async Task<UpdateResponse> UpdateBrickOwlOrderAsync(int studUserId,
+        List<BrickOwlOrderListDto> brickowlOrderItems)
+    {
+        var request = new UpdateRequest
+        {
+            UserId = studUserId,
+            Source = DataSource.Brickowl
+        };
+        foreach (var inv in brickowlOrderItems)
+        {
+            var invJson = JsonSerializer.Serialize(inv);
+            request.Inventories.Add(Struct.Parser.ParseJson(invJson));
+        }
+
         return await _orderClinet.UpdateOrdersAsync(request);
     }
 }

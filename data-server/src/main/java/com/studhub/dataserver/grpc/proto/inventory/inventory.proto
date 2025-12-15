@@ -36,6 +36,7 @@ message BrickLinkInventoryResponse {
 
 service InventoryService {
     rpc SetInventories (com.studhub.common.UpdateRequest) returns (com.studhub.common.UpdateResponse);
+    rpc UpdateInventories(com.studhub.common.UserId) returns (com.studhub.common.UpdateResponse);
     rpc GetDiffInventoryForBrickOwl (com.studhub.common.UserId) returns (BrickOwlDiffResponse);
     rpc GetBrickLinkInventory (com.studhub.common.UserId) returns (BrickLinkInventoryResponse); // For UC-1.1
 }

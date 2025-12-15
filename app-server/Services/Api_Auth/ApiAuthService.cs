@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Web;
 using Studhub.AppServer.Services.Auth_Login;
 using StudHub.SharedDTO;
 
@@ -63,7 +64,8 @@ public class ApiAuthService : IApiAuthService
         }
     }
 
-    public async Task<List<T>> GetBrickOwlResponse<T>(int studUserId, string url)
+    public async Task<List<T>> GetBrickOwlResponse<T>(int studUserId, string url,
+        Dictionary<string, string>? queryParams = null)
     {
         try
         {
@@ -73,28 +75,30 @@ public class ApiAuthService : IApiAuthService
                 throw new Exception(
                     $"No Brick Owl credentials for {studUserId}");
 
-            var fullUrl =
-                $"{url}?key={credentials.BrickOwlApiKey}";
-            var request = new HttpRequestMessage(HttpMethod.Get, fullUrl);
+            var uriBuilder = new UriBuilder(url);
+            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+
+            query["key"] = credentials.BrickOwlApiKey;
+            if (queryParams != null)
+                foreach (var param in queryParams)
+                    query[param.Key] = param.Value;
+
+            uriBuilder.Query = query.ToString();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, uriBuilder.Uri);
 
             var response = await _httpClient.SendAsync(request);
-
-            var jsonResponse = await response.Content.ReadAsStringAsync();
 
             response.EnsureSuccessStatusCode();
 
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-            var brickOwlResponse =
-                JsonSerializer
-                    .Deserialize<List<T>>(jsonResponse, options);
+            var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            if (brickOwlResponse == null) return new List<T>();
-
-            return brickOwlResponse;
+            return JsonSerializer.Deserialize<List<T>>(
+                jsonResponse,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            ) ?? new List<T>();
+            ;
         }
         catch (JsonException e)
         {

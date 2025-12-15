@@ -5,20 +5,26 @@ namespace Studhub.AppServer.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class OrderController:ControllerBase
+public class OrderController : ControllerBase
 {
     private readonly IOrderService _orderService;
-    
+
     public OrderController(IOrderService orderService)
     {
         _orderService = orderService;
     }
-    
-    [HttpGet("bricklink-orders")]
-    public async Task<ActionResult> GetBricklinkOrders([FromQuery] int studUserId)
+
+    [HttpGet("bricklink")]
+    public async Task<ActionResult> GetBrickLinkOrders([FromQuery] int studUserId)
     {
-        var orders = await _orderService.GetBricklinikOrderAsync(studUserId);
+        var orders = await _orderService.GetBricklinkOrderAsync(studUserId);
         return Ok(orders);
     }
-    
+
+    [HttpGet("brickowl")]
+    public async Task<ActionResult> GetBrickOwlOrders([FromQuery] int studUserId)
+    {
+        var orders = await _orderService.GetBrickOwlOrderAsync(studUserId);
+        return Ok(orders);
+    }
 }
