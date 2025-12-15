@@ -16,7 +16,7 @@ public class OrderService : IOrderService
         "https://api.bricklink.com/api/store/v1/orders";
 
     private static string brickOwlBaseOrderUrl =
-        "https://api.brickowl.com/v1/order/";
+        "https://api.brickowl.com/v1/order";
 
 
     public OrderService(IApiAuthService apiAuthService, OrderClient orderClinet)
@@ -29,29 +29,20 @@ public class OrderService : IOrderService
     {
         var desiredSatus = "Pending,Updated,Processing,Ready,Paid,Packed,Shipped,Received,Completed";
         var queryParams = new Dictionary<string, string> { { "status", desiredSatus } };
-        var data = await _apiAuthService.GetBrickLinkResponse<BrickLinkOrderDto>(studUserId, brickLinkOrdersUrl,
+        var orders = await _apiAuthService.GetBrickLinkResponse<BrickLinkOrderDto>(studUserId, brickLinkOrdersUrl,
             queryParams);
-        return data;
+        var res = await UpdateBricklinkOrderAsync(studUserId, orders);
+        return orders;
     }
 
-    public async Task<List<BrickOwlOrderItemDto>> GetBrickOwlOrderAsync(int studUserId)
+    public async Task<List<BrickOwlOrderListDto>> GetBrickOwlOrderAsync(int studUserId)
     {
-        // 1. Get last 1 hour order from BrickOWL
-        var unixTimestamp = DateTimeOffset.UtcNow
-            .AddHours(1)
-            .ToUnixTimeSeconds(); // Only fetch orders happens last hour
-        var quryParams = new Dictionary<string, string> { { "order_time", unixTimestamp.ToString() } };
-        var data = await _apiAuthService.GetBrickLinkResponse<List<BrickOwlOrderListDto>>(studUserId,
+        var quryParams = new Dictionary<string, string> { { "list_type", "store" } };
+        var orders = await _apiAuthService.GetBrickOwlResponse<BrickOwlOrderListDto>(studUserId,
             $"{brickOwlBaseOrderUrl}/list", quryParams);
-        // 2. Get item Details from each order
-        var allItems = new List<BrickOwlOrderItemDto>();
-        foreach (var order in data)
-        {
-            var items = await _apiAuthService.GetBrickLinkResponse<List<BrickOwlOrderItemDto>>(studUserId,
-                $"{brickOwlBaseOrderUrl}/items");
-        }
-
-        return allItems;
+        Console.WriteLine(orders);
+        var res = await UpdateBrickOwlOrderAsync(studUserId, orders);
+        return orders;
     }
 
 
@@ -72,7 +63,7 @@ public class OrderService : IOrderService
     }
 
     public async Task<UpdateResponse> UpdateBrickOwlOrderAsync(int studUserId,
-        List<BrickOwlOrderItemDto> brickowlOrderItems)
+        List<BrickOwlOrderListDto> brickowlOrderItems)
     {
         var request = new UpdateRequest
         {

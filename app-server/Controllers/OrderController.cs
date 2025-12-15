@@ -14,10 +14,17 @@ public class OrderController : ControllerBase
         _orderService = orderService;
     }
 
-    [HttpGet("bricklink-orders")]
-    public async Task<ActionResult> GetBricklinkOrders([FromQuery] int studUserId)
+    [HttpGet("bricklink")]
+    public async Task<ActionResult> GetBrickLinkOrders([FromQuery] int studUserId)
     {
         var orders = await _orderService.GetBricklinkOrderAsync(studUserId);
+        return Ok(orders);
+    }
+
+    [HttpGet("brickowl")]
+    public async Task<ActionResult> GetBrickOwlOrders([FromQuery] int studUserId)
+    {
+        var orders = await _orderService.GetBrickOwlOrderAsync(studUserId);
         return Ok(orders);
     }
 }
