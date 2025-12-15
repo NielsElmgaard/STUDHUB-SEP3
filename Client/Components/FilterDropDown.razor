@@ -1,0 +1,103 @@
+<Dropdown Color="DropdownColor.Primary">
+
+    <DropdownToggleButton>@Title: @(string.IsNullOrEmpty(SelectedValue) ? AllText : SelectedValue)</DropdownToggleButton>
+    <DropdownMenu Class="scrollable-dropdown">
+
+        <div class="p-2">
+            <input type="text"
+                   placeholder="Search @Title..."
+                   @bind-value="filterText"
+                   @oninput="OnFilterInput"/>
+        </div>
+        <hr class="dropdown-divider p-0 m-0"/>
+
+        <!-- clear the filter -->
+        <DropdownItem @onclick="() => SelectAndClose(null)"
+                      Type="DropdownItemType.Link">
+            @AllText
+        </DropdownItem>
+
+        <DropdownItem Type="DropdownItemType.Button"></DropdownItem>
+
+        <!-- Drop down items -->
+        @foreach (var item in FilteredItems)
+        {
+            string style = "";
+            string textColor = "";
+
+            if (Title.Equals("Color", StringComparison.OrdinalIgnoreCase) && BrickLinkColorData.TryGetInfo(item, out var colorInfo))
+            {
+                // Check for light colors to set a black border/text for visibility on white background
+                // Example: Check if the color is mostly white/light (using a perceived luminance calculation)
+                double luminance = (0.299 * colorInfo.R + 0.587 * colorInfo.G + 0.114 * colorInfo.B) / 255;
+                textColor = luminance > 0.6 ? "color: #000000; border: 1px solid #CCCCCC;" : "color: #FFFFFF;";
+
+                style = $"background-color: {colorInfo.Hex}; {textColor}";
+            }
+
+            <DropdownItem @onclick="() => SelectAndClose(item)"
+                          Type="DropdownItemType.Link"
+                          Active="@(SelectedValue == item)"
+                          Style="@style">
+                @item
+            </DropdownItem>
+        }
+    </DropdownMenu>
+</Dropdown>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Filter";
+
+    [Parameter] public string AllText { get; set; } = "All";
+
+    [Parameter] public List<string> Items { get; set; } = new List<string>();
+
+    [Parameter] public string? SelectedValue { get; set; }
+
+    [Parameter] public EventCallback<string?> OnItemSelected { get; set; }
+
+    private string filterText = string.Empty;
+    
+    private List<string> FilteredItems { get; set; } = new List<string>();
+
+    protected override void OnParametersSet()
+    {
+        if (Items != null)
+        {
+            FilterItems();
+        }
+    }
+
+    private void FilterItems()
+    {
+        // Now use the simple filterText field here:
+        if (string.IsNullOrWhiteSpace(filterText))
+        {
+            FilteredItems = Items;
+        }
+        else
+        {
+            string normalizedFilter = filterText.Trim().ToLowerInvariant();
+
+            FilteredItems = Items
+                .Where(item => item.ToLowerInvariant().Contains(normalizedFilter))
+                .ToList();
+        }
+        StateHasChanged();
+    }
+
+    private async Task SelectAndClose(string? item)
+    {
+        await OnItemSelected.InvokeAsync(item);
+
+        filterText = string.Empty;
+        FilterItems();
+    }
+    
+    private void OnFilterInput(ChangeEventArgs e)
+    {
+        filterText = e.Value?.ToString() ?? string.Empty;
+        FilterItems();
+    }
+
+}

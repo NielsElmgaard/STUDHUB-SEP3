@@ -41,6 +41,7 @@ builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
 builder.Services.AddScoped<Client.Services.Dashboard.DashboardSettingsService>();
 builder.Services.AddScoped<Client.Services.Synchronization.ISynchronizationClientService,
     Client.Services.Synchronization.SynchronizationHttpClient>();
+builder.Services.AddBlazorBootstrap();
 
 var app = builder.Build();
 

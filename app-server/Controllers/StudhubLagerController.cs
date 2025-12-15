@@ -19,7 +19,7 @@ public class StudhubLagerController : ControllerBase
 
     [HttpGet]
     public async Task<ActionResult> GetLager([FromQuery] int studUserId,
-        [FromQuery] string? search,
+        [FromQuery] string? search, [FromQuery] string? color, [FromQuery] string? itemType,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 25)
     {
@@ -30,7 +30,7 @@ public class StudhubLagerController : ControllerBase
 
         var inventoryList =
             await _service.GetAllBrickLinkInventoryAsync(studUserId, page,
-                pageSize, search);
+                pageSize, search,color,itemType);
 
         return Ok(inventoryList);
     }

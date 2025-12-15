@@ -763,3 +763,18 @@ h1, .store-connection-glow
     flex: 1;
   }
 }
+
+.color-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+.scrollable-dropdown {
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+}

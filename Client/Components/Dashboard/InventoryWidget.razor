@@ -43,7 +43,7 @@
         var uid = cp.FindFirst(ClaimTypes.NameIdentifier);
         if (uid != null && long.TryParse(uid.Value, out long studUserId))
         {
-            inventory = await InventoryClientService.GetUserBrickLinkInventoryFromDatabaseAsync(studUserId, 1, MAX_INVENTORY_SIZE,null);
+            inventory = await InventoryClientService.GetUserBrickLinkInventoryFromDatabaseAsync(studUserId, 1, MAX_INVENTORY_SIZE,null,null,null);
             lotsCount = inventory.TotalCount;
 
             if (inventory.Items != null && inventory.Items.Any())

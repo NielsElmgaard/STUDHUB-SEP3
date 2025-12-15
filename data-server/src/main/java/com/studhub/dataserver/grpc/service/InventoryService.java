@@ -170,12 +170,12 @@ import java.util.List;
     }
   }
 
-  @Override public void getBrickLinkInventory(BrickLinkInventoryRequest request,
+  @Override public void getBrickLinkInventory(UserId request,
       StreamObserver<BrickLinkInventoryResponse> responseObserver)
   {
     try
     {
-      Integer userId = request.getStudUserId();
+      Integer userId = request.getId();
       Stud stud = studRepository.findById(userId)
           .orElseThrow(() -> new RuntimeException("User not found"));
 
