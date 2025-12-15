@@ -20,8 +20,8 @@ builder.Services.AddRazorComponents()
 
     builder.Services.AddScoped(sp => new HttpClient
     {
-        BaseAddress = new Uri("https://localhost:7245/")
-        //BaseAddress = new Uri("http://localhost:5299/")
+        //BaseAddress = new Uri("https://localhost:7245/")
+        BaseAddress = new Uri("http://localhost:5299/")
     });
 
 builder.Services.AddSingleton<Client.Services.Dashboard.DashboardRegistry>();

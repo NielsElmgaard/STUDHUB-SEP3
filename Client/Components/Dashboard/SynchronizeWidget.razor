@@ -1,0 +1,131 @@
+@namespace Client.Components.Dashboard
+@inject HttpClient Http
+@using System.Text.Json;
+@using StudHub.SharedDTO.Inventory
+
+<div>
+
+    @if (IsLoading)
+    {
+        <p>Loading...</p>
+    }
+    else if (!string.IsNullOrWhiteSpace(Error))
+    {
+        <p class="text-danger">@Error</p>
+    }
+    else
+    {
+        <p>@Content</p>
+
+        <div class="d-flex flex-column gap-2">
+            <button class="btn btn-sm btn-primary"
+                    type="button"
+                    disabled="@IsBusy"
+                    @onclick="SynchronizeInventory">
+                synchronize inventory
+            </button>
+
+            <button class="btn btn-sm btn-primary"
+                    type="button"
+                    disabled="@IsBusy"
+                    @onclick="FetchOrders">
+                fetch orders
+            </button>
+        </div>
+
+
+        @if (IsBusy)
+        {
+            <div class="mt-2">
+                <small>Working…</small>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private bool IsLoading = true;
+    private bool IsBusy = false;
+    private string? Error;
+    private string Content = "";
+    
+    private const string SyncInventory = "http://localhost:5299/synchronization/?studUserId=5";
+    private const string FetchBLOrders = "api/your/endpoint-2";
+    private const string FetchBOOrders = "api/your/endpoint-2";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Content = "ready";
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task SynchronizeInventory() => await RunAction(async () =>
+    {
+        var resp = await Http.PostAsync(SyncInventory, content: null);
+        await EnsureOk(resp);
+
+        var json = await resp.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<SyncInventoryResponse>(
+            json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
+
+        var successCount = result?.Success.Count(x => x is not null) ?? 0;
+        var failedCount = result?.Failed.Count ?? 0;
+
+        Content = $"Inventory synchronized. Success: {successCount}, Failed: {failedCount}.";
+    });
+
+
+    private async Task FetchOrders() => await RunAction(async () =>
+    {
+        var resp2 = await Http.PostAsync(FetchBLOrders, content: null);
+        await EnsureOk(resp2);
+        
+        var resp3 = await Http.PostAsync(FetchBOOrders, content: null);
+        await EnsureOk(resp3);
+
+        Content = "Orders fetched and processed.";
+    });
+
+    private async Task RunAction(Func<Task> action)
+    {
+        if (IsBusy) return;
+
+        Error = null;
+        IsBusy = true;
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private static async Task EnsureOk(HttpResponseMessage resp)
+    {
+        if (resp.IsSuccessStatusCode) return;
+
+        var body = await resp.Content.ReadAsStringAsync();
+        throw new InvalidOperationException(
+            $"Request failed: {(int)resp.StatusCode} {resp.ReasonPhrase}. {body}"
+        );
+    }
+}

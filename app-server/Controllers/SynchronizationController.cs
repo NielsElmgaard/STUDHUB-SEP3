@@ -25,6 +25,17 @@ public class SynchronizationController : ControllerBase
     {
         try
         {
+            // 1. Get BrickLink Orders
+            // var blOrders = await _orderService.GetBricklinkOrderAsync(studUserId);
+            // 2. Update BrickLink Orders to data server
+            // var blResponse =
+            //     await _orderService.UpdateBricklinkOrderAsync(studUserId, blOrders);
+            // 3. Post Inventory Change to BrickOwl based on BrickLink Orders
+            // 4. Get sold items from BrickOwl Orders
+            // var boSoldItems = await _orderService.GetBrickOwlOrderAsync(studUserId);
+            // 5. Update BrickOwl Orders to data server
+            // var boRes = await _orderService.UpdateBrickOwlOrderAsync(studUserId, boSoldItems);
+            // 6. Post Inventory Change to BrickLink based on BrickLink Orders
             // 7 & 8 Get and update BrickLink Inventory
             var blInventories = await _inventoryService.GetUserBrickLinkInventoryAsync(studUserId);
             // 8. Update source of truth (BrickLink) Inventory

@@ -35,6 +35,14 @@ public class DashboardRegistry
             DetailsRoute: "/Inventory",
             DefaultEnabled: true
         ));
+        Register(new DashboardWidgetDescriptor(
+            Id: "three-actions",
+            Title: "Synchronize",
+            Tags: new[] { "tools", "integration" },
+            ComponentType: typeof(SynchronizeWidget),
+            DetailsRoute: null,
+            DefaultEnabled: true
+        ));
         
         // …add more widgets
     }
