@@ -34,9 +34,9 @@ public class StudhubLagerService : IStudhubLagerService
         GetAllBrickLinkInventoryAsync(int studUserId, int page, int pageSize,
             string? search, string? color, string? itemType)
     {
-        var request = new BrickLinkInventoryRequest()
+        var request = new UserId()
         {
-            StudUserId = studUserId,
+            Id = studUserId,
         };
         var jsonResponse =
             await _inventoryClient.GetBrickLinkInventoryAsync(request);
