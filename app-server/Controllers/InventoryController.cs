@@ -16,14 +16,25 @@ public class InventoryController : ControllerBase
     {
         _inventoryService = inventoryService;
     }
-
-    [HttpGet("sets")]
-    public async Task<ActionResult> GetSets([FromQuery] int studUserId)
+    
+    [HttpGet]
+    public async Task<ActionResult> GetStudHubStorage([FromQuery] int studUserId,
+        [FromQuery] string? search, [FromQuery] string? color, [FromQuery] string? itemType,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 25)
     {
-        var sets = await _inventoryService.GetUserSetsAsync(studUserId);
-        return Ok(sets);
-    }
+        if (page < 1 || pageSize < 1)
+        {
+            return BadRequest("Invalid page or pageSize value.");
+        }
 
+        var inventoryList =
+            await _inventoryService.GetAllBrickLinkInventoryFromDbAsync(studUserId, page,
+                pageSize, search,color,itemType);
+
+        return Ok(inventoryList);
+    }
+    
     [HttpGet("bricklink")]
     public async Task<ActionResult> GetAllBrickLinkInventoriesForStud(
         [FromQuery] int studUserId)
@@ -52,6 +63,7 @@ public class InventoryController : ControllerBase
         return Ok(inventories);
     }
 
+    // TODO: DELETE
     [HttpGet("brickowl-identifiers")]
     public async Task<ActionResult> DiscoverBrickOwlInventoryKeysAsync(
         [FromQuery] int studUserId)
@@ -61,6 +73,7 @@ public class InventoryController : ControllerBase
         return Ok(identifiers);
     }
     
+    // TODO: DELETE
     [HttpGet("bricklink-identifiers")]
     public async Task<ActionResult> DiscoverBrickLinkInventoryKeysAsync(
         [FromQuery] int studUserId)
@@ -69,4 +82,6 @@ public class InventoryController : ControllerBase
             await _inventoryService.DiscoverBrickLinkInventoryKeysAsync(studUserId);
         return Ok(identifiers);
     }
+    
+    
 }

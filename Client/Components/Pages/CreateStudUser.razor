@@ -33,7 +33,6 @@
 
     string LastSubmitResult;
     bool IsSucces;
-    CreateStudUserResponseDTO? CreatedUser;
 
     async Task ValidFormSubmitted()
     {
@@ -41,7 +40,7 @@
         IsSucces = false;
         try
         {
-            CreatedUser = await StudUserClientService.CreateStudUser(_studUserUser);
+            await StudUserClientService.CreateStudUser(_studUserUser);
 
             LastSubmitResult = $"Success! Stud user created with email: {_studUserUser.Email}.";
             IsSucces = true;

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Studhub.AppServer.Services;
 using Studhub.AppServer.Services.Lager;
 using StudHub.SharedDTO.Inventory;
 using StudHub.SharedDTO.Lager;
@@ -10,10 +11,12 @@ namespace Studhub.AppServer.Controllers;
 [Route("[controller]")]
 public class StudhubLagerController : ControllerBase
 {
-    private readonly StudhubLagerService _service;
+    private readonly IInventoryService _inventoryService;
+    private readonly IStudhubLagerService _service;
 
-    public StudhubLagerController(StudhubLagerService service)
+    public StudhubLagerController(IInventoryService inventoryService, IStudhubLagerService service)
     {
+        _inventoryService = inventoryService;
         _service = service;
     }
 
@@ -29,7 +32,7 @@ public class StudhubLagerController : ControllerBase
         }
 
         var inventoryList =
-            await _service.GetAllBrickLinkInventoryAsync(studUserId, page,
+            await _inventoryService.GetAllBrickLinkInventoryFromDbAsync(studUserId, page,
                 pageSize, search,color,itemType);
 
         return Ok(inventoryList);

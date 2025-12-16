@@ -1,9 +1,8 @@
-﻿using Client.Services.Inventory;
-using StudHub.SharedDTO;
+﻿using StudHub.SharedDTO;
 using StudHub.SharedDTO.Inventory;
 using StudHub.SharedDTO.StoreCredentials;
 
-namespace Client.Services;
+namespace Client.Services.Inventory;
 
 public class InventoryHttpClient : IInventoryClientService
 {
@@ -13,22 +12,6 @@ public class InventoryHttpClient : IInventoryClientService
     {
         _httpClient = httpClient;
     }
-
-    public async Task<List<SetDTO>> GetUserSetsAsync(long studUserId)
-    {
-        var response =
-            await _httpClient.GetAsync(
-                $"Inventory/sets?studUserId={studUserId}");
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Error fetching sets: {error}");
-        }
-
-        var sets = await response.Content.ReadFromJsonAsync<List<SetDTO>>();
-        return sets ?? new List<SetDTO>();
-    }
-
     public async Task<List<BrickLinkInventoryDTO>>
         GetUserBrickLinkInventoryAsync(long studUserId)
     {
@@ -139,7 +122,7 @@ public class InventoryHttpClient : IInventoryClientService
             int pageSize, string? searchText, string? selectedColor, string? selectedItemType)
     {
         var url =
-            $"StudHubLager?studUserId={studUserId}&page={page}&pageSize={pageSize}";
+            $"Inventory?studUserId={studUserId}&page={page}&pageSize={pageSize}";
 
         if (!string.IsNullOrWhiteSpace(searchText))
         {
