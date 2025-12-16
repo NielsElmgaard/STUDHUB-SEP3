@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace StudHub.SharedDTO.Order
 {
-    public class BrickLinkOrderDTO
+    public class BrickLinkOrderDto
     {
         [JsonPropertyName("order_id")]
         public long OrderId { get; set; }

@@ -1,0 +1,156 @@
+@namespace Client.Components.Dashboard
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+@inject Client.Services.Synchronization.ISynchronizationClientService SyncClient
+
+
+<div>
+    @if (IsLoading)
+    {
+        <p>Loading...</p>
+    }
+    else if (!string.IsNullOrWhiteSpace(Error))
+    {
+        <p class="text-danger">@Error</p>
+    }
+    else
+    {
+        <p>@Content</p>
+
+        <div class="d-flex flex-column gap-2">
+            <button class="btn btn-sm btn-primary"
+                    type="button"
+                    disabled="@IsBusy"
+                    @onclick="SynchronizeInventory">
+                synchronize inventory
+            </button>
+
+            <button class="btn btn-sm btn-primary"
+                    type="button"
+                    disabled="@IsBusy"
+                    @onclick="FetchOrders">
+                fetch orders
+            </button>
+        </div>
+
+        @if (IsBusy)
+        {
+            <div class="mt-2">
+                <small>@LoadingDots</small>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private bool IsLoading = true;
+    private bool IsBusy = false;
+    private string? Error;
+    private string Content = "ready";
+
+    private string LoadingDots = ".";
+    private PeriodicTimer? _loadingTimer;
+
+    protected override Task OnInitializedAsync()
+    {
+        IsLoading = false;
+        return Task.CompletedTask;
+    }
+
+    private async Task<long> GetStudUserIdAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var cp = authState.User;
+
+        var uid = cp.FindFirst(ClaimTypes.NameIdentifier);
+        if (uid is null || !long.TryParse(uid.Value, out var studUserId))
+            throw new Exception("Could not find logged-in user id.");
+
+        return studUserId;
+    }
+
+    private async Task SynchronizeInventory() => await RunAction(async () =>
+    {
+        Content = "this could take a few minutes";
+        var studUserId = await GetStudUserIdAsync();
+
+        var result = await SyncClient.SynchronizeInventoryAsync(studUserId);
+
+        var successCount = result.Success.Count(x => x is not null);
+        var failedCount = result.Failed.Count;
+
+        Content = $"Inventory synchronized. Success: {successCount}, Failed: {failedCount}.";
+
+    });
+
+    private async Task FetchOrders() => await RunAction(async () =>
+    {
+        var studUserId = await GetStudUserIdAsync();
+
+        await SyncClient.FetchBrickLinkOrdersAsync(studUserId);
+        // BrickOwl:
+        // await SyncClient.FetchBrickOwlOrdersAsync(studUserId);
+
+        Content = "Orders fetched and processed.";
+    });
+
+    private async Task RunAction(Func<Task> action)
+    {
+        if (IsBusy) return;
+
+        Error = null;
+        IsBusy = true;
+        StartLoadingAnimation();
+
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            StopLoadingAnimation();
+            IsBusy = false;
+        }
+    }
+
+    private void StartLoadingAnimation()
+    {
+        LoadingDots = ".";
+        _loadingTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(400));
+
+        _ = Task.Run(async () =>
+        {
+            while (_loadingTimer != null &&
+                   await _loadingTimer.WaitForNextTickAsync())
+            {
+                LoadingDots = LoadingDots.Length switch
+                {
+                    1 => "..",
+                    2 => "...",
+                    3 => "....",
+                    4 => ".....",
+                    5 => "......",
+                    6 => ".......",
+                    7 => "........",
+                    8 => ".........",
+                    9 => "..........",
+                    _ => "."
+                };
+
+                await InvokeAsync(StateHasChanged);
+            }
+        });
+    }
+
+    private void StopLoadingAnimation()
+    {
+        _loadingTimer?.Dispose();
+        _loadingTimer = null;
+        LoadingDots = ".";
+    }
+}

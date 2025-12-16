@@ -77,7 +77,7 @@ public interface BricklinkInventoryRepository extends JpaRepository<BricklinkInv
             WHERE
                 bo.lot_id::int IS NULL
                 OR bo.bo_quantity::numeric <> bi.quantity::numeric
-            LIMIT 10; 
+            LIMIT 100000;
             """, nativeQuery = true)
     List<BrickOwlDiffProjection> findAllForBrickOwl(@Param("userId") Integer userId);
 

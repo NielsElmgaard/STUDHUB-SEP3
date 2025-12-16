@@ -5,6 +5,8 @@ namespace Studhub.AppServer.Services.Order;
 
 public interface IOrderService
 {
-    Task<List<BrickLinkOrderDTO>> GetBricklinikOrderAsync(int studUserId);
-    Task<UpdateResponse> UpdateBricklinkOrderAsync(int studUserId, List<BrickLinkOrderDTO> brickLinkOrder);
+    Task<List<BrickLinkOrderDto>> GetBricklinkOrderAsync(int studUserId);
+    Task<List<BrickOwlOrderListDto>> GetBrickOwlOrderAsync(int studUserId);
+    Task<UpdateResponse> UpdateBricklinkOrderAsync(int studUserId, List<BrickLinkOrderDto> brickLinkOrders);
+    Task<UpdateResponse> UpdateBrickOwlOrderAsync(int studUserId, List<BrickOwlOrderListDto> brickowlOrder);
 }
