@@ -59,7 +59,7 @@ public class OrderService : IOrderService
             request.Inventories.Add(Struct.Parser.ParseJson(invJson));
         }
 
-        return await _orderClinet.UpdateOrdersAsync(request);
+        return await _orderClient.UpdateOrdersAsync(request);
     }
 
     public async Task<UpdateResponse> UpdateBrickOwlOrderAsync(int studUserId,
