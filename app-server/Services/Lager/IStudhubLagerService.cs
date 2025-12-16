@@ -1,10 +1,11 @@
 using StudHub.SharedDTO;
 using StudHub.SharedDTO.Inventory;
+using StudHub.SharedDTO.Lager;
 
 namespace Studhub.AppServer.Services.Lager;
 
 public interface IStudhubLagerService
 {
-    Task<PagedResultDTO<BrickLinkInventoryDTO>> GetAllBrickLinkInventoryAsync(
-        int studUserId, int page, int pageSize, string? search, string? color, string? itemType);
+    public Task<List<LagerItemDTO>> HentLagerOversigtAsync();
+    Task<LagerDetaljerDTO?> HentElementDetaljerAsync(int id);
 }

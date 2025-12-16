@@ -10,7 +10,7 @@ namespace Studhub.AppServer.Services.Order;
 public class OrderService : IOrderService
 {
     private readonly IApiAuthService _apiAuthService;
-    private readonly OrderClient _orderClinet;
+    private readonly OrderClient _orderClient;
 
     private static string brickLinkOrdersUrl =
         "https://api.bricklink.com/api/store/v1/orders";
@@ -19,10 +19,10 @@ public class OrderService : IOrderService
         "https://api.brickowl.com/v1/order/list";
 
     
-    public OrderService(IApiAuthService apiAuthService, OrderClient orderClinet)
+    public OrderService(IApiAuthService apiAuthService, OrderClient orderClient)
     {
         _apiAuthService = apiAuthService;
-        _orderClinet = orderClinet;
+        _orderClient = orderClient;
     }
 
     public async Task<List<BrickLinkOrderDTO>> GetBricklinikOrderAsync(int studUserId)
@@ -60,6 +60,6 @@ public class OrderService : IOrderService
             var invJson = JsonSerializer.Serialize(inv);
             request.Inventories.Add((Struct.Parser.ParseJson(invJson)));
         }
-        return await _orderClinet.UpdateOrdersAsync(request);
+        return await _orderClient.UpdateOrdersAsync(request);
     }
 }

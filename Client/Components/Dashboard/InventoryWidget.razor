@@ -36,7 +36,6 @@
         // Get logged-in email for header
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
 
-        // Load connection statuses
         AuthenticationState authenticationState = await State;
         ClaimsPrincipal cp = authenticationState.User;
 

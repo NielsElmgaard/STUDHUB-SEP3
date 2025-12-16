@@ -6,7 +6,7 @@
         <div class="p-2">
             <input type="text"
                    placeholder="Search @Title..."
-                   @bind-value="filterText"
+                   @bind-value="FilterText"
                    @oninput="OnFilterInput"/>
         </div>
         <hr class="dropdown-divider p-0 m-0"/>
@@ -56,7 +56,7 @@
 
     [Parameter] public EventCallback<string?> OnItemSelected { get; set; }
 
-    private string filterText = string.Empty;
+    private string FilterText = string.Empty;
     
     private List<string> FilteredItems { get; set; } = new List<string>();
 
@@ -71,13 +71,13 @@
     private void FilterItems()
     {
         // Now use the simple filterText field here:
-        if (string.IsNullOrWhiteSpace(filterText))
+        if (string.IsNullOrWhiteSpace(FilterText))
         {
             FilteredItems = Items;
         }
         else
         {
-            string normalizedFilter = filterText.Trim().ToLowerInvariant();
+            string normalizedFilter = FilterText.Trim().ToLowerInvariant();
 
             FilteredItems = Items
                 .Where(item => item.ToLowerInvariant().Contains(normalizedFilter))
@@ -90,13 +90,13 @@
     {
         await OnItemSelected.InvokeAsync(item);
 
-        filterText = string.Empty;
+        FilterText = string.Empty;
         FilterItems();
     }
     
     private void OnFilterInput(ChangeEventArgs e)
     {
-        filterText = e.Value?.ToString() ?? string.Empty;
+        FilterText = e.Value?.ToString() ?? string.Empty;
         FilterItems();
     }
 
