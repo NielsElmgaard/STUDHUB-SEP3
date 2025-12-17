@@ -11,7 +11,7 @@
 <div class="inventory-container d-flex">
     <div class="inventory-list-pane">
 
-        <h3>Lageroversigt (Page @currentPage of @totalPages)</h3>
+        <h3>Storage overview (Page @currentPage of @totalPages)</h3>
 
         <!-- https://dev.to/rijwanansari/creating-a-reusable-dynamic-pagination-component-in-blazor-3hgb -->
         @if (items != null && items.TotalPages > 1)
@@ -31,7 +31,7 @@
             </div>
         }
         <div>
-            <h4>Søg og filtrér</h4>
+            <h4>Search and filter</h4>
             <div class="d-flex align-items-end mb-2">
                 <div class="me-2 flex-grow-1">
                     <SearchBox Type="text" Label="name / part id / remarks etc."
@@ -62,7 +62,7 @@
         }
         else if (!items.Items.Any())
         {
-            <p>Ingen varer fundet.</p>
+            <p>No items found.</p>
         }
         else
         {
@@ -146,6 +146,7 @@
         if (long.TryParse(studUserIdClaim, out long id))
         {
             studUserId = id;
+            Console.WriteLine(studUserId);
             await LoadInventory();
         }
         else
