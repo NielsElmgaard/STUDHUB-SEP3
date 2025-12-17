@@ -185,70 +185,58 @@ public class InventoryService : IInventoryService
     /*
      * Update BrickOwl Inventory based on difference from BrickLink Inventory
      */
-    public async Task<Dictionary<string, List<string>>>
-        UpdateBrickOwlDiffInventoryAsync(int studUserId)
+    public async Task<Dictionary<string, List<string>>> UpdateBrickOwlDiffInventoryAsync(int studUserId)
     {
-        // 1. Get diff from data server
-        var request = new UserId
-        {
-            Id = studUserId
-        };
-        var diffInventories =
-            await _inventoryClient.GetDiffInventoryForBrickOwlAsync(request);
-        Console.WriteLine(diffInventories);
+        var request = new UserId { Id = studUserId };
+        var diffInventories = await _inventoryClient.GetDiffInventoryForBrickOwlAsync(request);
 
-        // 2. Create or update Inventories in BrickOwl
         var updateResult = new Dictionary<string, List<string>>
         {
             { "success", new List<string>() },
-            {
-                "failed", new List<string>()
-            }
+            { "failed", new List<string>() }
         };
-        foreach (var diff in diffInventories.Diffs)
-        {
-            var formData = new Dictionary<string, string>
-            {
-                { "type", diff.Type },
-                { "quantity", diff.Quantity },
-                { "price", diff.Price },
-                { "boid", diff.Boid },
-                { "condition", "new" }
-            };
-            switch (diff.Action)
-            {
-                case "CREATE":
-                    var createRes =
-                        await _apiAuthService
-                            .PostBrickOwlResponse<BrickOwlCreateLotDTO>(
-                                studUserId,
-                                $"{brickOwlInventoriesBaseUrl}/create",
-                                formData);
-                    // TODO: log fail post
-                    if (createRes.Status == "Success")
-                        updateResult["success"].Add(createRes.LotId);
-                    break;
-                case "UPDATE":
-                    if (diff.LotId == null)
-                        throw new Exception(
-                            "lot_id is required to update BrickOwl");
-                    formData.Add("lot_id", diff.LotId);
-                    var updateRes =
-                        await _apiAuthService
-                            .PostBrickOwlResponse<BrickOwlUpdateLotDto>(
-                                studUserId,
-                                $"{brickOwlInventoriesBaseUrl}/update",
-                                formData);
-                    // TODO: log fail post
-                    if (updateRes.Status == "Success")
-                        updateResult["success"].Add(diff.LotId);
-                    break;
-                default:
-                    throw new Exception(
-                        $"Unknown action {diff.Action} for BrickOwl Inventory Update");
-            }
-        }
 
+        // https://chatgpt.com:
+        // Semaphore is used to proceed multiple calls simultaneously
+        var semaphore = new SemaphoreSlim(5); 
+
+        var tasks = diffInventories.Diffs.Select(async diff =>
+        {
+            await semaphore.WaitAsync();
+            try
+            {
+                var formData = new Dictionary<string, string>
+                {
+                    { "type", diff.Type },
+                    { "quantity", diff.Quantity },
+                    { "price", diff.Price },
+                    { "boid", diff.Boid },
+                    { "condition", "new" }
+                };
+
+                if (diff.Action == "CREATE")
+                {
+                    var res = await _apiAuthService.PostBrickOwlResponse<BrickOwlCreateLotDTO>(studUserId, $"{brickOwlInventoriesBaseUrl}/create", formData);
+                    lock(updateResult) { updateResult["success"].Add(res.LotId); }
+                }
+                else if (diff.Action == "UPDATE")
+                {
+                    formData.Add("lot_id", diff.LotId);
+                    var res = await _apiAuthService.PostBrickOwlResponse<BrickOwlUpdateLotDto>(studUserId, $"{brickOwlInventoriesBaseUrl}/update", formData);
+                    lock(updateResult) { updateResult["success"].Add(diff.LotId); }
+                }
+            }
+            catch (Exception e)
+            {
+                lock(updateResult) { updateResult["failed"].Add($"BOID {diff.Boid}: {e.Message}"); }
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        });
+
+        await Task.WhenAll(tasks);
         return updateResult;
     }
 

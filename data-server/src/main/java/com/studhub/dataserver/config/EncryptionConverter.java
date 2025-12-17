@@ -6,6 +6,7 @@ import jakarta.persistence.Converter;
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -29,7 +30,8 @@ import java.util.Base64;
       throw new IllegalStateException(
           "Environment variable APP_SECRET_KEY must be 16 chars for AES-128");
     }
-    this.keySpec = new SecretKeySpec(key.getBytes(), "AES");
+    this.keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8),
+        "AES");
   }
 
   @Override public String convertToDatabaseColumn(String attribute)
@@ -71,10 +73,11 @@ import java.util.Base64;
     {
       byte[] combined = Base64.getDecoder().decode(dbData);
 
-      if (combined.length<IV_LENGTH){
+      if (combined.length < IV_LENGTH)
+      {
         throw new RuntimeException(
-            "Corrupted encrypted data: length " + combined.length + " is shorter than required IV length " + IV_LENGTH
-        );
+            "Corrupted encrypted data: length " + combined.length
+                + " is shorter than required IV length " + IV_LENGTH);
       }
 
       byte[] iv = new byte[IV_LENGTH];
@@ -90,6 +93,8 @@ import java.util.Base64;
     }
     catch (Exception e)
     {
-      throw new RuntimeException("Error decrypting attribute: " + e.getMessage(), e);    }
+      throw new RuntimeException(
+          "Error decrypting attribute: " + e.getMessage(), e);
+    }
   }
 }

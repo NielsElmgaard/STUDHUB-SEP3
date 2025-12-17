@@ -18,15 +18,7 @@ public class DashboardRegistry
             DetailsRoute: "/StoreConnectionPage",
             DefaultEnabled: true
         ));
-
-        Register(new DashboardWidgetDescriptor(
-            Id: "hello",
-            Title: "Hello widget",
-            Tags: new[] { "test" },
-            ComponentType: typeof(HelloWorldWidget),
-            DetailsRoute: null,
-            DefaultEnabled: true
-        ));
+        
         Register(new DashboardWidgetDescriptor(
             Id: "studhub-inventory",
             Title: "STUDHUB Inventory",

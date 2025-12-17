@@ -132,7 +132,10 @@ public class ApiAuthService : IApiAuthService
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
             Console.WriteLine("response: " + jsonResponse);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"API Error for user {studUserId}: {jsonResponse}");
+            }
 
 
             var options = new JsonSerializerOptions

@@ -21,8 +21,8 @@ builder.Services.AddRazorComponents()
     builder.Services.AddScoped(sp => new HttpClient
     {
         BaseAddress = new Uri("https://localhost:7245/"),
-        //BaseAddress = new Uri("http://localhost:5299/"),
-        Timeout = TimeSpan.FromMinutes(5) //We can adjust as needed
+        // BaseAddress = new Uri("http://localhost:5299/"), ### CHANGE TO HTTP: UNCOMMENT THIS LINE AND COMMENT THE ABOVE TO CHANGE TO HTTP INSTEAD OF HTTPS ###
+        Timeout = TimeSpan.FromMinutes(15) //We can adjust as needed
     });
 
 builder.Services.AddSingleton<Client.Services.Dashboard.DashboardRegistry>();
