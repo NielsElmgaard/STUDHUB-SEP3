@@ -18,4 +18,4 @@ build/
 .mvn/
 
 # Environment files
-.env
+data-server/.env
