@@ -15,14 +15,14 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("test") // Bruger application-test.properties
+@ActiveProfiles("test") // Loads application-test.properties
 class StudServiceIntegrationTest {
 
   @Autowired
   private StudRepository studRepository;
 
   @Autowired
-  private StudService studService; // Din gRPC service implementation
+  private StudService studService; // gRPC service implementation
 
   @Test
   void testSetBrickLinkAuth_Success() {
