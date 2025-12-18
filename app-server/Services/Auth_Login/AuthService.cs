@@ -3,6 +3,7 @@ using Studhub.Grpc.Data;
 using StudHub.SharedDTO;
 using StudHub.SharedDTO.StoreCredentials;
 using StudHub.SharedDTO.Users;
+using Microsoft.Extensions.Configuration;
 
 namespace Studhub.AppServer.Services.Auth_Login;
 
@@ -11,17 +12,25 @@ public class AuthService : IAuthService
     private readonly StudService.StudServiceClient _grpcClient;
     private readonly HttpClient _httpClient;
 
-    private static string brickLinkConnectionTestUrl =
+    private readonly string brickLinkConnectionTestUrl =
         "https://api.bricklink.com/api/store/v1/items/PART/3001";
 
-    private static string brickOwlConnectionTestUrl =
+    private readonly string brickOwlConnectionTestUrl =
         "https://api.brickowl.com/v1/user/details";
 
     public AuthService(StudService.StudServiceClient grpcClient,
-        HttpClient httpClient)
+        HttpClient httpClient,IConfiguration config)
     {
         _grpcClient = grpcClient;
         _httpClient = httpClient;
+        
+        
+        // Til IntegrationsTest
+        brickLinkConnectionTestUrl = config["ApiUrls:BrickLinkTest"] 
+                                     ?? "https://api.bricklink.com/api/store/v1/items/PART/3001";
+            
+        brickOwlConnectionTestUrl = config["ApiUrls:BrickOwlTest"] 
+                                    ?? "https://api.brickowl.com/v1/user/details";
     }
 
     public async Task<StudUserDTO?> ValidateUserAsync(string email,

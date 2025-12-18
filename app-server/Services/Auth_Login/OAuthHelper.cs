@@ -25,7 +25,7 @@ public class OAuthHelper
             {
                 result.Append(c);
             }
-            else
+            else 
             {
                 result.Append(
                     $"%{((int)c):X2}"); // formatted in Hexadecimal capitalized (2 digits guranteed)
