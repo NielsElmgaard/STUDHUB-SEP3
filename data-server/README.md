@@ -14,30 +14,38 @@
 > remove existing db first.
 ---
 
-## Amazon RDS (cloud database)
 
-1. Connect to database with tool at your choice, e.g. DataGrip. Database is running
-at <br>`studhub.c982ess8k9td.eu-north-1.rds.amazonaws.com:5432`, with postgres
-as both username and password. Database name is studhub_db.
-2. Add DB_PASSWORD as environment variable (shared elsewhere)
+### Setting Environment Variables in IntelliJ
+
+#### For Running the `DataServerApplication`:
+For the encryption and database connection you need to set the Environment Variables.
+You can either:
+- Manually set the variables from the provided .env file (see the instructions for [Running Integration Tests](#for-running-integration-tests)
+  below), or
+- Use the EnvFile plugin.
+[!IMPORTANT]
+
+**NOTE**: If you are using the local database (Docker), ensure your DB_URL is set to `jdbc:postgresql://localhost:4444/studhub_db`
+###### Using EnvFile-plugin:
+1. Install the EnvFile plugin via IntelliJ Settings → Plugins → Marketplace → EnvFile.
+2. Open Run → Edit Configurations….
+3. Select your DataServerApplication run configuration.
+4. Enable EnvFile in the configuration.
+5. Click + and choose the .env file from your project.
+6. Apply the changes.
+All environment variables from .env will now be available when running the application.
+#### For Running Integration Tests
+If you run integration tests (e.g., `StudServiceIntegrationTest`), you need to set the test APP_SECRET_KEY as an environment variable:
+1. Open **Run/Debug Configurations**.
+2. Click **Modify options...**.
+3. Select **Environment variables **.
+4. Add `APP_SECRET_KEY=1234567890123456` in the **Environment variables** field.
+5. Click **Apply**.
+   *Now all new tests you run will automatically have the secret key available.*
 ---
-
-## Encryption 
-The API keys stored in the database are protected using AES encryption.
-
-To enable decryption, you need the **Secret Key** used during encryption.
-Store this key in your IntelliJ Run Configuration as an environment variable:
-
-> **`APP_SECRET_KEY=YOUR_16_CHAR_SECRET_KEY`**
-
- *Replace* `YOUR_16_CHAR_SECRET_KEY` with the actual 16-character secret key
-value.
----
-
 ### Local HTTPS Setup (For Blazor Client)
 
-If you are running the Blazor Client project and the API Server locally using
-HTTPS (e.g., in Development mode), you must trust the .NET Core development
+By default, The Blazor Client is set to use HTTPS, therefore you must trust the .NET Core development
 certificate to prevent SSL connection errors:
 
 1. **Trust Certificate:** Open a terminal as an **Administrator** and run the
@@ -48,9 +56,18 @@ certificate to prevent SSL connection errors:
 2. **Restart:** Restart all running ASP.NET Core projects after running the
    trust command.
 
+#### Switching from HTTPS to HTTP
+To switch from HTTPS to HTTP you need to change the code inside `Client/Program.cs` in Rider to this:
+```csharp
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri("http://localhost:5299/"), // Use HTTP
+    Timeout = TimeSpan.FromMinutes(15)
+});
+```
 ---
 
-### Seed csv file
+### Seed csv file (not necessary if using the Amazon RDS)
 
 1. **Set API Key:** Get your Rebrickable API key
    from [https://rebrickable.com/api/](https://rebrickable.com/api/) and set it
