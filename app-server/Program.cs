@@ -63,3 +63,6 @@ app.MapControllers();
 
 
 app.Run();
+
+
+public partial class Program { } // Til AppServer Test
