@@ -135,6 +135,7 @@ public class ApiAuthService : IApiAuthService
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine($"API Error for user {studUserId}: {jsonResponse}");
+                throw new HttpRequestException($"BrickOwl API Error for user {studUserId}: {jsonResponse}");
             }
 
 

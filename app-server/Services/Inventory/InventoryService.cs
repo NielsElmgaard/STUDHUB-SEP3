@@ -203,6 +203,9 @@ public class InventoryService : IInventoryService
         var tasks = diffInventories.Diffs.Select(async diff =>
         {
             await semaphore.WaitAsync();
+            
+            var pacingTask = Task.Delay(150);
+            
             try
             {
                 var formData = new Dictionary<string, string>
@@ -232,6 +235,7 @@ public class InventoryService : IInventoryService
             }
             finally
             {
+                await pacingTask;
                 semaphore.Release();
             }
         });
