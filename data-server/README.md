@@ -32,6 +32,7 @@ You can either:
 3. Select your DataServerApplication run configuration.
 4. Enable EnvFile in the configuration.
 5. Click + and choose the .env file from your project.
+   6. You need to place the .env inside the `data-server` folder (the same place where e.g. `pom.xml` is located)
 6. Apply the changes.
 All environment variables from .env will now be available when running the application.
 #### For Running Integration Tests
