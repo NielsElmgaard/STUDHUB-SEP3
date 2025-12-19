@@ -1,3 +1,11 @@
+## StudHub Account
+You will be able to create a new stud user, but if you want to test any features which uses the api keys, here is an existing Account:
+- email: niels@gmail.com
+- password: Niels061003&
+
+For testing the connection to Brick Owl, you use this api key: 
+- c48e8ab631749c10ad2b9a66a76bd5368a1caeae874d71b16854820c7aec4149
+
 ## StudHub Data Server
 
 ## Spinup Database (local database)
