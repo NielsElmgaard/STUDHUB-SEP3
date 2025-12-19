@@ -1,7 +1,8 @@
 ## StudHub Data Server
 
 ## Spinup Database (local database)
-
+> [!Note]  
+> By default, the database runs on Amazon RDS (cloud database). If you prefer not to use RDS, follow the guide to spin up a local database
 1. Download [docker](https://www.docker.com/products/docker-desktop/)
 2. Run command `docker compose up -d` to run postgres in background.
 3. Connect to database with tool at your choice, e.g. DataGrip. Database is
